@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    :root {
+      --primary: #00796b;
+      --primary-dark: #004d40;
+      --secondary: #f2eb2d;
+      --gray-light: #f5f7fa;
+      --gray-border: #e0e6ed;
+      --success: #4CAF50;
+      --warning: #ff9800;
+      --danger: #f44336;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--gray-light);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .modal-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: white;
+    }
+
+    /* Header */
+    .modal-header {
+      background: var(--primary);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0 5px;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .close-btn:hover {
+      opacity: 1;
+    }
+
+    /* Tabs */
+    .tabs-container {
+      background: white;
+      border-bottom: 1px solid var(--gray-border);
+      display: flex;
+      padding: 0 20px;
+      gap: 10px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-size: 15px;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      font-weight: 500;
+    }
+
+    .content-area {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 20px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      margin-bottom: 5px
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Dashboard Cards */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .metric-card {
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .metric-label {
+      color: #666;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .metric-change {
+      font-size: 14px;
+      color: var(--success);
+      margin-top: 5px;
+    }
+
+    .metric-change.negative {
+      color: var(--danger);
+    }
+
+    /* Action Cards */
+    .action-section {
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .action-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-item {
+      padding: 10px;
+      border-left: 3px solid var(--warning);
+      background: #fff8e1;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .action-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Client List */
+    .clients-container {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 20px;
+      height: calc(100vh - 140px);
+    }
+
+    /* Client List Container */
+    .client-list {
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      overflow-y: auto;
+    }
+
+    /* Search Box */
+    .client-search {
+      padding: 12px;
+      border-bottom: 1px solid var(--gray-border);
+    }
+
+    .client-search input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--gray-border);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    /* Client Item */
+    .client-item {
+      padding: 15px;
+      border-bottom: 1px solid var(--gray-border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .client-item:hover {
+      background: var(--gray-light);
+    }
+
+    .client-item.selected {
+      background: #e8f5e9;
+      border-left: 3px solid var(--success);
+    }
+
+    .client-name {
+      font-weight: 500;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .client-meta {
+      font-size: 13px;
+      color: #666;
+      margin-top: 3px;
+    }
+
+    /* Status Indicator Dots */
+    .client-status {
+      display: inline-flex;
+      align-items: center;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* Status-specific styling (if you want additional colored backgrounds) */
+    .status-new { color: #4CAF50; }
+    .status-sent { color: #ff9800; }
+    .status-won { color: #2196F3; }
+    .status-completed { color: #9E9E9E; }
+    .status-cancelled { color: #f44336; }
+
+    /* Client Details */
+    .client-details {
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    .status-dropdown {
+      transition: border-color 0.2s;
+    }
+
+    .status-dropdown:hover {
+      border-color: var(--primary) !important;
+    }
+
+    .status-dropdown:focus {
+      outline: none;
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.1);
+    }
+
+    .detail-header {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--gray-border);
+    }
+
+    .detail-section {
+      margin-bottom: 25px;
+    }
+
+    .detail-section h3 {
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .document-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .document-item {
+      padding: 10px;
+      background: var(--gray-light);
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .document-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .mini-btn {
+      padding: 4px 8px;
+      font-size: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    /* Calendar View */
+    .calendar-section {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .project-card {
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .project-card.current {
+      border-left: 4px solid var(--success);
+    }
+
+    .project-card.upcoming {
+      border-left: 4px solid var(--warning);
+    }
+
+    .project-title {
+      font-weight: 500;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .project-dates {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .project-duration {
+      background: var(--gray-light);
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      font-size: 13px;
+    }
+
+    /* Actions Grid */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .action-card {
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .action-card h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: var(--primary);
+    }
+
+    .big-action-btn {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: white;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .big-action-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Loading Spinner */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      border: 3px solid var(--gray-border);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="modal-container">
+  <!-- Header -->
+  <div class="modal-header">
+    <div class="modal-title">
+      🎨 Style et Matière - Tableau de Bord
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-container">
+    <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">
+      📊 Accueil
+    </button>
+    <button class="tab-btn" data-tab="clients" onclick="switchTab('clients')">
+      👥 Clients
+    </button>
+    <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')">
+      📅 Calendrier
+    </button>
+    <button class="tab-btn" data-tab="actions" onclick="switchTab('actions')">
+      🛠️ Actions
+    </button>
+  </div>
+
+  <!-- Content Area -->
+  <div class="content-area">
+    
+    <!-- Dashboard Tab -->
+    <div id="dashboard-tab" class="tab-content active">
+      <div class="dashboard-grid">
+        <div class="metric-card">
+          <div class="metric-label">Chiffre d'Affaires (Mois)</div>
+          <div class="metric-value" id="revenue-month">--</div>
+          <div class="metric-change" id="revenue-change">--</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Devis en Attente</div>
+          <div class="metric-value" id="pending-quotes">--</div>
+          <div class="metric-change" id="pending-value">--</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Projets en Cours</div>
+          <div class="metric-value" id="active-projects">--</div>
+          <div class="metric-change" id="next-completion">--</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Taux de Conversion</div>
+          <div class="metric-value" id="conversion-rate">--%</div>
+          <div class="metric-change" id="conversion-trend">--</div>
+        </div>
+      </div>
+
+      <div class="action-section">
+        <h3 class="action-title">📅 Actions Requises</h3>
+        <div id="required-actions">
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-section">
+        <h3 class="action-title">🔄 Activité Récente</h3>
+        <div id="recent-activity">
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clients Tab -->
+    <div id="clients-tab" class="tab-content">
+      <div class="clients-container">
+        <div class="client-list">
+          <div class="client-search">
+            <input type="text" placeholder="Rechercher un client..." id="client-search" onkeyup="filterClients()">
+          </div>
+          <div id="client-list-items">
+            <div class="loading">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </div>
+        <div class="client-details" id="client-details">
+          <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #999;">
+            Sélectionnez un client pour voir les détails
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar Tab -->
+<div id="calendar-tab" class="tab-content">
+    <h2 style="margin-bottom: 20px;">📅 Planning des Projets</h2>
+    
+    <!-- Unplanned Projects Section (KEEP AS IS) -->
+    <div id="unplanned-section" style="background: #fff8e1; border: 2px solid #ffc107; border-left: 5px solid #ff9800; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+        <h3 style="margin: 0 0 10px 0; color: #ff9800;">📋 Projets À Planifier</h3>
+        <div id="unplanned-projects" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3-Month Grid View -->
+    <div class="months-grid" id="months-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+        <div class="loading" style="grid-column: 1 / -1; padding: 10px;">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div style="margin-top: 25px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+        <strong>Légende:</strong>
+        <div style="display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 30px; height: 20px; background: #2196F3; border-radius: 3px;"></div>
+                <span>Planifié</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 30px; height: 20px; background: #4CAF50; border-radius: 3px;"></div>
+                <span>En cours</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 30px; height: 20px; background: #424242; border-radius: 3px;"></div>
+                <span>Terminé</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 30px; height: 20px; background: #f44336; border-radius: 3px;"></div>
+                <span>Aujourd'hui</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <style>
+    /* 3-Month Calendar Styles */
+.month-column {
+    border: 2px solid var(--gray-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+}
+
+.month-header {
+    background: var(--primary);
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.calendar-grid {
+    padding: 10px;
+}
+
+.week-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin-bottom: 3px;
+}
+
+.day-header {
+    font-weight: 600;
+    font-size: 11px;
+    text-align: center;
+    padding: 8px 4px;
+    background: #f5f5f5;
+    border-radius: 3px;
+}
+
+.day-cell {
+    padding: 8px 4px;
+    text-align: center;
+    font-size: 12px;
+    border-radius: 4px;
+    min-height: 35px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.day-cell:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.day-cell.other-month {
+    color: #ccc;
+    background: #fafafa;
+}
+
+.day-cell.today {
+    background: #f44336;
+    color: white;
+    font-weight: bold;
+    border: 3px solid #f44336;
+    box-shadow: 0 0 0 1px #f44336;
+}
+
+.day-cell.weekend {
+    background: #8a8a8a;
+}
+
+.day-cell.has-project {
+    font-weight: 600;
+    color: white;
+    border: none;
+}
+
+.day-cell.project-planned {
+    background: #2196F3;
+}
+
+.day-cell.project-in-progress {
+    background: #4CAF50;
+}
+
+.day-cell.project-completed {
+    background: #424242;
+}
+
+.project-info {
+    font-size: 8px;
+    margin-top: 2px;
+    opacity: 0.9;
+}
+
+    .unplanned-item {
+      background: white;
+      border: 2px solid #ff9800;
+      border-radius: 6px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .unplanned-item:hover {
+      background: #fff3e0;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+    }
+
+    .unplanned-item .client-name {
+      font-weight: 400;
+      color: #333;
+      margin-bottom: 2px;
+    }
+
+    .unplanned-item .work-type {
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* Tooltip */
+    .project-tooltip {
+      position: fixed;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 1000;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .project-tooltip div {
+      margin: 3px 0;
+    }
+    </style>
+
+    <!-- Actions Tab -->
+    <div id="actions-tab" class="tab-content">
+      <div class="actions-grid">
+        <div class="action-card">
+          <h3>📄 Documents</h3>
+          <button class="big-action-btn" onclick="generateNewQuote()">
+            ➕ Nouveau Devis
+          </button>
+          <button class="big-action-btn" onclick="duplicateQuote()">
+            📋 Dupliquer un Devis
+          </button>
+          <button class="big-action-btn" onclick="generateInvoice()">
+            📑 Générer Facture
+          </button>
+        </div>
+        
+        <div class="action-card">
+          <h3>✉️ Communication</h3>
+          <button class="big-action-btn" onclick="createEmailDraft()">
+            📧 Créer Email Devis
+          </button>
+          <button class="big-action-btn" onclick="sendReminder()">
+            🔔 Envoyer Relance
+          </button>
+          <button class="big-action-btn" onclick="openEmailTemplateEditor()">
+            ✉ Modifier Emails modèles
+          </button>
+        </div>
+        
+        <div class="action-card">
+          <h3>⚙️ Administration</h3>
+          <button class="big-action-btn" onclick="editNotes()">
+            📝 Notes Internes
+          </button>
+          <button class="big-action-btn" onclick="resetInvoiceNumber()">
+            🔢 Reset Facturation
+          </button>
+          <button class="big-action-btn" onclick="exportData()">
+            📊 Export Comptable
+          </button>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<!-- Project Details Modal -->
+<div id="project-details-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 200; display: none; justify-content: center; align-items: center;">
+  <div style="background: white; padding: 30px; border-radius: 12px; width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+    <h2 style="margin: 0 0 10px 0; color: var(--primary);">🎉 Projet Gagné!</h2>
+    <p style="color: #666; margin: 0 0 25px 0;">Définissez les détails du projet (vous pourrez les compléter plus tard)</p>
+    
+    <!-- Project Value (Auto-filled) -->
+    <div class="form-group" style="flex-direction: column; align-items: stretch; margin-bottom: 20px; background: #e8f5e9; padding: 15px; border-radius: 8px;">
+      <label for="project-value-input" style="width: auto; margin-bottom: 8px; font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+        💰 Valeur du projet
+      </label>
+      <input 
+        type="number" 
+        id="project-value-input" 
+        step="0.01"
+        min="0"
+        placeholder="0.00"
+        style="padding: 12px; border: 2px solid var(--success); border-radius: 6px; font-size: 16px; font-weight: bold;"
+      >
+      <small style="color: #666; margin-top: 5px;">💡 Valeur pré-remplie depuis le devis (modifiable si nécessaire)</small>
+    </div>
+    
+    <!-- Project Start Date -->
+    <div class="form-group" style="flex-direction: column; align-items: stretch; margin-bottom: 0px;">
+      <label for="project-start-date-input" style="width: auto; margin-bottom: 8px; font-weight: 500; color: #555;">
+        📅 Date de début du projet
+      </label>
+      <input 
+        type="date" 
+        id="project-start-date-input" 
+        style="padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;"
+      >
+      <small style="color: #999; margin-top: 5px;">Laissez vide si la date n'est pas encore confirmée</small>
+    </div>
+    
+    <!-- Project End Date -->
+    <div class="form-group" style="flex-direction: column; align-items: stretch; margin-bottom: 20px;">
+      <label for="project-end-date-input" style="width: auto; margin-bottom: 8px; font-weight: 500; color: #555;">
+        🏁 Date de fin prévue
+      </label>
+      <input 
+        type="date" 
+        id="project-end-date-input" 
+        style="padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;"
+      >
+      <small style="color: #999; margin-top: 5px;">Fin estimée des travaux</small>
+    </div>
+    
+    <!-- Duration Display (calculated) -->
+    <div id="duration-display" style="display: none; background: #f5f5f5; padding: 12px; border-radius: 6px; margin-bottom: 20px; text-align: center;">
+      <strong style="color: var(--primary);">⏱️ Durée calculée: <span id="calculated-duration">-</span></strong>
+    </div>
+    
+    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
+      <button 
+        onclick="skipProjectDetails()" 
+        class="btn-secondary" 
+        style="padding: 10px 20px;"
+      >
+        ⏭️ Remplir plus tard
+      </button>
+      <button 
+        onclick="saveProjectDetails()" 
+        class="action-btn" 
+        style="padding: 10px 20px;"
+      >
+        💾 Enregistrer
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Global state
+let allClients = [];
+let selectedClientRow = null;
+let dashboardData = {};
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('>>> DOM Content Loaded');
+  console.log('Initializing client list...');
+  loadDashboardData();
+  // Check if we're on the clients tab
+  const clientsTab = document.getElementById('clients-tab');
+  if (!clientsTab) {
+    console.warn('Clients tab not found - may not be initialized yet');
+  }
+  loadClients();
+  setupKeyboardShortcuts();
+  // Setup search input listener
+  const searchInput = document.getElementById('client-search');
+  if (searchInput) {
+    console.log('Search input found, adding listener');
+    searchInput.addEventListener('keyup', filterClients);
+  } else {
+    console.warn('Search input not found');
+  }
+  console.log('>>> Initialization complete');
+});
+
+// Tab switching
+function switchTab(tabName) {
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
+  });
+  
+  // Update tab content
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.toggle('active', content.id === `${tabName}-tab`);
+  });
+  
+  // Load data for specific tabs
+  if (tabName === 'calendar') {
+    loadCalendarData();
+  }
+}
+
+// Dashboard data loading
+function loadDashboardData() {
+  google.script.run
+    .withSuccessHandler(updateDashboard)
+    .withFailureHandler(handleError)
+    .getDashboardMetrics();
+}
+
+function updateDashboard(data) {
+  dashboardData = data;
+  
+  // Update metrics
+  document.getElementById('revenue-month').textContent = formatCurrency(data.monthRevenue);
+  document.getElementById('revenue-change').textContent = `↑ ${data.revenueChange}%`;
+  document.getElementById('pending-quotes').textContent = data.pendingQuotes;
+  document.getElementById('pending-value').textContent = formatCurrency(data.pendingValue);
+  document.getElementById('active-projects').textContent = data.activeProjects;
+  document.getElementById('next-completion').textContent = data.nextCompletion;
+  document.getElementById('conversion-rate').textContent = `${data.conversionRate}%`;
+  document.getElementById('conversion-trend').textContent = `↑ ${data.conversionTrend} pts`;
+  
+  // Update actions
+  let actionsHtml = '';
+  data.requiredActions.forEach(action => {
+    actionsHtml += `
+      <div class="action-item">
+        <span>${action.text}</span>
+        <button class="action-btn" onclick="${action.onclick}">${action.buttonText}</button>
+      </div>
+    `;
+  });
+  document.getElementById('required-actions').innerHTML = actionsHtml || '<p style="color: #666;">Aucune action requise</p>';
+  
+  // Update recent activity
+  let activityHtml = '';
+  data.recentActivity.forEach(activity => {
+    activityHtml += `<div style="padding: 8px 0; border-bottom: 1px solid #eee;">
+      ${activity.time} - ${activity.description}
+    </div>`;
+  });
+  document.getElementById('recent-activity').innerHTML = activityHtml;
+}
+
+/**
+ * Load all clients from backend and display them
+ */
+function loadClients() {
+  console.log('>>> loadClients() called');
+  
+  // Show loading state
+  const listContainer = document.getElementById('client-list-items');
+  
+  if (!listContainer) {
+    console.error('ERROR: client-list-items container not found in DOM');
+    return;
+  }
+  
+  listContainer.innerHTML = `
+    <div class="loading" style="padding: 40px; text-align: center;">
+      <div class="spinner"></div>
+      <p style="margin-top: 10px; color: #666;">Chargement des clients...</p>
+    </div>
+  `;
+  
+  console.log('Calling backend getClientsData()...');
+  
+  google.script.run
+    .withSuccessHandler(function(clients) {
+      console.log('>>> SUCCESS: Backend returned data');
+      console.log('Data type:', typeof clients);
+      console.log('Is array:', Array.isArray(clients));
+      console.log('Data:', clients);
+      
+      displayClients(clients);
+    })
+    .withFailureHandler(function(error) {
+      console.error('>>> FAILURE: Backend call failed');
+      console.error('Error:', error);
+      
+      handleError(error);
+    })
+    .getClientsData();
+}
+
+
+/**
+ * Display clients in the list (already sorted by backend)
+ */
+function displayClients(clients) {
+  console.log('>>> displayClients() called');
+  console.log('Received:', clients);
+  
+  // NULL-SAFE: Handle null, undefined, or non-array data
+  if (!clients) {
+    console.warn('WARNING: clients is null or undefined');
+    clients = [];
+  }
+  
+  if (!Array.isArray(clients)) {
+    console.error('ERROR: clients is not an array:', typeof clients);
+    clients = [];
+  }
+  
+  allClients = clients;
+  
+  console.log(`Processing ${clients.length} clients`);
+  
+  if (clients.length > 0) {
+    console.log('First client:', clients[0]);
+    console.log('First client row:', clients[0].row);
+    console.log('Last client row:', clients[clients.length-1].row);
+  }
+  
+  renderClientList(clients);
+}
+
+/**
+ * Render the client list HTML
+ * Clients array is already sorted newest-first from backend
+ */
+function renderClientList(clients) {
+  console.log('>>> renderClientList() called');
+  
+  const container = document.getElementById('client-list-items');
+  
+  if (!container) {
+    console.error('ERROR: client-list-items container not found');
+    return;
+  }
+  
+  // NULL-SAFE: Ensure clients is an array
+  if (!clients || !Array.isArray(clients)) {
+    console.warn('WARNING: Invalid clients data in renderClientList');
+    clients = [];
+  }
+  
+  console.log(`Rendering ${clients.length} clients`);
+  
+  // Handle empty list
+  if (clients.length === 0) {
+    container.innerHTML = `
+      <div style="padding: 40px; text-align: center; color: #999;">
+        <p>Aucun client trouvé</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+          Les clients ajoutés apparaîtront ici
+        </p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Render client list
+  let html = '';
+  
+  clients.forEach((client, index) => {
+    try {
+      // Validate client object
+      if (!client || typeof client !== 'object') {
+        console.warn(`Skipping invalid client at index ${index}`);
+        return;
+      }
+      
+      const statusClass = getStatusClass(client.status);
+      const statusDot = getStatusDot(client.status);
+      
+      // Ensure all fields have safe defaults
+      const name = escapeHtml(client.name || 'Sans nom');
+      const email = client.email || '';
+      const phone = client.phone || '';
+      const row = client.row || 0;
+      const lastDocument = client.lastDocument || 'Aucun document';
+      const amount = client.amount || '0,00 €';
+      const lastAction = client.lastAction || 'Date inconnue';
+      
+      html += `
+        <div class="client-item ${selectedClientRow === row ? 'selected' : ''}" 
+             data-row="${row}"
+             onclick="selectClient(${row})">
+          <div class="client-name">
+            <span class="client-status ${statusClass}">${statusDot}</span>
+            ${name}
+          </div>
+          <div class="client-meta">
+            ${lastDocument} | ${amount}
+          </div>
+          <div class="client-meta">
+            Dernière action: ${lastAction}
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      console.error(`Error rendering client at index ${index}:`, e);
+      // Continue with other clients
+    }
+  });
+  
+  container.innerHTML = html || '<div style="padding: 20px; color: #999;">Erreur d\'affichage</div>';
+  
+  console.log('>>> renderClientList() completed');
+}
+
+/**
+ * Update the status of the currently selected client
+ */
+function updateStatus() {
+  const newStatus = document.getElementById('status-select').value;
+  const row = selectedClientRow;
+  
+  if (!row) {
+    showToast('Aucun client sélectionné', 'error');
+    return;
+  }
+  
+  // Show loading state
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Mise à jour...';
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      if (result.success) {
+        showToast(result.message, 'success');
+        
+        // If status changed to "Projet gagné", show project details modal
+        if (newStatus === 'Projet gagné') {
+          showProjectDetailsModal(row);
+        } else {
+          // Just refresh the view
+          loadClients();
+          google.script.run
+            .withSuccessHandler(displayClientDetails)
+            .withFailureHandler(handleError)
+            .getClientDetails(row);
+        }
+      } else {
+        showToast(result.message, 'error');
+      }
+      
+      // Reset button
+      btn.disabled = false;
+      btn.textContent = originalText;
+    })
+    .withFailureHandler(function(error) {
+      handleError(error);
+      btn.disabled = false;
+      btn.textContent = originalText;
+    })
+    .updateClientStatus(row, newStatus);
+}
+
+/**
+ * Show the project details modal
+ */
+function showProjectDetailsModal(row) {
+  window.currentProjectRow = row;
+  
+  // Clear previous inputs
+  document.getElementById('project-start-date-input').value = '';
+  document.getElementById('project-end-date-input').value = '';
+  document.getElementById('project-value-input').value = '';
+  document.getElementById('duration-display').style.display = 'none';
+  
+  // Get and pre-fill quote value
+  google.script.run
+    .withSuccessHandler(function(quoteValue) {
+      if (quoteValue > 0) {
+        document.getElementById('project-value-input').value = quoteValue.toFixed(2);
+      }
+    })
+    .withFailureHandler(function(error) {
+      console.error('Failed to get quote value:', error);
+    })
+    .getQuoteValue(row);
+  
+  // Add event listeners for date changes
+  document.getElementById('project-start-date-input').addEventListener('change', calculateDuration);
+  document.getElementById('project-end-date-input').addEventListener('change', calculateDuration);
+  
+  // Show modal
+  document.getElementById('project-details-modal').style.display = 'flex';
+}
+
+/**
+ * Save project details from the modal
+ */
+function saveProjectDetails() {
+  const row = window.currentProjectRow;
+  const startDate = document.getElementById('project-start-date-input').value;
+  const endDate = document.getElementById('project-end-date-input').value;
+  const projectValue = parseFloat(document.getElementById('project-value-input').value) || 0;
+  
+  // Validate: at least project value should be filled
+  if (!projectValue || projectValue <= 0) {
+    showToast('Veuillez entrer la valeur du projet', 'warning');
+    return;
+  }
+  
+  // Validate: end date should be after start date
+  if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+    showToast('La date de fin doit être après la date de début', 'error');
+    return;
+  }
+  
+  // Show loading state
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Enregistrement...';
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      // ALWAYS reset button state first
+      btn.disabled = false;
+      btn.textContent = originalText;
+      
+      if (result.success) {
+        showToast('Détails du projet enregistrés', 'success');
+        closeProjectDetailsModal();
+        
+        // Refresh the view
+        loadClients();
+        
+        // Wait for sheet update, then refresh details
+        setTimeout(function() {
+          google.script.run
+            .withSuccessHandler(function(clientDetails) {
+              displayClientDetails(clientDetails);
+              console.log('Client details refreshed:', clientDetails);
+            })
+            .withFailureHandler(handleError)
+            .getClientDetails(row);
+        }, 500);
+      } else {
+        showToast(result.message, 'error');
+      }
+    })
+    .withFailureHandler(function(error) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      handleError(error);
+    })
+    .updateProjectDetails(row, startDate, endDate, projectValue);
+}
+
+/**
+ * Calculate and display duration between dates (INCLUSIVE of both start and end days)
+ */
+function calculateDuration() {
+  const startDate = document.getElementById('project-start-date-input').value;
+  const endDate = document.getElementById('project-end-date-input').value;
+  const durationDisplay = document.getElementById('duration-display');
+  const durationText = document.getElementById('calculated-duration');
+  
+  if (startDate && endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both days
+    
+    if (diffDays === 1) {
+      durationText.textContent = '1 jour';
+    } else if (diffDays < 14) {
+      durationText.textContent = `${diffDays} jours`;
+    } else if (diffDays < 60) {
+      const weeks = Math.round(diffDays / 7);
+      durationText.textContent = `${weeks} semaine${weeks > 1 ? 's' : ''} (${diffDays} jours)`;
+    } else {
+      const months = Math.round(diffDays / 30);
+      durationText.textContent = `${months} mois (${diffDays} jours)`;
+    }
+    
+    durationDisplay.style.display = 'block';
+  } else {
+    durationDisplay.style.display = 'none';
+  }
+}
+
+/**
+ * Skip project details input for now
+ */
+function skipProjectDetails() {
+  const row = window.currentProjectRow;
+  
+  showToast('Vous pourrez ajouter ces détails plus tard', 'info');
+  closeProjectDetailsModal();
+  
+  // Refresh the view
+  loadClients();
+  google.script.run
+    .withSuccessHandler(displayClientDetails)
+    .withFailureHandler(handleError)
+    .getClientDetails(row);
+}
+
+/**
+ * Close the project details modal
+ */
+function closeProjectDetailsModal() {
+  document.getElementById('project-details-modal').style.display = 'none';
+  window.currentProjectRow = null;
+}
+
+/**
+ * Show a toast notification
+ */
+function showToast(message, type = 'info') {
+  const colors = {
+    success: '#4CAF50',
+    error: '#f44336',
+    warning: '#ff9800',
+    info: '#2196F3'
+  };
+  
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: ${colors[type]};
+    color: white;
+    padding: 15px 20px;
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    z-index: 1000;
+    font-size: 14px;
+    font-weight: 500;
+    animation: slideIn 0.3s ease-out;
+  `;
+  toast.textContent = message;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Add CSS animations for toast (add to <style> section)
+
+/**
+ * Get CSS class for status indicator
+ */
+function getStatusClass(status) {
+  const statusMap = {
+    'Nouveau': 'status-new',
+    'Devis envoyé': 'status-sent',
+    'Projet gagné': 'status-won',
+    'Terminé': 'status-completed',
+    'Annulé': 'status-cancelled'
+  };
+  return statusMap[status] || 'status-new';
+}
+
+/**
+ * Get emoji dot for status
+ */
+function getStatusDot(status) {
+  const dotMap = {
+    'Nouveau': '🟢',
+    'Devis envoyé': '🟡',
+    'Projet gagné': '🔵',
+    'Terminé': '⚫',
+    'Annulé': '❌'
+  };
+  return dotMap[status] || '🟢';
+}
+
+/**
+ * Filter clients based on search input
+ * Maintains reverse chronological order in results
+ */
+/**
+ * Filter clients (NULL-SAFE)
+ */
+function filterClients() {
+  const searchInput = document.getElementById('client-search');
+  
+  if (!searchInput) {
+    console.warn('Search input not found');
+    return;
+  }
+  
+  const searchTerm = searchInput.value.toLowerCase();
+  
+  // Need at least 2 characters
+  if (searchTerm.length < 2) {
+    renderClientList(allClients);
+    return;
+  }
+  
+  // Filter (NULL-SAFE)
+  const filtered = (allClients || []).filter(client => {
+    if (!client) return false;
+    
+    return (
+      (client.name || '').toLowerCase().includes(searchTerm) ||
+      (client.email || '').toLowerCase().includes(searchTerm) ||
+      (client.phone || '').includes(searchTerm) ||
+      (client.lastDocument || '').toLowerCase().includes(searchTerm)
+    );
+  });
+  
+  console.log(`Search "${searchTerm}": ${filtered.length} results`);
+  renderClientList(filtered);
+}
+
+function selectClient(row) {
+  selectedClientRow = row;
+  
+  // Update selection UI
+  document.querySelectorAll('.client-item').forEach(item => {
+    item.classList.toggle('selected', item.dataset.row == row);
+  });
+  
+  // Load client details
+  google.script.run
+    .withSuccessHandler(displayClientDetails)
+    .withFailureHandler(handleError)
+    .getClientDetails(row);
+}
+
+function displayClientDetails(client) {
+  // Auto-scroll to top to show client information
+  const clientDetailsPanel = document.getElementById('client-details');
+  if (clientDetailsPanel) {
+    clientDetailsPanel.scrollTop = 0;
+  }
+
+  console.log('=== Displaying Client Details ===');
+  console.log('Client object:', client);
+  console.log('Project Value (raw):', client.projectValue);
+  console.log('Project Start Date:', client.projectStartDate);
+  console.log('Project End Date:', client.projectEndDate);
+  console.log('Status:', client.status);
+  
+  // Build the status dropdown with current status selected
+  const statusOptions = [
+    { value: 'Nouveau', label: '🟢 Nouveau' },
+    { value: 'Devis envoyé', label: '🟡 Devis envoyé' },
+    { value: 'Projet gagné', label: '🔵 Projet gagné' },
+    { value: 'Terminé', label: '⚫ Terminé' },
+    { value: 'Annulé', label: '❌ Annulé' }
+  ];
+  
+  let statusOptionsHtml = '';
+  statusOptions.forEach(option => {
+    const selected = option.value === client.status ? 'selected' : '';
+    statusOptionsHtml += `<option value="${option.value}" ${selected}>${option.label}</option>`;
+  });
+  
+  let html = `
+    <!-- CLIENT HEADER - AT THE TOP -->
+    <div class="detail-header" style="padding-bottom: 20px; border-bottom: 2px solid var(--gray-border); margin-bottom: 20px;">
+      <h2 style="margin: 0 0 15px 0; color: var(--primary);">${client.name}</h2>
+      <div style="display: grid; gap: 8px; font-size: 15px;">
+        <div>📧 ${client.email}</div>
+        <div>📱 ${client.phone}</div>
+        <div>📍 ${client.address}</div>
+      </div>
+    </div>
+    
+    <!-- PROJECT INFORMATION - ONLY FOR "PROJET GAGNÉ" STATUS -->
+    ${client.status === 'Projet gagné' ? `
+      <div class="detail-section" style="background: #f0f8ff; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 2px solid var(--primary);">
+        <h3 style="margin: 0 0 15px 0; color: var(--primary);">🏗️ Informations du Projet</h3>
+        
+        <!-- 2x2 Grid Layout -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+          
+          <!-- Top Left: Project Value -->
+          <div style="background: white; padding: 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <label style="font-weight: 500; color: #666; display: block; margin-bottom: 8px; font-size: 13px;">💰 VALEUR DU PROJET</label>
+            <div style="color: var(--primary); font-weight: bold; font-size: 24px;">
+              ${client.projectValue && client.projectValue > 0 ? formatCurrency(client.projectValue) : '<em style="color: #ff9800; font-weight: normal; font-size: 16px;">⚠ Non définie</em>'}
+            </div>
+          </div>
+          
+          <!-- Top Right: Duration -->
+          <div style="background: white; padding: 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <label style="font-weight: 500; color: #666; display: block; margin-bottom: 8px; font-size: 13px;">⏱️ DURÉE</label>
+            <div style="color: var(--primary); font-weight: bold; font-size: 24px;">
+              ${client.projectStartDate && client.projectEndDate ? calculateDisplayDuration(client.projectStartDate, client.projectEndDate) : '<em style="color: #ff9800; font-weight: normal; font-size: 16px;">⚠ Non définie</em>'}
+            </div>
+          </div>
+          
+          <!-- Bottom Left: Start Date -->
+          <div style="background: white; padding: 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <label style="font-weight: 500; color: #666; display: block; margin-bottom: 8px; font-size: 13px;">📅 DATE DE DÉBUT</label>
+            <div style="font-size: 18px; font-weight: 500;">
+              ${client.projectStartDate || '<em style="color: #ff9800;">⚠ Non définie</em>'}
+            </div>
+          </div>
+          
+          <!-- Bottom Right: End Date -->
+          <div style="background: white; padding: 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <label style="font-weight: 500; color: #666; display: block; margin-bottom: 8px; font-size: 13px;">🏁 DATE DE FIN PRÉVUE</label>
+            <div style="font-size: 18px; font-weight: 500;">
+              ${client.projectEndDate || '<em style="color: #ff9800;">⚠ Non définie</em>'}
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Edit button -->
+        ${!client.projectValue || client.projectValue <= 0 || !client.projectStartDate || !client.projectEndDate ? `
+          <button 
+            onclick="editProjectDetailsForClient(${client.row})" 
+            class="big-action-btn" 
+            style="width: 100%; background: var(--warning); color: white; padding: 12px 16px; font-size: 15px; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; transition: background 0.2s;"
+            onmouseover="this.style.background='#f57c00'" 
+            onmouseout="this.style.background='var(--warning)'"
+          >
+            ${(client.projectValue && client.projectValue > 0) || client.projectStartDate || client.projectEndDate ? '✏️ Compléter les détails du projet' : '⚠️ Ajouter les détails du projet'}
+          </button>
+        ` : `
+          <button 
+            onclick="editProjectDetailsForClient(${client.row})" 
+            class="mini-btn" 
+            style="width: 100%; padding: 10px 16px; font-size: 14px;"
+          >
+            ✏️ Modifier les détails du projet
+          </button>
+        `}
+      </div>
+    ` : ''}
+    
+    <!-- STATUS UPDATE SECTION -->
+    <div class="status-section" style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 2px solid var(--success);">
+      <h3 style="margin: 0 0 15px 0; color: var(--primary);">📊 Statut du Devis</h3>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <select id="status-select" class="status-dropdown" style="flex: 1; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 6px; background: white; cursor: pointer;">
+          ${statusOptionsHtml}
+        </select>
+        <button onclick="updateStatus()" class="action-btn" style="padding: 12px 24px; font-size: 16px; white-space: nowrap;">
+          Mettre à Jour
+        </button>
+      </div>
+    </div>
+    
+    <!-- DOCUMENTS SECTION -->
+    <div class="detail-section" style="margin-bottom: 25px;">
+      <h3 style="color: var(--primary); margin-bottom: 15px;">📄 Documents</h3>
+      <div class="document-list">
+  `;
+
+  // Show existing quote if it exists
+  if (client.quoteNumber) {
+    html += `
+      <div class="document-item">
+        <span>📄 Devis ${client.quoteNumber}</span>
+        <div class="document-actions">
+          <button class="mini-btn" onclick="viewDocument('${client.quoteUrl}')">Ouvrir</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Show "Generate Quote" button ONLY for "Nouveau" status WITHOUT existing quote
+  if (client.status === 'Nouveau' && !client.quoteNumber) {
+    html += `
+      <button class="big-action-btn" onclick="generateQuoteForClient(${client.row})" 
+              style="width: 100%; padding: 12px; background: var(--primary); color: white;">
+        ➕ Générer le Devis
+      </button>
+    `;
+  }
+
+  // Show existing invoice if it exists
+  if (client.invoiceNumber) {
+    html += `
+      <div class="document-item">
+        <span>📑 Facture ${client.invoiceNumber}</span>
+        <div class="document-actions">
+          <button class="mini-btn" onclick="viewDocument('${client.invoiceUrl}')">Ouvrir</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Show "Generate Invoice" button ONLY for "Projet gagné" status WITH quote but WITHOUT invoice
+  if (client.status === 'Projet gagné' && client.quoteNumber && !client.invoiceNumber) {
+    html += `
+      <button class="big-action-btn" onclick="generateInvoiceForClient(${client.row})" 
+              style="width: 100%; padding: 12px; background: var(--success); color: white;">
+        ➕ Générer Facture
+      </button>
+    `;
+  }
+
+  html += `
+      </div>
+    </div>
+
+    <!-- EMAIL ACTIONS SECTION -->
+    <div class="detail-section" style="margin-bottom: 25px;">
+      <h3 style="color: var(--primary); margin-bottom: 15px;">✉️ Actions Email</h3>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Quote Email - Only show if quote exists -->
+        <button 
+          id="email-quote-btn"
+          class="action-btn" 
+          style="width: 100%; padding: 10px; display: none;"
+          onclick="sendQuoteEmail()">
+          📧 Envoyer le Devis par Email
+        </button>
+        
+        <!-- Follow-up Email - Only show if status is "Devis envoyé" -->
+        <button 
+          id="email-followup-btn"
+          class="action-btn" 
+          style="width: 100%; padding: 10px; display: none;"
+          onclick="sendFollowUpEmail()">
+          🔔 Envoyer une Relance
+        </button>
+        
+        <!-- Testimonial Email - Only show if status is "Terminé" -->
+        <button 
+          id="email-testimonial-btn"
+          class="action-btn" 
+          style="width: 100%; padding: 10px; display: none;"
+          onclick="sendTestimonialEmail()">
+          ⭐ Demander un Témoignage
+        </button>
+      </div>
+    </div>
+  
+    <!-- NOTES SECTION -->
+    <div class="detail-section">
+      <h3 style="color: var(--primary); margin-bottom: 15px;">📝 Notes Internes</h3>
+      <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; min-height: 80px; border: 1px solid #e0e0e0;">
+        ${client.notes || '<em style="color: #999;">Aucune note</em>'}
+      </div>
+      <button class="mini-btn" style="margin-top: 12px; padding: 8px 16px;" onclick="editClientNotes(${client.row})">
+        ✏️ Modifier les notes
+      </button>
+    </div>
+  `;
+  
+  document.getElementById('client-details').innerHTML = html;
+
+  // Show/hide email buttons based on status and availability
+  const quoteEmailBtn = document.getElementById('email-quote-btn');
+  const followUpBtn = document.getElementById('email-followup-btn');
+  const testimonialBtn = document.getElementById('email-testimonial-btn');
+  
+  // Show quote email button if quote exists AND status is not "Terminé"
+  if (client.quoteNumber && client.quoteUrl && client.status !== 'Terminé') {
+    quoteEmailBtn.style.display = 'block';
+  } else {
+    quoteEmailBtn.style.display = 'none';
+  }
+  
+  // Show follow-up button only for "Devis envoyé" status
+  if (client.status === 'Devis envoyé') {
+    followUpBtn.style.display = 'block';
+  } else {
+    followUpBtn.style.display = 'none';
+  }
+  
+  // Show testimonial button only for "Terminé" status
+  if (client.status === 'Terminé') {
+    testimonialBtn.style.display = 'block';
+  } else {
+    testimonialBtn.style.display = 'none';
+  }
+}
+
+/**
+ * Open the project details modal for editing existing project
+ */
+function editProjectDetailsForClient(row) {
+  google.script.run
+    .withSuccessHandler(function(client) {
+      window.currentProjectRow = row;
+      
+      // Pre-fill project value
+      if (client.projectValue) {
+        document.getElementById('project-value-input').value = client.projectValue;
+      } else {
+        // Try to get from quote if not set
+        google.script.run
+          .withSuccessHandler(function(quoteValue) {
+            if (quoteValue > 0) {
+              document.getElementById('project-value-input').value = quoteValue.toFixed(2);
+            }
+          })
+          .getQuoteValue(row);
+      }
+      
+      // Pre-fill dates if they exist
+      if (client.projectStartDate) {
+        // Convert DD/MM/YYYY to YYYY-MM-DD for input
+        const parts = client.projectStartDate.split('/');
+        if (parts.length === 3) {
+          const dateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
+          document.getElementById('project-start-date-input').value = dateStr;
+        }
+      } else {
+        document.getElementById('project-start-date-input').value = '';
+      }
+      
+      if (client.projectEndDate) {
+        // Convert DD/MM/YYYY to YYYY-MM-DD for input
+        const parts = client.projectEndDate.split('/');
+        if (parts.length === 3) {
+          const dateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
+          document.getElementById('project-end-date-input').value = dateStr;
+        }
+      } else {
+        document.getElementById('project-end-date-input').value = '';
+      }
+      
+      // Calculate duration if both dates exist
+      calculateDuration();
+      
+      // Add event listeners
+      document.getElementById('project-start-date-input').addEventListener('change', calculateDuration);
+      document.getElementById('project-end-date-input').addEventListener('change', calculateDuration);
+      
+      // Show modal
+      document.getElementById('project-details-modal').style.display = 'flex';
+    })
+    .withFailureHandler(handleError)
+    .getClientDetails(row);
+}
+
+/**
+ * Calculate human-readable duration from two date strings (DD/MM/YYYY)
+ * INCLUSIVE of both start and end days
+ */
+function calculateDisplayDuration(startDateStr, endDateStr) {
+  try {
+    // Parse DD/MM/YYYY format
+    const startParts = startDateStr.split('/');
+    const endParts = endDateStr.split('/');
+    
+    const start = new Date(startParts[2], startParts[1] - 1, startParts[0]);
+    const end = new Date(endParts[2], endParts[1] - 1, endParts[0]);
+    
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both days
+    
+    if (diffDays === 1) {
+      return '1 jour';
+    } else if (diffDays < 14) {
+      return `${diffDays} jours`;
+    } else if (diffDays < 60) {
+      const weeks = Math.round(diffDays / 7);
+      return `${weeks} semaine${weeks > 1 ? 's' : ''} (${diffDays} jours)`;
+    } else {
+      const months = Math.round(diffDays / 30);
+      return `${months} mois (${diffDays} jours)`;
+    }
+  } catch (e) {
+    console.error('Error calculating duration:', e);
+    return '-';
+  }
+}
+
+// Calendar functions
+function loadCalendarData() {
+  google.script.run
+    .withSuccessHandler(displayCalendarData)
+    .withFailureHandler(handleError)
+    .getCalendarData();
+}
+
+function displayCalendarData(data) {
+  // Current projects
+  let currentHtml = '';
+  data.currentProjects.forEach(project => {
+    currentHtml += `
+      <div class="project-card current">
+        <div class="project-title">${project.clientName}</div>
+        <div class="project-dates">
+          📅 ${project.startDate} → ${project.endDate}
+        </div>
+        <div class="project-duration">${project.duration}</div>
+        <div style="margin-top: 10px; color: #666;">
+          Progression: ${project.progress}%
+        </div>
+      </div>
+    `;
+  });
+  
+  document.getElementById('current-projects-list').innerHTML = 
+    currentHtml || '<p style="color: #999;">Aucun projet en cours</p>';
+  
+  // Upcoming projects
+  let upcomingHtml = '';
+  data.upcomingProjects.forEach(project => {
+    upcomingHtml += `
+      <div class="project-card upcoming">
+        <div class="project-title">${project.clientName}</div>
+        <div class="project-dates">
+          📅 Début: ${project.startDate}
+        </div>
+        <div class="project-duration">${project.duration}</div>
+      </div>
+    `;
+  });
+  
+  document.getElementById('upcoming-projects-list').innerHTML = 
+    upcomingHtml || '<p style="color: #999;">Aucun projet planifié</p>';
+}
+
+/**
+ * Select a client from the calendar view
+ * This switches to the clients tab and selects the client
+ */
+function selectClientFromCalendar(row) {
+  // Switch to clients tab
+  switchTab('clients');
+  
+  // Wait a moment for tab to render, then select the client
+  setTimeout(() => {
+    selectClient(row);
+  }, 100);
+}
+
+// Action functions
+function generateNewQuote() {
+  google.script.host.close();
+  google.script.run.selectClientAndGenerateQuote();
+}
+
+function duplicateQuote() {
+  google.script.host.close();
+  google.script.run.duplicateQuote();
+}
+
+function generateInvoice() {
+  google.script.host.close();
+  google.script.run.openInvoiceEditor();
+}
+
+function generateInvoiceForClient(row) {
+  google.script.host.close();
+  google.script.run.generateInvoiceForRow(row);
+}
+
+function createEmailDraft() {
+  google.script.host.close();
+  google.script.run.createEmailDraft();
+}
+
+function editNotes() {
+  google.script.host.close();
+  google.script.run.editInternalNotes();
+}
+
+function viewDocument(url) {
+  window.open(url, '_blank');
+}
+
+/**
+ * Generate quote for a specific client
+ */
+function generateQuoteForClient(row) {
+  // Close modal
+  google.script.host.close();
+  
+  // Call backend to activate row and trigger quote generation
+  google.script.run.generateQuoteForRow(row);
+}
+
+// Keyboard shortcuts
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+      switch(e.key) {
+        case 'n':
+          e.preventDefault();
+          generateNewQuote();
+          break;
+        case 'd':
+          e.preventDefault();
+          duplicateQuote();
+          break;
+        case 'Escape':
+          google.script.host.close();
+          break;
+      }
+    }
+  });
+}
+
+// Utility functions
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('fr-FR', { 
+    style: 'currency', 
+    currency: 'EUR' 
+  }).format(amount);
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/**
+ * Handle errors from backend
+ */
+function handleError(error) {
+  console.error('>>> handleError() called');
+  console.error('Error:', error);
+  
+  const container = document.getElementById('client-list-items');
+  
+  if (!container) return;
+  
+  container.innerHTML = `
+    <div style="padding: 40px; text-align: center; color: #f44336;">
+      <p style="font-size: 18px; margin-bottom: 10px;">⚠️ Erreur de chargement</p>
+      <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
+        ${escapeHtml(error.message || 'Erreur inconnue')}
+      </p>
+      <button onclick="loadClients()" 
+              style="padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Réessayer
+      </button>
+      <p style="font-size: 12px; color: #999; margin-top: 20px;">
+        Vérifiez que le nom de la feuille est correct dans CONFIG
+      </p>
+    </div>
+  `;
+}
+
+// Auto-refresh every 30 seconds
+setInterval(() => {
+  if (document.getElementById('dashboard-tab').classList.contains('active')) {
+    loadDashboardData();
+  }
+}, 30000);
+
+/**
+ * ================================================================
+ * EMAIL FUNCTIONS - PHASE 1: DRAFT GENERATION
+ * ================================================================
+ */
+
+function sendQuoteEmail() {
+  const row = selectedClientRow;
+  if (!row) {
+    showToast('Aucun client sélectionné', 'error');
+    return;
+  }
+  
+  // Disable button and show loading
+  const btn = document.getElementById('email-quote-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '📧 Création du brouillon...';
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      
+      if (result.success) {
+        showToast(result.message + ' - Vérifiez vos brouillons Gmail', 'success');
+        
+        // Open Gmail in new tab
+        window.open('https://mail.google.com/mail/#drafts', '_blank');
+      } else {
+        showToast(result.message, 'error');
+      }
+    })
+    .withFailureHandler(function(error) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      handleError(error);
+    })
+    .generateQuoteEmailDraft(row);
+}
+
+function sendFollowUpEmail() {
+  const row = selectedClientRow;
+  if (!row) {
+    showToast('Aucun client sélectionné', 'error');
+    return;
+  }
+  
+  const btn = document.getElementById('email-followup-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '🔔 Création du brouillon...';
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      
+      if (result.success) {
+        showToast(result.message + ' - Vérifiez vos brouillons Gmail', 'success');
+        window.open('https://mail.google.com/mail/#drafts', '_blank');
+      } else {
+        showToast(result.message, 'error');
+      }
+    })
+    .withFailureHandler(function(error) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      handleError(error);
+    })
+    .generateFollowUpEmailDraft(row);
+}
+
+function sendTestimonialEmail() {
+  const row = selectedClientRow;
+  if (!row) {
+    showToast('Aucun client sélectionné', 'error');
+    return;
+  }
+  
+  const btn = document.getElementById('email-testimonial-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⭐ Création du brouillon...';
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      
+      if (result.success) {
+        showToast(result.message + ' - Vérifiez vos brouillons Gmail', 'success');
+        window.open('https://mail.google.com/mail/#drafts', '_blank');
+      } else {
+        showToast(result.message, 'error');
+      }
+    })
+    .withFailureHandler(function(error) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      handleError(error);
+    })
+    .generateTestimonialEmailDraft(row);
+}
+
+/**
+ * Email Template Editor Functions
+ */
+function openEmailTemplateEditor() {
+  // Load current templates
+  google.script.run
+    .withSuccessHandler(function(templates) {
+      // Populate form with current templates
+      document.getElementById('template-quote-subject').value = templates.quote.subject;
+      document.getElementById('template-quote-body').value = templates.quote.body;
+      document.getElementById('template-followup-subject').value = templates.followup.subject;
+      document.getElementById('template-followup-body').value = templates.followup.body;
+      document.getElementById('template-testimonial-subject').value = templates.testimonial.subject;
+      document.getElementById('template-testimonial-body').value = templates.testimonial.body;
+      
+      // Show modal
+      document.getElementById('template-editor-modal').style.display = 'flex';
+    })
+    .withFailureHandler(handleError)
+    .getEmailTemplates();
+}
+
+function closeTemplateEditor() {
+  document.getElementById('template-editor-modal').style.display = 'none';
+}
+
+function saveEmailTemplates() {
+  const templates = {
+    quote: {
+      subject: document.getElementById('template-quote-subject').value,
+      body: document.getElementById('template-quote-body').value
+    },
+    followup: {
+      subject: document.getElementById('template-followup-subject').value,
+      body: document.getElementById('template-followup-body').value
+    },
+    testimonial: {
+      subject: document.getElementById('template-testimonial-subject').value,
+      body: document.getElementById('template-testimonial-body').value
+    }
+  };
+
+  google.script.run
+    .withSuccessHandler(function(result) {
+      if (result.success) {
+        showToast('Templates enregistrés avec succès', 'success');
+        closeTemplateEditor();
+      } else {
+        showToast('Erreur: ' + result.message, 'error');
+      }
+    })
+    .withFailureHandler(handleError)
+    .saveEmailTemplates(templates);
+}
+
+function resetEmailTemplates() {
+  if (confirm('Voulez-vous vraiment restaurer les templates par défaut ? Vos modifications seront perdues.')) {
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result.success) {
+          showToast('Templates restaurés aux valeurs par défaut', 'success');
+          closeTemplateEditor();
+        }
+      })
+      .withFailureHandler(handleError)
+      .resetEmailTemplates();
+  }
+}
+
+/**
+ * ================================================================
+ * NOTES EDITOR FUNCTIONS
+ * ================================================================
+ */
+
+let currentNotesRow = null;
+let currentNotesClientName = null;
+
+/**
+ * Open the notes editor modal
+ */
+function editClientNotes(row) {
+  // Get current client details
+  google.script.run
+    .withSuccessHandler(function(client) {
+      currentNotesRow = row;
+      currentNotesClientName = client.name;
+      
+      // Populate modal
+      document.getElementById('notes-client-name').textContent = client.name;
+      document.getElementById('notes-textarea').value = client.notes || '';
+      
+      // Update character counter
+      updateCharCounter();
+      
+      // Show modal
+      document.getElementById('notes-editor-modal').style.display = 'flex';
+      
+      // Focus textarea
+      setTimeout(() => {
+        document.getElementById('notes-textarea').focus();
+      }, 100);
+    })
+    .withFailureHandler(handleError)
+    .getClientDetails(row);
+}
+
+/**
+ * Close the notes editor modal
+ */
+function closeNotesEditor() {
+  document.getElementById('notes-editor-modal').style.display = 'none';
+  currentNotesRow = null;
+  currentNotesClientName = null;
+}
+
+/**
+ * Save client notes
+ */
+function saveClientNotes() {
+  const notes = document.getElementById('notes-textarea').value.trim();
+  const row = currentNotesRow;
+  
+  if (!row) {
+    showToast('Erreur: client non sélectionné', 'error');
+    return;
+  }
+  
+  // Disable save button
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Enregistrement...';
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      
+      if (result.success) {
+        showToast('Notes enregistrées avec succès', 'success');
+        closeNotesEditor();
+        
+        // Refresh client details
+        selectClient(row);
+      } else {
+        showToast('Erreur: ' + result.message, 'error');
+      }
+    })
+    .withFailureHandler(function(error) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      handleError(error);
+    })
+    .saveClientNotes(row, notes);
+}
+
+/**
+ * Update character counter for notes
+ */
+function updateCharCounter() {
+  const textarea = document.getElementById('notes-textarea');
+  const counter = document.getElementById('char-counter');
+  
+  if (textarea && counter) {
+    const length = textarea.value.length;
+    counter.textContent = `${length} / 1000`;
+    
+    // Change color when approaching limit
+    if (length > 900) {
+      counter.style.color = '#f44336';
+      counter.style.fontWeight = 'bold';
+    } else if (length > 750) {
+      counter.style.color = '#ff9800';
+    } else {
+      counter.style.color = '#666';
+      counter.style.fontWeight = 'normal';
+    }
+  }
+}
+
+// Add event listener for character counter when DOM loads
+document.addEventListener('DOMContentLoaded', function() {
+  const textarea = document.getElementById('notes-textarea');
+  if (textarea) {
+    textarea.addEventListener('input', updateCharCounter);
+  }
+});
+
+// ================================================================
+// CALENDAR TIMELINE FUNCTIONS
+// ================================================================
+
+/**
+ * Load and display calendar timeline data
+ */
+function loadCalendarData() {
+  google.script.run
+    .withSuccessHandler(displayCalendarTimeline)
+    .withFailureHandler(handleError)
+    .getCalendarData();
+}
+
+/**
+ * Display 3-month calendar grid with colored project days
+ */
+function displayCalendarTimeline(data) {
+    console.log('Calendar data received:', data);
+    
+    const monthsGrid = document.getElementById('months-grid');
+    const unplannedContainer = document.getElementById('unplanned-projects');
+    
+    // Display unplanned projects (unchanged)
+    if (data.unplanned && data.unplanned.length > 0) {
+        let unplannedHtml = '';
+        data.unplanned.forEach(project => {
+            unplannedHtml += `
+                <div class="unplanned-item" onclick="selectClientFromCalendar(${project.row})">
+                    <div class="client-name">${escapeHtml(project.clientName)}</div>
+                    <div class="work-type">${escapeHtml(project.workType)}</div>
+                </div>
+            `;
+        });
+        unplannedContainer.innerHTML = unplannedHtml;
+    } else {
+        unplannedContainer.innerHTML = '<p style="color: #999; margin: 0;">Aucun projet à planifier</p>';
+    }
+    
+    // Extract all projects from weeks and build date map
+    const projectsByDate = {};
+    
+    if (data.weeks && data.weeks.length > 0) {
+        data.weeks.forEach(week => {
+            if (week.projects && week.projects.length > 0) {
+                week.projects.forEach(project => {
+                    if (project.startDate && project.endDate) {
+                        const start = parseDate(project.startDate);
+                        const end = parseDate(project.endDate);
+                        
+                        if (start && end) {
+                            // Fill all days in project duration
+                            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                                const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                                projectsByDate[key] = {
+                                    clientName: project.clientName,
+                                    status: project.status,
+                                    row: project.row
+                                };
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
+    
+    // Parse today's date from backend
+    const today = data.today ? new Date(data.today) : new Date();
+    
+    // Generate 3 months
+    const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                       'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    const dayNames = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+    
+    let calendarHtml = '';
+    
+    for (let i = 0; i < 3; i++) {
+        const month = (today.getMonth() + i) % 12;
+        const year = today.getFullYear() + Math.floor((today.getMonth() + i) / 12);
+        const isCurrentMonth = i === 0;
+        
+        calendarHtml += `
+            <div class="month-column">
+                <div class="month-header ${isCurrentMonth ? 'current' : ''}">
+                    ${monthNames[month]} ${year}
+                </div>
+                <div class="calendar-grid">
+        `;
+        
+        // Day headers
+        calendarHtml += '<div class="week-row">';
+        dayNames.forEach(day => {
+            calendarHtml += `<div class="day-header">${day}</div>`;
+        });
+        calendarHtml += '</div>';
+        
+        // Calculate month days
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startingDayOfWeek = (firstDay.getDay() + 6) % 7; // Monday = 0, Sunday = 6
+        const totalDays = lastDay.getDate();
+        
+        let dayCounter = 1;
+        
+        // Generate weeks
+        for (let week = 0; week < 6 && dayCounter <= totalDays; week++) {
+            calendarHtml += '<div class="week-row">';
+            
+            for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+                if (week === 0 && dayOfWeek < startingDayOfWeek) {
+                    calendarHtml += '<div class="day-cell other-month"></div>';
+                } else if (dayCounter > totalDays) {
+                    calendarHtml += '<div class="day-cell other-month"></div>';
+                } else {
+                    const dateKey = `${year}-${month}-${dayCounter}`;
+                    const project = projectsByDate[dateKey];
+                    
+                    let classes = ['day-cell'];
+                    let onclick = '';
+                    let title = '';
+                    let projectInfo = '';
+                    
+                    // Weekend
+                    if (dayOfWeek === 5 || dayOfWeek === 6) {
+                        classes.push('weekend');
+                    }
+                    
+                    // Today
+                    if (dayCounter === today.getDate() && 
+                        month === today.getMonth() && 
+                        year === today.getFullYear()) {
+                        classes.push('today');
+                    }
+                    
+                    // Project coloring
+                    if (project) {
+                        classes.push('has-project');
+                        if (project.status === 'planned') classes.push('project-planned');
+                        else if (project.status === 'in-progress') classes.push('project-in-progress');
+                        else if (project.status === 'completed') classes.push('project-completed');
+                        
+                        onclick = `onclick="selectClientFromCalendar(${project.row})"`;
+                        title = `title="${escapeHtml(project.clientName)}"`;
+                        projectInfo = `<div class="project-info">${escapeHtml(project.clientName)}</div>`;
+                    }
+                    
+                    calendarHtml += `
+                        <div class="${classes.join(' ')}" ${onclick} ${title}>
+                            ${dayCounter}
+                            ${projectInfo}
+                        </div>
+                    `;
+                    
+                    dayCounter++;
+                }
+            }
+            
+            calendarHtml += '</div>';
+        }
+        
+        calendarHtml += '</div></div>';
+    }
+    
+    monthsGrid.innerHTML = calendarHtml;
+}
+
+/**
+ * Parse DD/MM/YYYY date string to Date object
+ */
+function parseDate(dateStr) {
+    if (!dateStr) return null;
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return null;
+    // Parse as integers to ensure proper Date construction
+    return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+}
+
+/**
+ * Organize projects into non-overlapping rows
+ */
+function organizeProjectsIntoRows(projects) {
+  if (!projects || projects.length === 0) return [];
+  
+  const rows = [];
+  
+  projects.forEach(project => {
+    let placed = false;
+    
+    // Try to place in existing row
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      let canPlace = true;
+      
+      // Check if project overlaps with any in this row
+      for (let j = 0; j < row.length; j++) {
+        const existing = row[j];
+        const projectEnd = project.dayOffset + project.daysInWeek;
+        const existingEnd = existing.dayOffset + existing.daysInWeek;
+        
+        if (!(projectEnd <= existing.dayOffset || project.dayOffset >= existingEnd)) {
+          canPlace = false;
+          break;
+        }
+      }
+      
+      if (canPlace) {
+        row.push(project);
+        placed = true;
+        break;
+      }
+    }
+    
+    // Create new row if couldn't place
+    if (!placed) {
+      rows.push([project]);
+    }
+  });
+  
+  return rows;
+}
+
+/**
+ * Show project tooltip on hover
+ */
+function showProjectTooltip(event, project) {
+  const tooltip = document.createElement('div');
+  tooltip.className = 'project-tooltip';
+  tooltip.id = 'project-tooltip';
+  tooltip.innerHTML = `
+    <div><strong>${escapeHtml(project.clientName)}</strong></div>
+    <div>Type: ${escapeHtml(project.workType)}</div>
+    <div>Période: ${project.startDate} → ${project.endDate}</div>
+    <div>Durée: ${project.duration}</div>
+    <div style="margin-top: 5px; font-size: 11px; opacity: 0.8;">🖱 Cliquez pour voir le client</div>
+  `;
+  
+  document.body.appendChild(tooltip);
+  
+  // Position tooltip
+  const x = event.clientX + 15;
+  const y = event.clientY - 10;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+/**
+ * Hide project tooltip
+ */
+function hideProjectTooltip() {
+  const tooltip = document.getElementById('project-tooltip');
+  if (tooltip) {
+    tooltip.remove();
+  }
+}
+
+</script>
+
+<!-- Email Template Editor Modal -->
+<div id="template-editor-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 300; display: none; justify-content: center; align-items: center; overflow-y: auto;">
+  <div style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; margin: 20px;">
+    <h2 style="margin: 0 0 20px 0; color: var(--primary);">✉ Modifier les Templates d'Email</h2>
+    
+    <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+      Personnalisez vos emails. Variables disponibles: <code>{{CLIENT_NAME}}</code>, <code>{{QUOTE_NUMBER}}</code>, <code>{{WORK_TYPE}}</code>, <code>{{TOTAL_AMOUNT}}</code>, <code>{{VALIDITY_DATE}}</code>
+    </p>
+
+    <!-- Quote Template -->
+    <div style="margin-bottom: 30px; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+      <h3 style="margin: 0 0 15px 0; color: var(--primary);">📄 Email de Devis</h3>
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; font-weight: 500; margin-bottom: 5px;">Sujet:</label>
+        <input type="text" id="template-quote-subject" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+      </div>
+      <div>
+        <label style="display: block; font-weight: 500; margin-bottom: 5px;">Corps du message:</label>
+        <textarea id="template-quote-body" rows="8" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 13px;"></textarea>
+      </div>
+    </div>
+
+    <!-- Follow-up Template -->
+    <div style="margin-bottom: 30px; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+      <h3 style="margin: 0 0 15px 0; color: var(--primary);">🔔 Email de Relance</h3>
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; font-weight: 500; margin-bottom: 5px;">Sujet:</label>
+        <input type="text" id="template-followup-subject" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+      </div>
+      <div>
+        <label style="display: block; font-weight: 500; margin-bottom: 5px;">Corps du message:</label>
+        <textarea id="template-followup-body" rows="8" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 13px;"></textarea>
+      </div>
+    </div>
+
+    <!-- Testimonial Template -->
+    <div style="margin-bottom: 30px; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+      <h3 style="margin: 0 0 15px 0; color: var(--primary);">⭐ Email Témoignage</h3>
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; font-weight: 500; margin-bottom: 5px;">Sujet:</label>
+        <input type="text" id="template-testimonial-subject" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+      </div>
+      <div>
+        <label style="display: block; font-weight: 500; margin-bottom: 5px;">Corps du message:</label>
+        <textarea id="template-testimonial-body" rows="8" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 13px;"></textarea>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; justify-content: space-between; gap: 12px; margin-top: 25px;">
+      <button onclick="resetEmailTemplates()" class="btn-secondary" style="padding: 10px 20px;">
+        🔄 Restaurer Défauts
+      </button>
+      <div style="display: flex; gap: 12px;">
+        <button onclick="closeTemplateEditor()" class="btn-secondary" style="padding: 10px 20px;">
+          Annuler
+        </button>
+        <button onclick="saveEmailTemplates()" class="action-btn" style="padding: 10px 20px;">
+          💾 Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+/**
+ * ================================================================
+ * NOTE FUNCTION
+ * ================================================================
+ */
+
+<!-- Notes Editor Modal -->
+<div id="notes-editor-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 300; display: none; justify-content: center; align-items: center;">
+  <div style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+    <h2 style="margin: 0 0 10px 0; color: var(--primary);">📝 Notes Internes</h2>
+    <p style="color: #666; margin: 0 0 20px 0; font-size: 14px;">
+      Ces notes ne seront pas visibles sur les documents clients.
+    </p>
+
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #555;">
+        Client: <span id="notes-client-name" style="color: var(--primary);"></span>
+      </label>
+      <textarea 
+        id="notes-textarea" 
+        rows="10" 
+        maxlength="1000"
+        placeholder="Ajoutez vos notes ici..."
+        style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical;"
+      ></textarea>
+      <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 13px; color: #666;">
+        <span>💡 Limite: 1000 caractères</span>
+        <span id="char-counter">0 / 1000</span>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
+      <button onclick="closeNotesEditor()" class="btn-secondary" style="padding: 10px 20px;">
+        Annuler
+      </button>
+      <button onclick="saveClientNotes()" class="action-btn" style="padding: 10px 20px;">
+        💾 Enregistrer
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

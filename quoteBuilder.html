@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    :root {
+      --primary-color: #00796b;
+      --light-gray: #f5f7fa;
+      --border-color: #e0e6ed;
+      --text-color: #333;
+      --shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      /* This font-stack relies on system fonts and requires no external network calls */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--light-gray);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+    }
+    .view {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .header, .footer {
+      background-color: white;
+      padding: 16px 24px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border-color);
+      box-sizing: border-box;
+    }
+    .footer {
+      border-bottom: none;
+      border-top: 1px solid var(--border-color);
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    h3 { margin: 0; font-size: 1.2em; }
+    .content {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    button {
+      background-color: #4285f4;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    button:hover { background-color: #357ae8; }
+    button:disabled { background-color: #aaa; cursor: not-allowed; }
+    .btn-secondary { background-color: #e0e0e0; color: #333; }
+    .btn-secondary:hover { background-color: #d5d5d5; }
+    .room-section {
+      background-color: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+    .room-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .room-header input[type="text"] {
+      flex-grow: 1;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+    .btn-new-service {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      font-size: 20px;
+      font-weight: bold;
+      line-height: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-new-service:hover { background-color: #005a4d; }
+    .room-content { padding: 16px; }
+    .service-line {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto 40px;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .service-line:last-child { border-bottom: none; }
+    .service-line .description { font-size: 1em; }
+    .service-line input {
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 80px;
+      text-align: right;
+    }
+    .remove-service-btn {
+      background: none;
+      border: none;
+      color: red;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+    .service-search-wrapper { position: relative; margin-top: 16px; }
+    .service-search-wrapper input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .search-results {
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+      z-index: 10;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+    .search-results div { padding: 10px; cursor: pointer; }
+    .search-results div:hover { background-color: #f0f0f0; }
+    #add-room-btn { width: 100%; padding: 12px; }
+    #preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    #preview-table th, #preview-table td {
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    #preview-table th { background-color: var(--light-gray); font-weight: bold; }
+    #preview-table .subtitle-row td {
+      background-color: #f0f4f8;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    #preview-totals { text-align: right; font-size: 1.2em; font-weight: bold; padding: 10px 0; }
+    .business-form { margin-top: 16px; padding-top: 20px; border-top: 2px solid var(--border-color); }
+    .form-group { display: flex; align-items: center; margin-bottom: 12px; }
+    .form-group label { width: 200px; font-weight: bold; color: #555; }
+    .form-group input { flex-grow: 1; padding: 8px 12px; border-radius: 4px; border: 1px solid #ccc; }
+    
+    .spinner-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid var(--primary-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="spinner-overlay" class="spinner-overlay">
+    <div class="spinner"></div>
+    <div id="spinner-message">Chargement...</div>
+  </div>
+
+  <div id="new-service-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 100; display:none; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 24px; border-radius: 8px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+      <h3>Ajouter une Nouvelle Prestation</h3>
+      <div class="form-group" style="flex-direction: column; align-items: stretch; margin-top: 20px;">
+        <label for="new-service-description" style="width: auto; margin-bottom: 5px;">Description</label>
+        <input type="text" id="new-service-description" placeholder="Ex: Peinture murale acrylique">
+      </div>
+      <div class="form-group" style="flex-direction: column; align-items: stretch;">
+        <label for="new-service-category" style="width: auto; margin-bottom: 5px;">Catégorie</label>
+        <input type="text" id="new-service-category" placeholder="Ex: Peinture">
+      </div>
+      <div class="form-group" style="flex-direction: column; align-items: stretch;">
+        <label for="new-service-unit" style="width: auto; margin-bottom: 5px;">Unité</label>
+        <input type="text" id="new-service-unit" placeholder="Ex: m², h, forfait">
+      </div>
+      <div class="form-group" style="flex-direction: column; align-items: stretch;">
+        <label for="new-service-price" style="width: auto; margin-bottom: 5px;">Prix U. HT (€)</label>
+        <input type="number" id="new-service-price" step="0.01" placeholder="Ex: 25.50">
+      </div>
+      <div class="form-group" style="flex-direction: column; align-items: stretch;">
+        <label for="new-service-type" style="width: auto; margin-bottom: 5px;">Type</label>
+        <select id="new-service-type" required style="padding: 8px 12px; border-radius: 4px; border: 1px solid #ccc; font-size: 1em; background-color: white;">
+          <option value="" disabled selected>Choisir un type...</option>
+          <option value="Intérieur">Intérieur</option>
+          <option value="Exterieur">Exterieur</option>
+        </select>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+        <button id="cancel-service-btn" class="btn-secondary">Annuler</button>
+        <button id="save-service-btn">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editor-view" class="view">
+    <div class="header">
+      <h3>Construire le Devis</h3>
+    </div>
+    <div class="content">
+      <div id="rooms-container"></div>
+      <button id="add-room-btn" class="btn-secondary">Ajouter une Pièce / Section</button>
+    </div>
+    <div class="footer">
+      <button id="show-preview-btn">Prévisualiser</button>
+    </div>
+  </div>
+
+  <div id="preview-view" class="view" style="display:none;">
+    <div class="header">
+      <h3>Prévisualisation et finalisation</h3>
+    </div>
+    <div class="content" id="preview-content">
+      <!-- The dynamic table will be inserted here -->
+
+      <div class="business-form">
+
+        <!-- Special Mentions -->
+        <div class="form-row" style="flex-direction: column; align-items: stretch; margin-bottom: 20px;">
+          <label style="font-weight: 500; margin-bottom: 10px; color: #555;">
+            📋 Mentions Spéciales (optionnel)
+          </label>
+          <div id="mentions-container" style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+            <div class="loading-spinner" style="text-align: center; color: #999;">
+              Chargement des mentions...
+            </div>
+          </div>
+        </div>
+
+        <!-- This field is for QUOTES ONLY -->
+        <div class="form-group" id="duration-group">
+          <label for="estimated-duration">Durée Estimée des Travaux:</label>
+          <input type="text" id="estimated-duration" placeholder="Ex: 3 jours">
+        </div>
+
+        <!-- This field is for QUOTES ONLY (but its value is used for invoices) -->
+        <div class="form-group" id="discount-group">
+          <label for="discount-percentage">Pourcentage de Remise (%):</label>
+          <input type="number" id="discount-percentage" value="0" min="0" max="100" step="1">
+        </div>
+        
+        <!-- This field is for INVOICES ONLY -->
+        <div class="form-group" id="deposit-paid-group" style="display:none;">
+          <label for="deposit-paid">Acompte Versé (€):</label>
+          <input type="number" id="deposit-paid" value="0" min="0" step="0.01" placeholder="Ex: 500.00">
+        </div>
+
+      </div>
+
+      <div id="generation-result" style="margin-top: 20px; text-align: center;"></div>
+    </div>
+    <div class="footer">
+      <button id="back-to-edit-btn" class="btn-secondary">Retour à l'édition</button>
+      <button id="confirm-generate-btn">Confirmer et Générer</button>
+    </div>
+  </div>
+
+  <template id="room-template">
+    <div class="room-section">
+      <div class="room-header">
+        <input type="text" class="room-name" placeholder="Nom de la pièce (ex: Salon, Façade...)">
+        <button class="btn-new-service" title="Ajouter une nouvelle prestation au catalogue">+</button>
+      </div>
+      <div class="room-content">
+        <div class="services-list"></div>
+        <div class="service-search-wrapper">
+          <input type="text" class="service-search" placeholder="Ajouter une prestation...">
+          <div class="search-results"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="service-line-template">
+    <div class="service-line">
+      <div class="description"></div>
+      <input type="number" class="quantity-number" value="1" min="0" step="any">
+      <div class="unit"></div>
+      <input type="number" class="price" step="0.01">
+      <button class="remove-service-btn">×</button>
+    </div>
+  </template>
+
+<script>
+// The entire JavaScript from your original document goes here.
+// I have copied it from your provided files to ensure it's complete.
+// GLOBAL STATE
+let quoteStructure = [];
+let serviceCatalog = [];
+let currentServicesListContainer = null;
+let IS_INVOICE_MODE = false;
+
+// INITIALIZATION
+document.addEventListener('DOMContentLoaded', function() {
+  showSpinner(true, 'Chargement des données...');
+
+  // --- FINAL, RELIABLE MODE DETECTION ---
+  // Read the launchMode variable passed directly from the server. This is 100% reliable.
+  const LAUNCH_MODE = '<?!= launchMode ?>';
+  IS_INVOICE_MODE = (LAUNCH_MODE === 'invoice');
+
+  if (IS_INVOICE_MODE) {
+    // UI setup for INVOICES
+    document.querySelector('#editor-view h3').textContent = 'Construire la Facture';
+    document.querySelector('#preview-view h3').textContent = 'Prévisualisation et finalisation de la Facture';
+    document.getElementById('confirm-generate-btn').textContent = 'Confirmer et Générer la Facture';
+
+    // Hide quote fields, show invoice fields
+    document.getElementById('duration-group').style.display = 'none';
+    document.getElementById('discount-group').style.display = 'none';
+    document.getElementById('deposit-paid-group').style.display = 'flex';
+  } else {
+    // UI setup for QUOTES (new or edited)
+    // Titles are correct by default.
+    document.getElementById('duration-group').style.display = 'flex';
+    document.getElementById('discount-group').style.display = 'flex';
+    document.getElementById('deposit-paid-group').style.display = 'none';
+  }
+  // --- END OF CORRECTION ---
+
+  initKeyboardShortcuts();
+  setupEventListeners();
+  loadMentions();
+
+  google.script.run
+    .withSuccessHandler(onServicesLoaded)
+    .withFailureHandler(onFailure)
+    .getServices();
+  initAutoSave();
+});
+
+// AUTO-SAVE FUNCTIONALITY
+let autoSaveTimer = null;
+let lastSaveTime = null;
+
+function initAutoSave() {
+  // Check for existing draft on load
+  const row = <?= selectedRow ?>;
+  google.script.run
+    .withSuccessHandler(draft => {
+      if (draft && draft.timestamp) {
+        const timeDiff = new Date() - new Date(draft.timestamp);
+        const minutesAgo = Math.floor(timeDiff / 60000);
+        
+        if (minutesAgo < 60) { // Less than 1 hour old
+          if (confirm(`Un brouillon sauvegardé il y a ${minutesAgo} minutes a été trouvé. Voulez-vous le restaurer?`)) {
+            restoreDraft(draft);
+          }
+        }
+      }
+    })
+    .getQuoteDraft(row);
+  
+  // Set up auto-save every 30 seconds
+  autoSaveTimer = setInterval(() => {
+    if (quoteStructure.length > 0) {
+      performAutoSave();
+    }
+  }, 30000);
+}
+
+function performAutoSave() {
+  const businessData = {
+    estimatedDuration: document.getElementById('estimated-duration').value,
+    discountPercentage: document.getElementById('discount-percentage').value,
+    selectedMentions: getSelectedMentions()
+  };
+  
+  const row = <?= selectedRow ?>;
+  
+  google.script.run
+    .withSuccessHandler(result => {
+      if (result.success) {
+        lastSaveTime = new Date();
+        showAutoSaveIndicator();
+      }
+    })
+    .saveQuoteDraft(row, quoteStructure, businessData);
+}
+
+function restoreDraft(draft) {
+  if (draft.quoteStructure) {
+    populateFormWithSavedData(draft.quoteStructure);
+  }
+  if (draft.businessData) {
+    document.getElementById('estimated-duration').value = draft.businessData.estimatedDuration || '';
+    document.getElementById('discount-percentage').value = draft.businessData.discountPercentage || 0;
+  }
+}
+
+function showAutoSaveIndicator() {
+  const indicator = document.createElement('div');
+  indicator.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px; border-radius: 5px; z-index: 1000;';
+  indicator.textContent = 'Brouillon sauvegardé';
+  document.body.appendChild(indicator);
+  
+  setTimeout(() => {
+    indicator.remove();
+  }, 2000);
+}
+
+function onServicesLoaded(services) {
+  serviceCatalog = services;
+  debugModal();
+  const row = <?= selectedRow ?>;
+  google.script.run
+    .withSuccessHandler(onInitialDataLoaded)
+    .withFailureHandler(onFailure)
+    .getInitialBusinessData(row);
+}
+
+/**
+ * CORRECTED: This function now properly handles all 3 cases:
+ * 1. Creating a new quote.
+ * 2. Editing an existing quote.
+ * 3. Creating an invoice from a quote.
+ */
+function onInitialDataLoaded(data) {
+  try {
+    if (data.savedQuoteData) {
+      // CASE 2 & 3: We are EDITING a QUOTE or CREATING an INVOICE.
+      const savedData = JSON.parse(data.savedQuoteData);
+
+      // Pre-fill business data from the SAVED JSON object
+      document.getElementById('estimated-duration').value = savedData.businessData.estimatedDuration || '';
+      document.getElementById('discount-percentage').value = savedData.businessData.discountPercentage || 0;
+
+      // The structure key can be 'quoteStructure' (from a quote) or 'invoiceStructure'
+      const structure = savedData.quoteStructure || savedData.invoiceStructure;
+
+      if (structure && structure.length > 0) {
+        populateFormWithSavedData(structure);
+      } else {
+        addSection(); // Fallback: add a blank section if structure is empty
+      }
+
+    } else {
+      // CASE 1: We are CREATING a NEW QUOTE from scratch.
+      // Pre-fill business data from the default values from the sheet row
+      document.getElementById('estimated-duration').value = data.duration || '';
+      document.getElementById('discount-percentage').value = data.discount || 0;
+      addSection();
+    }
+  } catch (e) {
+    console.error("Error processing initial data: ", e);
+    alert("Une erreur est survenue lors du chargement des données. Un formulaire vierge sera affiché pour éviter un blocage.");
+    addSection(); // Ensure the user is not stuck on the spinner
+  } finally {
+    // This block ensures the spinner is ALWAYS hidden, even if an error occurs.
+    showSpinner(false);
+  }
+}
+
+function populateFormWithSavedData(savedStructure) {
+  const sectionsContainer = document.getElementById('rooms-container');
+  sectionsContainer.innerHTML = '';
+  quoteStructure = [];
+  savedStructure.forEach(sectionData => {
+    const sectionId = addSection(sectionData.name);
+    if (sectionData.services) {
+      sectionData.services.forEach(serviceData => {
+        addServiceToSection(sectionId, serviceData);
+      });
+    }
+  });
+}
+
+// EVENT LISTENERS & HANDLERS
+function setupEventListeners() {
+  document.getElementById('add-room-btn').addEventListener('click', () => addSection());
+  document.getElementById('show-preview-btn').addEventListener('click', showPreview);
+  document.getElementById('back-to-edit-btn').addEventListener('click', () => switchView('editor'));
+  document.getElementById('confirm-generate-btn').addEventListener('click', generateQuote);
+  document.getElementById('save-service-btn').addEventListener('click', saveNewService);
+  document.getElementById('cancel-service-btn').addEventListener('click', closeNewServiceModal);
+  
+  const sectionsContainer = document.getElementById('rooms-container');
+  sectionsContainer.addEventListener('input', handleDynamicInput);
+  sectionsContainer.addEventListener('click', handleDynamicClick);
+  
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.service-search-wrapper')) {
+      document.querySelectorAll('.search-results').forEach(el => el.style.display = 'none');
+    }
+  });
+}
+
+function handleDynamicInput(e) {
+  const target = e.target;
+  const sectionId = target.closest('.room-section')?.dataset.sectionId;
+  const section = quoteStructure.find(s => s.id === sectionId);
+  if (!section) return;
+
+  if (target.classList.contains('room-name')) {
+    section.name = target.value;
+  } else if (target.closest('.service-line')) {
+    const serviceId = target.closest('.service-line').dataset.serviceId;
+    const service = section.services.find(s => s.id === serviceId);
+    if (!service) return;
+    if (target.classList.contains('quantity-number')) {
+      service.quantity = parseFloat(target.value) || 0;
+    } else if (target.classList.contains('price')) {
+      service.price = parseFloat(target.value) || 0;
+    }
+  } else if (target.classList.contains('service-search')) {
+    //handleServiceSearch(target);
+    const searchTerm = target.value.toLowerCase();
+    const resultsContainer = target.nextElementSibling;
+    if (searchTerm.length < 2) {
+      resultsContainer.style.display = 'none';
+      return;
+    }
+    const filteredServices = serviceCatalog.filter(s =>
+      s.description.toLowerCase().includes(searchTerm) ||
+      s.category.toLowerCase().includes(searchTerm)
+    );
+    renderSearchResults(filteredServices, resultsContainer);
+  }
+}
+
+function handleDynamicClick(e) {
+  const target = e.target;
+  const removeServiceBtn = target.closest('.remove-service-btn');
+  const newServiceBtn = target.closest('.btn-new-service');
+  const searchResultItem = target.closest('.search-results > div');
+
+  if (removeServiceBtn) {
+    const serviceElement = removeServiceBtn.closest('.service-line');
+    const sectionElement = removeServiceBtn.closest('.room-section');
+    const serviceId = serviceElement.dataset.serviceId;
+    const sectionId = sectionElement.dataset.sectionId;
+    serviceElement.remove();
+    const section = quoteStructure.find(s => s.id === sectionId);
+    if (section) {
+      section.services = section.services.filter(s => s.id !== serviceId);
+    }
+  } else if (newServiceBtn) {
+    const sectionElement = newServiceBtn.closest('.room-section');
+    currentServicesListContainer = sectionElement.querySelector('.services-list');
+    openNewServiceModal();
+  } else if (searchResultItem) {
+    const serviceId = searchResultItem.dataset.serviceId;
+    const service = serviceCatalog.find(s => s.id === serviceId);
+    const sectionId = target.closest('.room-section').dataset.sectionId;
+    if (service && sectionId) {
+      addServiceToSection(sectionId, service);
+    }
+    const searchWrapper = target.closest('.service-search-wrapper');
+    searchWrapper.querySelector('.service-search').value = '';
+    searchWrapper.querySelector('.search-results').style.display = 'none';
+  }
+}
+
+// CORE UI MANIPULATION
+function addSection(placeholder = 'Nouvelle Section') {
+  const sectionId = 'section-' + Date.now();
+  quoteStructure.push({ id: sectionId, name: name, services: [] });
+  const template = document.getElementById('room-template');
+  const clone = template.content.cloneNode(true);
+  const sectionElement = clone.querySelector('.room-section');
+  sectionElement.id = sectionId;
+  sectionElement.dataset.sectionId = sectionId;
+  sectionElement.querySelector('.room-name').value = name;
+  document.getElementById('rooms-container').appendChild(clone);
+  return sectionId;
+}
+
+function addServiceToSection(sectionId, serviceData) {
+  // If serviceData comes from a saved quote, it has an ID. Use it.
+  // Otherwise, generate a new unique ID for this new line item.
+  const serviceId = serviceData.id || 'service-' + Date.now();
+  const section = quoteStructure.find(s => s.id === sectionId);
+  if (!section) return;
+  
+  const newService = {
+    id: serviceId,
+    description: serviceData.description || 'N/A',
+    quantity: serviceData.quantity || 1,
+    unit: serviceData.unit || '',
+    price: serviceData.price || 0
+  };
+  section.services.push(newService);
+
+  const template = document.getElementById('service-line-template');
+  const clone = template.content.cloneNode(true);
+  const serviceElement = clone.querySelector('.service-line');
+  serviceElement.dataset.serviceId = serviceId;
+  serviceElement.querySelector('.description').textContent = newService.description;
+  serviceElement.querySelector('.quantity-number').value = newService.quantity;
+  serviceElement.querySelector('.unit').textContent = newService.unit;
+  serviceElement.querySelector('.price').value = parseFloat(newService.price).toFixed(2);
+  
+  document.getElementById(sectionId).querySelector('.services-list').appendChild(clone);
+}
+
+function renderSearchResults(services, container) {
+  container.innerHTML = '';
+  if (services.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+  services.forEach(service => {
+    const item = document.createElement('div');
+    item.textContent = `${service.description} (${service.category || 'N/A'})`;
+    item.dataset.serviceId = service.id;
+    container.appendChild(item);
+  });
+  container.style.display = 'block';
+}
+
+// "ADD NEW SERVICE" MODAL FUNCTIONS
+function openNewServiceModal() {
+  document.getElementById('new-service-modal').style.display = 'flex';
+}
+
+function closeNewServiceModal() {
+  const modal = document.getElementById('new-service-modal');
+  modal.style.display = 'none';
+  modal.querySelectorAll('input, select').forEach(input => {
+    if(input.type !== 'submit') input.value = '';
+  });
+}
+
+function saveNewService() {
+  const serviceData = {
+    description: document.getElementById('new-service-description').value.trim(),
+    category: document.getElementById('new-service-category').value.trim() || 'Autres',
+    unit: document.getElementById('new-service-unit').value.trim() || 'forfait',
+    price: parseFloat(document.getElementById('new-service-price').value),
+    type: document.getElementById('new-service-type').value
+  };
+
+  if (!serviceData.description || !serviceData.type || isNaN(serviceData.price) || serviceData.price < 0) {
+    alert('Veuillez remplir la description, le prix (valide) et le type.');
+    return;
+  }
+
+  const btn = document.getElementById('save-service-btn');
+  btn.disabled = true;
+  btn.textContent = 'Enregistrement...';
+
+  google.script.run
+    .withSuccessHandler(newService => {
+      serviceCatalog.push(newService);
+      if (currentServicesListContainer) {
+        const sectionId = currentServicesListContainer.closest('.room-section').dataset.sectionId;
+        addServiceToSection(sectionId, newService);
+      }
+      alert(`La prestation "${newService.description}" a été ajoutée.`);
+      closeNewServiceModal();
+      btn.disabled = false;
+      btn.textContent = 'Enregistrer';
+    })
+    .withFailureHandler(err => {
+      alert(`Erreur: ${err.message}`);
+      btn.disabled = false;
+      btn.textContent = 'Enregistrer';
+    })
+    .addNewService(serviceData);
+}
+
+// PREVIEW & GENERATION
+function collectAllDataForPreview() {
+  return quoteStructure
+    .map(section => ({
+      ...section,
+      services: section.services.filter(service => service.quantity > 0)
+    }))
+    .filter(section => section.services.length > 0);
+}
+
+function showPreview() {
+  const data = collectAllDataForPreview();
+  if (data.length === 0) {
+    alert('Veuillez ajouter au moins une prestation avec une quantité valide.');
+    return;
+  }
+  populatePreview(data);
+  switchView('preview');
+}
+
+function populatePreview(data) {
+  let subtotal = 0;
+  let tableRows = '';
+  data.forEach(section => {
+    tableRows += `<tr class="subtitle-row"><td colspan="5">${section.name}</td></tr>`;
+    section.services.forEach(service => {
+      const lineTotal = service.quantity * service.price;
+      subtotal += lineTotal;
+      tableRows += `
+        <tr>
+          <td>${service.description}</td>
+          <td style="text-align:center;">${service.quantity}</td>
+          <td>${service.unit}</td>
+          <td style="text-align:right;">${formatCurrency(service.price)}</td>
+          <td style="text-align:right;">${formatCurrency(lineTotal)}</td>
+        </tr>`;
+    });
+  });
+
+  const tableHtml = `
+    <table id="preview-table">
+      <thead><tr><th>Description</th><th>Quantité</th><th>Unité</th><th>Prix U. HT</th><th>Total HT</th></tr></thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+    <div id="preview-totals">Sous-Total HT: ${formatCurrency(subtotal)}</div>`;
+  
+  // Inject the table into the preview content, BEFORE the business form
+  const previewContent = document.getElementById('preview-content');
+  const existingTable = previewContent.querySelector('#preview-table');
+  const existingTotals = previewContent.querySelector('#preview-totals');
+  if (existingTable) existingTable.remove();
+  if (existingTotals) existingTotals.remove();
+  
+  previewContent.insertAdjacentHTML('afterbegin', tableHtml);
+}
+
+/**
+ * Load mentions from backend and display as checkboxes
+ */
+function loadMentions() {
+  google.script.run
+    .withSuccessHandler(function(mentions) {
+      displayMentions(mentions);
+    })
+    .withFailureHandler(function(error) {
+      console.error('Failed to load mentions:', error);
+      document.getElementById('mentions-container').innerHTML = 
+        '<p style="color: #999; font-style: italic;">Aucune mention disponible</p>';
+    })
+    .getMentions();
+}
+
+/**
+ * Display mentions as checkboxes
+ */
+function displayMentions(mentions) {
+  const container = document.getElementById('mentions-container');
+  
+  if (!mentions || mentions.length === 0) {
+    container.innerHTML = '<p style="color: #999; font-style: italic;">Aucune mention disponible</p>';
+    return;
+  }
+  
+  let html = '';
+  mentions.forEach((mention, index) => {
+    html += `
+      <div style="margin-bottom: 10px;">
+        <label style="display: flex; align-items: start; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;" 
+               onmouseover="this.style.background='#e8f5e9'" 
+               onmouseout="this.style.background='transparent'">
+          <input type="checkbox" 
+                 class="mention-checkbox" 
+                 value="${index}" 
+                 data-mention="${escapeHtml(mention)}"
+                 style="margin-top: 3px; margin-right: 10px; cursor: pointer;">
+          <span style="flex: 1; font-size: 14px; line-height: 1.5;">${escapeHtml(mention)}</span>
+        </label>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+/**
+ * Get selected mentions
+ */
+function getSelectedMentions() {
+  const checkboxes = document.querySelectorAll('.mention-checkbox:checked');
+  const selected = [];
+  
+  checkboxes.forEach(checkbox => {
+    selected.push(checkbox.getAttribute('data-mention'));
+  });
+  
+  return selected;
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function generateQuote() {
+  const btn = document.getElementById('confirm-generate-btn');
+  const backBtn = document.getElementById('back-to-edit-btn');
+  btn.disabled = true;
+  backBtn.disabled = true;
+
+  // Use the global IS_INVOICE_MODE variable to change the message
+  const message = IS_INVOICE_MODE ? 'Génération de la facture...' : 'Génération du devis...';
+  showSpinner(true, message);
+
+  const finalQuoteStructure = collectAllDataForPreview();
+  const businessData = {
+    estimatedDuration: document.getElementById('estimated-duration').value.trim() || 'À définir',
+    discountPercentage: parseFloat(document.getElementById('discount-percentage').value) || 0,
+    depositPaid: parseFloat(document.getElementById('deposit-paid').value) || 0,
+    selectedMentions: getSelectedMentions()
+  };
+
+  const selectedRow = <?= selectedRow ?>;
+
+  // Define success callback
+  function successCallback(result) {
+    console.log('=== SUCCESS CALLBACK ===');
+    console.log('Result type:', typeof result);
+    console.log('Result value:', result);
+    
+    showSpinner(false);
+    
+    // Clear auto-save draft
+    const row = <?= selectedRow ?>;
+    google.script.run.clearQuoteDraft(row);
+    
+    // Validate that result is a string URL
+    if (result && typeof result === 'string' && result.length > 0) {
+      window.open(result, '_blank');
+      google.script.host.close();
+    } else {
+      // If result is not a valid URL, show error
+      const resultDiv = document.getElementById('generation-result');
+      resultDiv.innerHTML = `<p style="color: red;"><strong>Erreur:</strong> Le document a été créé mais l'URL est invalide.</p>`;
+      btn.disabled = false;
+      backBtn.disabled = false;
+    }
+  }
+
+  // Define failure callback
+  function failureCallback(err) {
+    console.error('=== FAILURE CALLBACK ===');
+    console.error('Error:', err);
+    
+    showSpinner(false);
+    const resultDiv = document.getElementById('generation-result');
+    
+    // Extract error message safely
+    let errorMessage = 'Erreur inconnue';
+    if (err && err.message) {
+      errorMessage = err.message;
+    } else if (typeof err === 'string') {
+      errorMessage = err;
+    }
+    
+    resultDiv.innerHTML = `<p style="color: red;"><strong>Erreur:</strong> ${errorMessage}</p>`;
+    btn.disabled = false;
+    backBtn.disabled = false;
+  }
+  
+  // 3. Call the correct backend function and pass the HANDLER NAMES
+  if (IS_INVOICE_MODE) {
+    google.script.run
+      .withSuccessHandler(successCallback) // Pass the function name
+      .withFailureHandler(failureCallback)   // Pass the function name
+      .generateInvoiceWithServices(finalQuoteStructure, businessData, selectedRow);
+  } else {
+    google.script.run
+      .withSuccessHandler(successCallback) // Pass the function name
+      .withFailureHandler(failureCallback)   // Pass the function name
+      .generateQuoteWithServices(finalQuoteStructure, businessData, selectedRow);
+  }
+}
+
+// UTILITY FUNCTIONS
+function switchView(viewName) {
+  document.getElementById('editor-view').style.display = viewName === 'editor' ? 'flex' : 'none';
+  document.getElementById('preview-view').style.display = viewName === 'preview' ? 'flex' : 'none';
+}
+
+function formatCurrency(num) {
+  const number = parseFloat(num) || 0;
+  return number.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+}
+
+function onFailure(error) {
+  alert('Erreur critique: ' + error.message);
+  showSpinner(false);
+}
+
+function showSpinner(visible, message = 'Chargement...') {
+  const overlay = document.getElementById('spinner-overlay');
+  if (visible) {
+    document.getElementById('spinner-message').textContent = message;
+    overlay.style.display = 'flex';
+  } else {
+    overlay.style.display = 'none';
+  }
+}
+
+// ============================================
+// KEYBOARD SHORTCUTS
+// ============================================
+
+let shortcuts = {
+  ctrlS: false,
+  ctrlEnter: false
+};
+
+// Initialize keyboard shortcuts
+function initKeyboardShortcuts() {
+  document.addEventListener('keydown', function(e) {
+    // Don't trigger shortcuts when typing in input fields
+    const activeElement = document.activeElement;
+    const isInputField = activeElement && 
+      (activeElement.tagName === 'INPUT' || 
+       activeElement.tagName === 'TEXTAREA' || 
+       activeElement.tagName === 'SELECT');
+    
+    // Ctrl+S or Cmd+S - Manual save (works even in input fields)
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      performManualSave();
+      return;
+    }
+    
+    // Skip other shortcuts if in an input field
+    if (isInputField && e.key !== 'Escape') {
+      return;
+    }
+    
+    // Ctrl+Enter or Cmd+Enter - Generate quote/invoice
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      
+      // Check which view is active
+      if (document.getElementById('preview-view').style.display === 'flex') {
+        // In preview mode - trigger generation
+        document.getElementById('confirm-generate-btn').click();
+      } else {
+        // In edit mode - go to preview
+        document.getElementById('show-preview-btn').click();
+      }
+      return;
+    }
+    
+    // Escape - Close modals or go back
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      
+      // Check for open modals first
+      const newServiceModal = document.getElementById('new-service-modal');
+      if (newServiceModal.style.display === 'flex') {
+        closeNewServiceModal();
+        return;
+      }
+      
+      // If in preview, go back to edit
+      if (document.getElementById('preview-view').style.display === 'flex') {
+        document.getElementById('back-to-edit-btn').click();
+        return;
+      }
+    }
+    
+    // Alt+N - Add new section/room
+    if (e.altKey && e.key === 'n') {
+      e.preventDefault();
+      document.getElementById('add-room-btn').click();
+      return;
+    }
+  });
+  
+  // Show keyboard shortcuts help
+  addKeyboardShortcutsHelp();
+}
+
+function performManualSave() {
+  if (quoteStructure.length === 0) {
+    showNotification('Aucune donnée à sauvegarder', 'warning');
+    return;
+  }
+  
+  const businessData = {
+    estimatedDuration: document.getElementById('estimated-duration').value,
+    discountPercentage: document.getElementById('discount-percentage').value
+  };
+  
+  const row = <?= selectedRow ?>;
+  
+  google.script.run
+    .withSuccessHandler(result => {
+      if (result.success) {
+        showNotification('✓ Brouillon sauvegardé manuellement', 'success');
+      }
+    })
+    .withFailureHandler(() => {
+      showNotification('Erreur lors de la sauvegarde', 'error');
+    })
+    .saveQuoteDraft(row, quoteStructure, businessData);
+}
+
+function showNotification(message, type = 'info') {
+  const colors = {
+    success: '#4CAF50',
+    warning: '#FF9800',
+    error: '#F44336',
+    info: '#2196F3'
+  };
+  
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: ${colors[type]};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    animation: slideIn 0.3s ease-out;
+  `;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+function addKeyboardShortcutsHelp() {
+  const helpButton = document.createElement('button');
+  helpButton.innerHTML = '⌨️';
+  helpButton.title = 'Raccourcis clavier';
+  helpButton.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 40px;
+    z-index: 100;
+  `;
+  
+  helpButton.onclick = function() {
+    const helpModal = document.createElement('div');
+    helpModal.style.cssText = `
+      position: fixed;
+      bottom: 70px;
+      left: 20px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 101;
+      max-width: 300px;
+    `;
+    helpModal.innerHTML = `
+      <h4 style="margin: 0 0 10px 0;">Raccourcis Clavier</h4>
+      <div style="font-size: 14px; line-height: 1.8;">
+        <div><kbd>Ctrl+S</kbd> - Sauvegarder manuellement</div>
+        <div><kbd>Ctrl+↵</kbd> - Générer le document</div>
+        <div><kbd>Esc</kbd> - Fermer/Retour</div>
+        <div><kbd>Alt+N</kbd> - Nouvelle section</div>
+      </div>
+      <button onclick="this.parentElement.remove()" style="margin-top: 10px;">Fermer</button>
+    `;
+    document.body.appendChild(helpModal);
+  };
+  
+  document.body.appendChild(helpButton);
+}
+
+// Add CSS animation for notifications
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+  kbd {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    font-family: monospace;
+    font-size: 12px;
+  }
+`;
+document.head.appendChild(style);
+
+function debugModal() {
+  console.log('Service Catalog loaded:', serviceCatalog.length, 'services');
+  console.log('Quote Structure:', quoteStructure);
+  console.log('Modal is visible:', document.getElementById('editor-view').style.display);
+}
+
+</script>
+</body>
+</html>
