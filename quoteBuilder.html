@@ -456,7 +456,6 @@ function showAutoSaveIndicator() {
 
 function onServicesLoaded(services) {
   serviceCatalog = services;
-  debugModal();
   const row = <?= selectedRow ?>;
   google.script.run
     .withSuccessHandler(onInitialDataLoaded)
@@ -497,7 +496,6 @@ function onInitialDataLoaded(data) {
       addSection();
     }
   } catch (e) {
-    console.error("Error processing initial data: ", e);
     alert("Une erreur est survenue lors du chargement des données. Un formulaire vierge sera affiché pour éviter un blocage.");
     addSection(); // Ensure the user is not stuck on the spinner
   } finally {
@@ -779,7 +777,6 @@ function loadMentions() {
       displayMentions(mentions);
     })
     .withFailureHandler(function(error) {
-      console.error('Failed to load mentions:', error);
       document.getElementById('mentions-container').innerHTML = 
         '<p style="color: #999; font-style: italic;">Aucune mention disponible</p>';
     })
@@ -863,9 +860,6 @@ function generateQuote() {
 
   // Define success callback
   function successCallback(result) {
-    console.log('=== SUCCESS CALLBACK ===');
-    console.log('Result type:', typeof result);
-    console.log('Result value:', result);
     
     showSpinner(false);
     
@@ -888,8 +882,6 @@ function generateQuote() {
 
   // Define failure callback
   function failureCallback(err) {
-    console.error('=== FAILURE CALLBACK ===');
-    console.error('Error:', err);
     
     showSpinner(false);
     const resultDiv = document.getElementById('generation-result');
@@ -1148,11 +1140,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-function debugModal() {
-  console.log('Service Catalog loaded:', serviceCatalog.length, 'services');
-  console.log('Quote Structure:', quoteStructure);
-  console.log('Modal is visible:', document.getElementById('editor-view').style.display);
-}
 
 </script>
 </body>
