@@ -214,12 +214,12 @@ function getServices() {
       .map((row, index) => {
         const serviceObj = createObjectFromRow(row, headers);
         return {
-          id: serviceObj['ID'] || serviceObj['id'] || `service-${index}`,
+          id: serviceObj['ID Prestation'] || serviceObj['ID'] || serviceObj['id'] || `service-${index}`,
           type: serviceObj['Type'] || 'Non classé',
           category: serviceObj['Catégorie'] || serviceObj['Category'] || 'Autres',
           description: serviceObj['Description'],
           unit: serviceObj['Unité'] || serviceObj['Unit'],
-          price: parseFloat(serviceObj['Prix HT'] || serviceObj['Price']) || 0
+          price: parseFloat(serviceObj['Prix Unitaire HT'] || serviceObj['Prix HT'] || serviceObj['Price']) || 0
         };
       });
 
