@@ -456,6 +456,7 @@ function showAutoSaveIndicator() {
 
 function onServicesLoaded(services) {
   serviceCatalog = services;
+  console.log('Services loaded:', serviceCatalog);
   const row = <?= selectedRow ?>;
   google.script.run
     .withSuccessHandler(onInitialDataLoaded)
@@ -577,6 +578,13 @@ function handleDynamicClick(e) {
   const newServiceBtn = target.closest('.btn-new-service');
   const searchResultItem = target.closest('.search-results > div');
 
+  console.log('handleDynamicClick called', {
+    target: target,
+    removeServiceBtn: removeServiceBtn,
+    newServiceBtn: newServiceBtn,
+    searchResultItem: searchResultItem
+  });
+
   if (removeServiceBtn) {
     const serviceElement = removeServiceBtn.closest('.service-line');
     const sectionElement = removeServiceBtn.closest('.room-section');
@@ -592,11 +600,21 @@ function handleDynamicClick(e) {
     currentServicesListContainer = sectionElement.querySelector('.services-list');
     openNewServiceModal();
   } else if (searchResultItem) {
+    console.log('Search result item clicked');
     const serviceId = searchResultItem.dataset.serviceId;
     const service = serviceCatalog.find(s => s.id === serviceId);
     const sectionId = target.closest('.room-section').dataset.sectionId;
+    console.log('Service click details:', {
+      serviceId: serviceId,
+      service: service,
+      sectionId: sectionId,
+      serviceCatalog: serviceCatalog
+    });
     if (service && sectionId) {
+      console.log('Calling addServiceToSection');
       addServiceToSection(sectionId, service);
+    } else {
+      console.log('NOT calling addServiceToSection - missing service or sectionId');
     }
     const searchWrapper = target.closest('.service-search-wrapper');
     searchWrapper.querySelector('.service-search').value = '';
@@ -619,12 +637,20 @@ function addSection(placeholder = 'Nouvelle Section') {
 }
 
 function addServiceToSection(sectionId, serviceData) {
+  console.log('addServiceToSection called', { sectionId, serviceData });
+
   // If serviceData comes from a saved quote, it has an ID. Use it.
   // Otherwise, generate a new unique ID for this new line item.
   const serviceId = serviceData.id || 'service-' + Date.now();
   const section = quoteStructure.find(s => s.id === sectionId);
-  if (!section) return;
-  
+
+  console.log('Section lookup:', { section, quoteStructure });
+
+  if (!section) {
+    console.log('Section not found! Returning early');
+    return;
+  }
+
   const newService = {
     id: serviceId,
     description: serviceData.description || 'N/A',
@@ -634,6 +660,8 @@ function addServiceToSection(sectionId, serviceData) {
   };
   section.services.push(newService);
 
+  console.log('Service added to quoteStructure, now updating DOM');
+
   const template = document.getElementById('service-line-template');
   const clone = template.content.cloneNode(true);
   const serviceElement = clone.querySelector('.service-line');
@@ -642,8 +670,18 @@ function addServiceToSection(sectionId, serviceData) {
   serviceElement.querySelector('.quantity-number').value = newService.quantity;
   serviceElement.querySelector('.unit').textContent = newService.unit;
   serviceElement.querySelector('.price').value = parseFloat(newService.price).toFixed(2);
-  
-  document.getElementById(sectionId).querySelector('.services-list').appendChild(clone);
+
+  const sectionElement = document.getElementById(sectionId);
+  console.log('Section element:', sectionElement);
+
+  if (sectionElement) {
+    const servicesList = sectionElement.querySelector('.services-list');
+    console.log('Services list container:', servicesList);
+    servicesList.appendChild(clone);
+    console.log('Service added to DOM successfully');
+  } else {
+    console.log('ERROR: Could not find section element with ID:', sectionId);
+  }
 }
 
 function renderSearchResults(services, container) {
