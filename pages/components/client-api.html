@@ -1,0 +1,154 @@
+<script>
+/**
+ * Client-Side API Helper
+ * Replaces google.script.run with fetch-based API calls
+ * Version: 1.0
+ */
+
+const API = {
+  /**
+   * Base URL for API calls (current page)
+   */
+  baseUrl: window.location.href.split('?')[0],
+
+  /**
+   * Makes API call to server
+   * @param {string} action - API action name
+   * @param {Object} data - Request data
+   * @returns {Promise} Response data promise
+   */
+  call: async function(action, data = {}) {
+    try {
+      const response = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: action,
+          ...data
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Unknown error');
+      }
+
+      return result.data;
+
+    } catch (error) {
+      console.error('API call failed [' + action + ']:', error);
+      throw error;
+    }
+  },
+
+  // Convenience methods for dashboard
+  getDashboardMetrics: function() {
+    return this.call('getDashboardMetrics');
+  },
+
+  // Convenience methods for clients
+  getClientsData: function() {
+    return this.call('getClientsData');
+  },
+
+  getClientDetails: function(row) {
+    return this.call('getClientDetails', { row });
+  },
+
+  updateClientStatus: function(row, status) {
+    return this.call('updateClientStatus', { row, status });
+  },
+
+  updateProjectDetails: function(row, startDate, endDate, value) {
+    return this.call('updateProjectDetails', { row, startDate, endDate, value });
+  },
+
+  saveClientNotes: function(row, notes) {
+    return this.call('saveClientNotes', { row, notes });
+  },
+
+  getQuoteValue: function(row) {
+    return this.call('getQuoteValue', { row });
+  },
+
+  // Convenience methods for calendar
+  getCalendarData: function() {
+    return this.call('getCalendarData');
+  },
+
+  // Convenience methods for email
+  generateQuoteEmailDraft: function(row) {
+    return this.call('generateQuoteEmailDraft', { row });
+  },
+
+  generateFollowUpEmailDraft: function(row) {
+    return this.call('generateFollowUpEmailDraft', { row });
+  },
+
+  generateTestimonialEmailDraft: function(row) {
+    return this.call('generateTestimonialEmailDraft', { row });
+  },
+
+  // Convenience methods for templates
+  getEmailTemplates: function() {
+    return this.call('getEmailTemplates');
+  },
+
+  saveEmailTemplates: function(templates) {
+    return this.call('saveEmailTemplates', { templates });
+  },
+
+  resetEmailTemplates: function() {
+    return this.call('resetEmailTemplates');
+  }
+};
+
+/**
+ * Error handler for API calls
+ * Shows user-friendly error messages
+ */
+function handleApiError(error) {
+  console.error('API Error:', error);
+  showToast(error.message || 'Une erreur est survenue', 'error');
+}
+
+/**
+ * Toast notification helper
+ */
+function showToast(message, type = 'info') {
+  const colors = {
+    success: '#4CAF50',
+    warning: '#FF9800',
+    error: '#F44336',
+    info: '#2196F3'
+  };
+
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: ${colors[type] || colors.info};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    z-index: 10000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    animation: slideIn 0.3s ease-out;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+</script>
