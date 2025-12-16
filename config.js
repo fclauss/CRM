@@ -336,5 +336,32 @@ Tél: 06.38.70.45.76`
     ligne_remise_end: '{{/LIGNE_REMISE}}',                    // End discount section
     ligne_remise_label: '{{LIGNE_REMISE_LABEL}}',             // Discount label with %
     ligne_remise_valeur: '{{LIGNE_REMISE_VALEUR}}'            // Discount amount
+  },
+
+  // ===========================================================================
+  // WEB APP AUTHENTICATION
+  // ===========================================================================
+  // Authentication settings for standalone web app
+  // Add email addresses of authorized users
+
+  auth: {
+    // Allowed users (must match Google account email)
+    // IMPORTANT: Update these with actual email addresses
+    allowed_users: [
+      'your-email@example.com',        // Admin user (Fabien)
+      'styleematiere@gmail.com'         // User (Style et Matière)
+    ],
+
+    // Admin users (full access including settings and reset)
+    admins: [
+      'your-email@example.com'          // Fabien has admin access
+    ],
+
+    // Custom display names (optional)
+    // If not specified, name is extracted from email
+    user_names: {
+      'your-email@example.com': 'Fabien',
+      'styleematiere@gmail.com': 'Style et Matière'
+    }
   }
 };
