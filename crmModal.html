@@ -883,25 +883,19 @@ let dashboardData = {};
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('>>> DOM Content Loaded');
-  console.log('Initializing client list...');
   loadDashboardData();
   // Check if we're on the clients tab
   const clientsTab = document.getElementById('clients-tab');
   if (!clientsTab) {
-    console.warn('Clients tab not found - may not be initialized yet');
   }
   loadClients();
   setupKeyboardShortcuts();
   // Setup search input listener
   const searchInput = document.getElementById('client-search');
   if (searchInput) {
-    console.log('Search input found, adding listener');
     searchInput.addEventListener('keyup', filterClients);
   } else {
-    console.warn('Search input not found');
   }
-  console.log('>>> Initialization complete');
 });
 
 // Tab switching
@@ -969,13 +963,11 @@ function updateDashboard(data) {
  * Load all clients from backend and display them
  */
 function loadClients() {
-  console.log('>>> loadClients() called');
   
   // Show loading state
   const listContainer = document.getElementById('client-list-items');
   
   if (!listContainer) {
-    console.error('ERROR: client-list-items container not found in DOM');
     return;
   }
   
@@ -986,20 +978,13 @@ function loadClients() {
     </div>
   `;
   
-  console.log('Calling backend getClientsData()...');
   
   google.script.run
     .withSuccessHandler(function(clients) {
-      console.log('>>> SUCCESS: Backend returned data');
-      console.log('Data type:', typeof clients);
-      console.log('Is array:', Array.isArray(clients));
-      console.log('Data:', clients);
       
       displayClients(clients);
     })
     .withFailureHandler(function(error) {
-      console.error('>>> FAILURE: Backend call failed');
-      console.error('Error:', error);
       
       handleError(error);
     })
@@ -1011,28 +996,20 @@ function loadClients() {
  * Display clients in the list (already sorted by backend)
  */
 function displayClients(clients) {
-  console.log('>>> displayClients() called');
-  console.log('Received:', clients);
   
   // NULL-SAFE: Handle null, undefined, or non-array data
   if (!clients) {
-    console.warn('WARNING: clients is null or undefined');
     clients = [];
   }
   
   if (!Array.isArray(clients)) {
-    console.error('ERROR: clients is not an array:', typeof clients);
     clients = [];
   }
   
   allClients = clients;
   
-  console.log(`Processing ${clients.length} clients`);
   
   if (clients.length > 0) {
-    console.log('First client:', clients[0]);
-    console.log('First client row:', clients[0].row);
-    console.log('Last client row:', clients[clients.length-1].row);
   }
   
   renderClientList(clients);
@@ -1043,22 +1020,18 @@ function displayClients(clients) {
  * Clients array is already sorted newest-first from backend
  */
 function renderClientList(clients) {
-  console.log('>>> renderClientList() called');
   
   const container = document.getElementById('client-list-items');
   
   if (!container) {
-    console.error('ERROR: client-list-items container not found');
     return;
   }
   
   // NULL-SAFE: Ensure clients is an array
   if (!clients || !Array.isArray(clients)) {
-    console.warn('WARNING: Invalid clients data in renderClientList');
     clients = [];
   }
   
-  console.log(`Rendering ${clients.length} clients`);
   
   // Handle empty list
   if (clients.length === 0) {
@@ -1080,7 +1053,6 @@ function renderClientList(clients) {
     try {
       // Validate client object
       if (!client || typeof client !== 'object') {
-        console.warn(`Skipping invalid client at index ${index}`);
         return;
       }
       
@@ -1113,14 +1085,12 @@ function renderClientList(clients) {
         </div>
       `;
     } catch (e) {
-      console.error(`Error rendering client at index ${index}:`, e);
       // Continue with other clients
     }
   });
   
   container.innerHTML = html || '<div style="padding: 20px; color: #999;">Erreur d\'affichage</div>';
   
-  console.log('>>> renderClientList() completed');
 }
 
 /**
@@ -1193,7 +1163,6 @@ function showProjectDetailsModal(row) {
       }
     })
     .withFailureHandler(function(error) {
-      console.error('Failed to get quote value:', error);
     })
     .getQuoteValue(row);
   
@@ -1250,7 +1219,6 @@ function saveProjectDetails() {
           google.script.run
             .withSuccessHandler(function(clientDetails) {
               displayClientDetails(clientDetails);
-              console.log('Client details refreshed:', clientDetails);
             })
             .withFailureHandler(handleError)
             .getClientDetails(row);
@@ -1402,7 +1370,6 @@ function filterClients() {
   const searchInput = document.getElementById('client-search');
   
   if (!searchInput) {
-    console.warn('Search input not found');
     return;
   }
   
@@ -1426,7 +1393,6 @@ function filterClients() {
     );
   });
   
-  console.log(`Search "${searchTerm}": ${filtered.length} results`);
   renderClientList(filtered);
 }
 
@@ -1452,12 +1418,6 @@ function displayClientDetails(client) {
     clientDetailsPanel.scrollTop = 0;
   }
 
-  console.log('=== Displaying Client Details ===');
-  console.log('Client object:', client);
-  console.log('Project Value (raw):', client.projectValue);
-  console.log('Project Start Date:', client.projectStartDate);
-  console.log('Project End Date:', client.projectEndDate);
-  console.log('Status:', client.status);
   
   // Build the status dropdown with current status selected
   const statusOptions = [
@@ -1779,7 +1739,6 @@ function calculateDisplayDuration(startDateStr, endDateStr) {
       return `${months} mois (${diffDays} jours)`;
     }
   } catch (e) {
-    console.error('Error calculating duration:', e);
     return '-';
   }
 }
@@ -1933,8 +1892,6 @@ function escapeHtml(text) {
  * Handle errors from backend
  */
 function handleError(error) {
-  console.error('>>> handleError() called');
-  console.error('Error:', error);
   
   const container = document.getElementById('client-list-items');
   
@@ -2276,7 +2233,6 @@ function loadCalendarData() {
  * Display 3-month calendar grid with colored project days
  */
 function displayCalendarTimeline(data) {
-    console.log('Calendar data received:', data);
     
     const monthsGrid = document.getElementById('months-grid');
     const unplannedContainer = document.getElementById('unplanned-projects');
