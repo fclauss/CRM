@@ -41,3 +41,5 @@ Claude.local.md
 # Environment variables
 .env
 .env.local
+node_modules/
+package-lock.json
