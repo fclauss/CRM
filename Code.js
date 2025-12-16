@@ -211,10 +211,10 @@ function getServices() {
 
     return data
       .filter(row => row[0] && row[3])
-      .map(row => {
+      .map((row, index) => {
         const serviceObj = createObjectFromRow(row, headers);
         return {
-          id: serviceObj['ID'] || serviceObj['id'],
+          id: serviceObj['ID'] || serviceObj['id'] || `service-${index}`,
           type: serviceObj['Type'] || 'Non classé',
           category: serviceObj['Catégorie'] || serviceObj['Category'] || 'Autres',
           description: serviceObj['Description'],
