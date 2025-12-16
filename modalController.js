@@ -30,6 +30,7 @@ function openCRMModal() {
 
 /**
  * Calculates and returns dashboard metrics for the home tab
+ * PERFORMANCE OPTIMIZED: Uses direct array indexing instead of createObjectFromRow
  * Includes revenue, pending quotes, active projects, conversion rates, and activity feeds
  *
  * @returns {Object} Dashboard metrics object containing:
@@ -48,6 +49,14 @@ function getDashboardMetrics() {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
 
+  // PERFORMANCE: Pre-compute column indices once instead of creating objects per row
+  const C = CONFIG.column_mappings;
+  const statusIdx = headers.indexOf(C.status);
+  const quoteDateIdx = headers.indexOf(C.quote_date);
+  const quoteJsonIdx = headers.indexOf(C.quote_data_json);
+  const quoteNumberIdx = headers.indexOf(C.quote_number);
+  const clientNameIdx = headers.indexOf(C.client_name);
+
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -62,55 +71,59 @@ function getDashboardMetrics() {
   const requiredActions = [];
   const recentActivity = [];
 
-  const C = CONFIG.column_mappings;
-
+  // PERFORMANCE: Single pass through data with direct array access
   data.forEach((row, index) => {
-    const rowData = createObjectFromRow(row, headers);
+    const status = row[statusIdx];
 
-    if (rowData[C.status] === CONFIG.statuses.WON || rowData[C.status] === CONFIG.statuses.COMPLETED) {
-      const quoteDate = new Date(rowData[C.quote_date]);
-      const amount = parseQuoteValue(rowData[C.quote_data_json]);
+    // Skip rows without status early
+    if (!status) return;
+
+    // Process won/completed quotes for revenue
+    if (status === CONFIG.statuses.WON || status === CONFIG.statuses.COMPLETED) {
+      const quoteDate = new Date(row[quoteDateIdx]);
+      const amount = parseQuoteValueOptimized(row[quoteJsonIdx]);
 
       if (quoteDate >= startOfMonth) {
         monthRevenue += amount;
       } else if (quoteDate >= startOfLastMonth && quoteDate < startOfMonth) {
         lastMonthRevenue += amount;
       }
+
+      if (status === CONFIG.statuses.WON) {
+        activeProjects++;
+      }
+      wonQuotes++;
     }
 
-    if (rowData[C.status] === CONFIG.statuses.SENT) {
+    // Process pending quotes
+    if (status === CONFIG.statuses.SENT) {
       pendingQuotes++;
-      pendingValue += parseQuoteValue(rowData[C.quote_data_json]);
+      pendingValue += parseQuoteValueOptimized(row[quoteJsonIdx]);
 
-      const quoteDate = new Date(rowData[C.quote_date]);
+      const quoteDate = new Date(row[quoteDateIdx]);
       const daysSince = Math.floor((now - quoteDate) / (1000 * 60 * 60 * 24));
 
       if (daysSince > 7) {
         requiredActions.push({
-          text: 'Relancer devis ' + rowData[C.quote_number] + ' - ' + rowData[C.client_name] + ' (' + daysSince + ' jours)',
+          text: 'Relancer devis ' + row[quoteNumberIdx] + ' - ' + row[clientNameIdx] + ' (' + daysSince + ' jours)',
           onclick: 'sendReminderForRow(' + (index + 2) + ')',
           buttonText: 'Relancer'
         });
       }
     }
 
-    if (rowData[C.status] === CONFIG.statuses.WON) {
-      activeProjects++;
-    }
-
-    if (rowData[C.quote_number]) {
+    // Count total quotes
+    if (row[quoteNumberIdx]) {
       totalQuotes++;
-      if (rowData[C.status] === CONFIG.statuses.WON || rowData[C.status] === CONFIG.statuses.COMPLETED) {
-        wonQuotes++;
-      }
     }
 
-    if (rowData[C.quote_date] && recentActivity.length < 5) {
-      const date = new Date(rowData[C.quote_date]);
+    // Collect recent activity (limit to 5)
+    if (row[quoteDateIdx] && recentActivity.length < 5) {
+      const date = new Date(row[quoteDateIdx]);
       const timeStr = formatTimeAgo(date);
       recentActivity.push({
         time: timeStr,
-        description: 'Devis ' + rowData[C.quote_number] + ' créé pour ' + rowData[C.client_name]
+        description: 'Devis ' + row[quoteNumberIdx] + ' créé pour ' + row[clientNameIdx]
       });
     }
   });
@@ -138,17 +151,24 @@ function getDashboardMetrics() {
 }
 
 /**
- * Parses quote total value from JSON data
- * Calculates subtotal, applies discount, and adds VAT
+ * PERFORMANCE OPTIMIZED: Parses quote total value from JSON data
+ * Tries to use pre-calculated totals.total if available, falls back to calculation
  *
  * @param {string} quoteDataJson - JSON string containing quote structure and business data
  * @returns {number} Total quote value including VAT, rounded to 2 decimals
  */
-function parseQuoteValue(quoteDataJson) {
+function parseQuoteValueOptimized(quoteDataJson) {
   if (!quoteDataJson) return 0;
 
   try {
     const data = JSON.parse(quoteDataJson);
+
+    // PERFORMANCE: Use pre-calculated total if available (from Phase 2 optimization)
+    if (data.totals && data.totals.total) {
+      return data.totals.total;
+    }
+
+    // Fallback: Calculate from services
     const services = data.quoteStructure || [];
     let subtotal = 0;
 
@@ -171,6 +191,18 @@ function parseQuoteValue(quoteDataJson) {
     Logger.log('Error parsing quote value: ' + e.message);
     return 0;
   }
+}
+
+/**
+ * Parses quote total value from JSON data
+ * Calculates subtotal, applies discount, and adds VAT
+ * DEPRECATED: Use parseQuoteValueOptimized for better performance
+ *
+ * @param {string} quoteDataJson - JSON string containing quote structure and business data
+ * @returns {number} Total quote value including VAT, rounded to 2 decimals
+ */
+function parseQuoteValue(quoteDataJson) {
+  return parseQuoteValueOptimized(quoteDataJson);
 }
 
 /**

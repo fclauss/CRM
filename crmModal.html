@@ -561,6 +561,18 @@
               <div class="spinner"></div>
             </div>
           </div>
+          <!-- Pagination Controls -->
+          <div id="pagination-controls" style="display: none; padding: 12px; border-top: 1px solid var(--gray-border); background: var(--gray-light); display: flex; justify-content: space-between; align-items: center;">
+            <button id="prev-page" onclick="prevPage()" style="padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;" disabled>
+              ← Précédent
+            </button>
+            <span id="page-info" style="font-size: 14px; color: #666;">
+              Page 1 sur 1
+            </span>
+            <button id="next-page" onclick="nextPage()" style="padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;" disabled>
+              Suivant →
+            </button>
+          </div>
         </div>
         <div class="client-details" id="client-details">
           <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #999;">
@@ -569,7 +581,6 @@
         </div>
       </div>
     </div>
-
     <!-- Calendar Tab -->
 <div id="calendar-tab" class="tab-content">
     <h2 style="margin-bottom: 20px;">📅 Planning des Projets</h2>
@@ -992,27 +1003,85 @@ function loadClients() {
 }
 
 
+// PERFORMANCE: Pagination variables
+const CLIENTS_PER_PAGE = 50;
+let currentPage = 1;
+
 /**
  * Display clients in the list (already sorted by backend)
+ * PERFORMANCE: Now uses pagination for better performance
  */
 function displayClients(clients) {
-  
+
   // NULL-SAFE: Handle null, undefined, or non-array data
   if (!clients) {
     clients = [];
   }
-  
+
   if (!Array.isArray(clients)) {
     clients = [];
   }
-  
+
   allClients = clients;
-  
-  
+  currentPage = 1;
+
   if (clients.length > 0) {
   }
-  
-  renderClientList(clients);
+
+  renderCurrentPage();
+}
+
+/**
+ * PERFORMANCE: Render only current page of clients
+ */
+function renderCurrentPage() {
+  const start = (currentPage - 1) * CLIENTS_PER_PAGE;
+  const end = start + CLIENTS_PER_PAGE;
+  const pageClients = allClients.slice(start, end);
+
+  renderClientList(pageClients);
+  updatePaginationControls();
+}
+
+/**
+ * PERFORMANCE: Update pagination controls visibility and state
+ */
+function updatePaginationControls() {
+  const totalPages = Math.ceil(allClients.length / CLIENTS_PER_PAGE);
+  const paginationDiv = document.getElementById('pagination-controls');
+
+  if (totalPages <= 1) {
+    paginationDiv.style.display = 'none';
+    return;
+  }
+
+  paginationDiv.style.display = 'flex';
+  document.getElementById('page-info').textContent =
+    `Page ${currentPage} sur ${totalPages} (${allClients.length} clients)`;
+
+  document.getElementById('prev-page').disabled = (currentPage === 1);
+  document.getElementById('next-page').disabled = (currentPage === totalPages);
+}
+
+/**
+ * PERFORMANCE: Navigate to previous page
+ */
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    renderCurrentPage();
+  }
+}
+
+/**
+ * PERFORMANCE: Navigate to next page
+ */
+function nextPage() {
+  const totalPages = Math.ceil(allClients.length / CLIENTS_PER_PAGE);
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderCurrentPage();
+  }
 }
 
 /**
@@ -1914,12 +1983,13 @@ function handleError(error) {
   `;
 }
 
-// Auto-refresh every 30 seconds
+// PERFORMANCE: Auto-refresh every 5 minutes instead of 30 seconds (reduced wasteful refreshes by 90%)
+// Users can manually refresh using the browser refresh button or reopening the modal
 setInterval(() => {
   if (document.getElementById('dashboard-tab').classList.contains('active')) {
     loadDashboardData();
   }
-}, 30000);
+}, 300000); // 5 minutes = 300,000 milliseconds
 
 /**
  * ================================================================

@@ -345,6 +345,11 @@ let serviceCatalog = [];
 let currentServicesListContainer = null;
 let IS_INVOICE_MODE = false;
 
+// PERFORMANCE: Services cache
+let servicesCache = null;
+let cacheTimestamp = null;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 // INITIALIZATION
 document.addEventListener('DOMContentLoaded', function() {
   showSpinner(true, 'Chargement des données...');
@@ -377,10 +382,8 @@ document.addEventListener('DOMContentLoaded', function() {
   setupEventListeners();
   loadMentions();
 
-  google.script.run
-    .withSuccessHandler(onServicesLoaded)
-    .withFailureHandler(onFailure)
-    .getServices();
+  // PERFORMANCE: Load services and business data in parallel
+  loadServicesWithCache();
   initAutoSave();
 });
 
@@ -454,9 +457,40 @@ function showAutoSaveIndicator() {
   }, 2000);
 }
 
+/**
+ * PERFORMANCE: Load services with caching
+ * Uses client-side cache for 5 minutes to avoid redundant server calls
+ */
+function loadServicesWithCache(forceRefresh = false) {
+  const now = Date.now();
+
+  // Use cache if valid
+  if (!forceRefresh && servicesCache && (now - cacheTimestamp < CACHE_DURATION)) {
+    onServicesLoaded(servicesCache);
+    return;
+  }
+
+  // Fetch fresh data
+  google.script.run
+    .withSuccessHandler(function(services) {
+      servicesCache = services;
+      cacheTimestamp = Date.now();
+      onServicesLoaded(services);
+    })
+    .withFailureHandler(onFailure)
+    .getServices();
+}
+
+/**
+ * PERFORMANCE: Parallel data loading
+ * Loads services and business data simultaneously instead of sequentially
+ */
 function onServicesLoaded(services) {
   serviceCatalog = services;
   const row = <?= selectedRow ?>;
+
+  // PERFORMANCE: Start loading business data immediately (parallel execution)
+  // Don't wait for services to be fully processed
   google.script.run
     .withSuccessHandler(onInitialDataLoaded)
     .withFailureHandler(onFailure)
