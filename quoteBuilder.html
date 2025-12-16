@@ -607,13 +607,13 @@ function handleDynamicClick(e) {
 // CORE UI MANIPULATION
 function addSection(placeholder = 'Nouvelle Section') {
   const sectionId = 'section-' + Date.now();
-  quoteStructure.push({ id: sectionId, name: name, services: [] });
+  quoteStructure.push({ id: sectionId, name: placeholder, services: [] });
   const template = document.getElementById('room-template');
   const clone = template.content.cloneNode(true);
   const sectionElement = clone.querySelector('.room-section');
   sectionElement.id = sectionId;
   sectionElement.dataset.sectionId = sectionId;
-  sectionElement.querySelector('.room-name').value = name;
+  sectionElement.querySelector('.room-name').value = placeholder;
   document.getElementById('rooms-container').appendChild(clone);
   return sectionId;
 }
