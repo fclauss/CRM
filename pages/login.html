@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Style et Matière - Connexion</title>
+
+  <style>
+    :root {
+      --primary: #00796b;
+      --primary-dark: #004d40;
+      --secondary: #f2eb2d;
+      --gray-light: #f5f7fa;
+      --gray-border: #e0e6ed;
+      --danger: #f44336;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      max-width: 450px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .login-header {
+      background: var(--primary);
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .app-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .app-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .login-body {
+      padding: 40px 30px;
+    }
+
+    .message-box {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: start;
+      gap: 10px;
+    }
+
+    .message-box.error {
+      background: #f8d7da;
+      border-color: var(--danger);
+    }
+
+    .message-box.success {
+      background: #d4edda;
+      border-color: #28a745;
+    }
+
+    .message-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .message-text {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .info-section {
+      margin-bottom: 25px;
+    }
+
+    .info-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .info-text {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .info-list {
+      list-style: none;
+      margin: 10px 0;
+    }
+
+    .info-list li {
+      font-size: 14px;
+      color: #666;
+      padding: 5px 0;
+      padding-left: 25px;
+      position: relative;
+    }
+
+    .info-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .action-button {
+      width: 100%;
+      padding: 14px 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .action-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .action-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--gray-border);
+      margin: 25px 0;
+    }
+
+    .help-text {
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+      margin-top: 20px;
+    }
+
+    .help-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .help-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-container {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .login-header {
+        padding: 30px 20px;
+      }
+
+      .logo {
+        font-size: 40px;
+      }
+
+      .app-title {
+        font-size: 20px;
+      }
+
+      .login-body {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <div class="logo">🎨</div>
+      <div class="app-title">Style et Matière</div>
+      <div class="app-subtitle">Système de Gestion Client</div>
+    </div>
+
+    <div class="login-body">
+      <div class="message-box">
+        <span class="message-icon">🔒</span>
+        <div class="message-text">
+          <strong>Accès restreint</strong><br>
+          Vous devez être connecté avec un compte Google autorisé pour accéder à cette application.
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-title">Comment se connecter?</div>
+        <div class="info-text">
+          Cette application utilise votre compte Google pour l'authentification. Seuls les comptes autorisés peuvent y accéder.
+        </div>
+        <ul class="info-list">
+          <li>Cliquez sur le bouton ci-dessous</li>
+          <li>Connectez-vous avec votre compte Google</li>
+          <li>Autorisez l'application si demandé</li>
+        </ul>
+      </div>
+
+      <button class="action-button" onclick="attemptLogin()">
+        <span>🔑</span>
+        <span>Se connecter avec Google</span>
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="info-section">
+        <div class="info-title">Problèmes de connexion?</div>
+        <div class="info-text">
+          Si vous pensez que vous devriez avoir accès mais que vous rencontrez des difficultés:
+        </div>
+        <ul class="info-list">
+          <li>Vérifiez que vous utilisez le bon compte Google</li>
+          <li>Assurez-vous que les cookies sont activés</li>
+          <li>Essayez de vous déconnecter puis reconnecter</li>
+          <li>Contactez l'administrateur si le problème persiste</li>
+        </ul>
+      </div>
+
+      <div class="help-text">
+        Besoin d'aide? <a href="mailto:<?= CONFIG.company_info?.email || 'contact@styleetmatiere.fr' ?>" class="help-link">Contactez-nous</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Attempt to login by reloading the page
+     * Google Apps Script will handle the authentication flow
+     */
+    function attemptLogin() {
+      // Show loading state
+      const button = document.querySelector('.action-button');
+      button.disabled = true;
+      button.innerHTML = '<span>⏳</span><span>Redirection...</span>';
+
+      // Reload to trigger Google authentication
+      // The doGet() function will handle authentication and redirect appropriately
+      setTimeout(() => {
+        window.location.href = window.location.href;
+      }, 500);
+    }
+
+    /**
+     * Check if there's an error message in the URL
+     */
+    window.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      const error = params.get('error');
+
+      if (error === 'unauthorized') {
+        showError('Compte non autorisé. Veuillez contacter l\'administrateur pour obtenir l\'accès.');
+      } else if (error === 'auth_failed') {
+        showError('Échec de l\'authentification. Veuillez réessayer.');
+      }
+    });
+
+    /**
+     * Show error message
+     */
+    function showError(message) {
+      const errorBox = document.createElement('div');
+      errorBox.className = 'message-box error';
+      errorBox.innerHTML = `
+        <span class="message-icon">⚠️</span>
+        <div class="message-text">
+          <strong>Erreur</strong><br>
+          ${message}
+        </div>
+      `;
+
+      const loginBody = document.querySelector('.login-body');
+      loginBody.insertBefore(errorBox, loginBody.firstChild);
+    }
+
+    /**
+     * Show success message
+     */
+    function showSuccess(message) {
+      const successBox = document.createElement('div');
+      successBox.className = 'message-box success';
+      successBox.innerHTML = `
+        <span class="message-icon">✓</span>
+        <div class="message-text">
+          <strong>Succès</strong><br>
+          ${message}
+        </div>
+      `;
+
+      const loginBody = document.querySelector('.login-body');
+      loginBody.insertBefore(successBox, loginBody.firstChild);
+    }
+  </script>
+</body>
+</html>
