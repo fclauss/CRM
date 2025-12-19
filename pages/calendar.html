@@ -16,46 +16,38 @@
       --warning: #ff9800;
       --danger: #f44336;
       --info: #2196F3;
-    }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       background: var(--gray-light);
       min-height: 100vh;
-    }
 
     .page-container {
       max-width: 1400px;
       margin: 0 auto;
       padding: 20px;
-    }
 
     .page-header {
       margin-bottom: 30px;
-    }
 
     .page-title {
       font-size: 28px;
       font-weight: 600;
       color: #333;
       margin-bottom: 10px;
-    }
 
     .page-subtitle {
       font-size: 16px;
       color: #666;
-    }
 
     /* Calendar Sections */
     .calendar-section {
       margin-bottom: 30px;
-    }
 
     .section-header {
       display: flex;
@@ -65,13 +57,11 @@
       font-weight: 500;
       margin-bottom: 15px;
       color: #333;
-    }
 
     .projects-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
-    }
 
     /* Project Cards */
     .project-card {
@@ -81,32 +71,26 @@
       padding: 20px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       transition: transform 0.2s, box-shadow 0.2s;
-    }
 
     .project-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
 
     .project-card.current {
       border-left: 4px solid var(--success);
-    }
 
     .project-card.upcoming {
       border-left: 4px solid var(--warning);
-    }
 
     .project-card.completed {
       border-left: 4px solid var(--info);
       opacity: 0.9;
-    }
 
     .project-title {
       font-weight: 500;
       font-size: 18px;
       margin-bottom: 12px;
       color: var(--primary);
-    }
 
     .project-dates {
       color: #666;
@@ -115,7 +99,6 @@
       display: flex;
       align-items: center;
       gap: 5px;
-    }
 
     .project-duration {
       background: var(--gray-light);
@@ -124,24 +107,20 @@
       display: inline-block;
       font-size: 13px;
       margin-bottom: 10px;
-    }
 
     .project-value {
       font-size: 16px;
       font-weight: 600;
       color: var(--primary);
       margin-bottom: 10px;
-    }
 
     .project-progress {
       margin-top: 12px;
-    }
 
     .progress-label {
       font-size: 12px;
       color: #666;
       margin-bottom: 5px;
-    }
 
     .progress-bar-container {
       width: 100%;
@@ -149,14 +128,12 @@
       background: var(--gray-light);
       border-radius: 4px;
       overflow: hidden;
-    }
 
     .progress-bar {
       height: 100%;
       background: linear-gradient(90deg, var(--success), var(--primary));
       border-radius: 4px;
       transition: width 0.3s ease;
-    }
 
     .project-meta {
       font-size: 13px;
@@ -164,7 +141,6 @@
       margin-top: 10px;
       padding-top: 10px;
       border-top: 1px solid var(--gray-border);
-    }
 
     /* Empty State */
     .empty-state {
@@ -174,22 +150,18 @@
       padding: 40px;
       text-align: center;
       color: #999;
-    }
 
     .empty-state-icon {
       font-size: 48px;
       margin-bottom: 15px;
-    }
 
     .empty-state-text {
       font-size: 16px;
       margin-bottom: 10px;
-    }
 
     .empty-state-hint {
       font-size: 14px;
       color: #aaa;
-    }
 
     /* Loading Spinner */
     .loading {
@@ -198,7 +170,6 @@
       justify-content: center;
       align-items: center;
       padding: 40px;
-    }
 
     .spinner {
       border: 3px solid var(--gray-border);
@@ -207,21 +178,17 @@
       width: 40px;
       height: 40px;
       animation: spin 1s linear infinite;
-    }
 
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
-    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
-    }
 
     .fade-in {
       animation: fadeIn 0.3s ease-out;
-    }
 
     /* Timeline View (Optional Enhancement) */
     .timeline-view {
@@ -230,14 +197,12 @@
       border-radius: 8px;
       padding: 20px;
       margin-bottom: 30px;
-    }
 
     .timeline-item {
       display: flex;
       gap: 15px;
       margin-bottom: 20px;
       position: relative;
-    }
 
     .timeline-item:not(:last-child)::after {
       content: '';
@@ -247,7 +212,6 @@
       width: 2px;
       height: calc(100% - 20px);
       background: var(--gray-border);
-    }
 
     .timeline-dot {
       width: 40px;
@@ -259,62 +223,48 @@
       font-size: 20px;
       flex-shrink: 0;
       z-index: 1;
-    }
 
     .timeline-dot.current {
       background: var(--success);
       color: white;
-    }
 
     .timeline-dot.upcoming {
       background: var(--warning);
       color: white;
-    }
 
     .timeline-dot.completed {
       background: var(--info);
       color: white;
-    }
 
     .timeline-content {
       flex: 1;
       padding: 5px 0;
-    }
 
     .timeline-title {
       font-weight: 500;
       margin-bottom: 5px;
-    }
 
     .timeline-date {
       font-size: 13px;
       color: #666;
-    }
 
     /* Responsive Design */
     @media (max-width: 1024px) {
       .projects-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      }
-    }
 
     @media (max-width: 768px) {
       .page-container {
         padding: 10px;
-      }
 
       .projects-grid {
         grid-template-columns: 1fr;
-      }
 
       .page-title {
         font-size: 24px;
-      }
 
       .section-header {
         font-size: 18px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -339,10 +289,6 @@
   <?!= include('pages/components/client-api'); ?>
 
   <script>
-    // Set user info in header
-    if (window.setUserInfo) {
-      window.setUserInfo(<?= JSON.stringify(user) ?>);
-    }
     // Global state
     let calendarData = null;
 
@@ -350,6 +296,11 @@
      * Initialize calendar on page load
      */
     window.addEventListener('DOMContentLoaded', function() {
+      // Set user info in header after DOM is ready
+      if (window.setUserInfo) {
+        window.setUserInfo(<?= JSON.stringify(user) ?>);
+      }
+
       loadCalendarData();
     });
 
@@ -364,8 +315,6 @@
       } catch (error) {
         console.error('Error loading calendar:', error);
         showError('Erreur lors du chargement du calendrier: ' + error.message);
-      }
-    }
 
     /**
      * Render calendar with projects
@@ -406,7 +355,6 @@
           ` : ''}
         </div>
       `;
-    }
 
     /**
      * Render a section of projects
@@ -420,12 +368,10 @@
             <div class="empty-state-hint">${getEmptyStateHint(type)}</div>
           </div>
         `;
-      }
 
       const projectCards = projects.map(project => renderProjectCard(project, type)).join('');
 
       return `<div class="projects-grid">${projectCards}</div>`;
-    }
 
     /**
      * Render a single project card
@@ -463,7 +409,6 @@
           ` : ''}
         </div>
       `;
-    }
 
     /**
      * Get empty state icon based on section type
@@ -475,7 +420,6 @@
         'completed': '✅'
       };
       return icons[type] || '📅';
-    }
 
     /**
      * Get empty state text based on section type
@@ -487,7 +431,6 @@
         'completed': 'Aucun projet terminé récemment'
       };
       return texts[type] || 'Aucun projet';
-    }
 
     /**
      * Get empty state hint based on section type
@@ -499,7 +442,6 @@
         'completed': 'Les projets terminés dans les 30 derniers jours apparaîtront ici'
       };
       return hints[type] || '';
-    }
 
     /**
      * Format date range for display
@@ -526,10 +468,8 @@
         return `Début: ${start}`;
       } else if (end) {
         return `Fin: ${end}`;
-      }
 
       return 'Dates non définies';
-    }
 
     /**
      * Format currency values
@@ -542,7 +482,6 @@
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(value);
-    }
 
     /**
      * Escape HTML to prevent XSS
@@ -551,7 +490,6 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
-    }
 
     /**
      * Show error message
@@ -577,14 +515,12 @@
           </button>
         </div>
       `;
-    }
 
     /**
      * Manual refresh
      */
     function refreshCalendar() {
       loadCalendarData();
-    }
   </script>
 </body>
 </html>

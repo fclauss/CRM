@@ -15,41 +15,34 @@
       --success: #4CAF50;
       --warning: #ff9800;
       --danger: #f44336;
-    }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       background: var(--gray-light);
       min-height: 100vh;
-    }
 
     .page-container {
       max-width: 1000px;
       margin: 0 auto;
       padding: 20px;
-    }
 
     .page-header {
       margin-bottom: 30px;
-    }
 
     .page-title {
       font-size: 28px;
       font-weight: 600;
       color: #333;
       margin-bottom: 10px;
-    }
 
     .page-subtitle {
       font-size: 16px;
       color: #666;
-    }
 
     /* Settings Sections */
     .settings-section {
@@ -58,7 +51,6 @@
       border-radius: 8px;
       padding: 25px;
       margin-bottom: 20px;
-    }
 
     .section-header {
       display: flex;
@@ -70,12 +62,10 @@
       color: #333;
       padding-bottom: 15px;
       border-bottom: 2px solid var(--gray-border);
-    }
 
     /* Form Elements */
     .form-group {
       margin-bottom: 20px;
-    }
 
     .form-label {
       display: block;
@@ -83,7 +73,6 @@
       margin-bottom: 8px;
       color: #333;
       font-size: 14px;
-    }
 
     .form-input,
     .form-textarea,
@@ -95,7 +84,6 @@
       font-size: 14px;
       font-family: inherit;
       transition: border-color 0.2s;
-    }
 
     .form-input:focus,
     .form-textarea:focus,
@@ -103,25 +91,21 @@
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.1);
-    }
 
     .form-textarea {
       min-height: 120px;
       resize: vertical;
-    }
 
     .form-help {
       font-size: 13px;
       color: #666;
       margin-top: 5px;
-    }
 
     /* Buttons */
     .button-group {
       display: flex;
       gap: 10px;
       margin-top: 20px;
-    }
 
     .btn {
       padding: 10px 20px;
@@ -131,40 +115,32 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
-    }
 
     .btn-primary {
       background: var(--primary);
       color: white;
-    }
 
     .btn-primary:hover {
       background: var(--primary-dark);
-    }
 
     .btn-secondary {
       background: white;
       color: #666;
       border: 1px solid var(--gray-border);
-    }
 
     .btn-secondary:hover {
       background: var(--gray-light);
-    }
 
     .btn-danger {
       background: var(--danger);
       color: white;
-    }
 
     .btn-danger:hover {
       background: #d32f2f;
-    }
 
     .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-    }
 
     /* Info Box */
     .info-box {
@@ -175,28 +151,23 @@
       margin-bottom: 20px;
       display: flex;
       gap: 10px;
-    }
 
     .info-box.warning {
       background: #fff8e1;
       border-color: var(--warning);
-    }
 
     .info-box.danger {
       background: #ffebee;
       border-color: var(--danger);
-    }
 
     .info-icon {
       font-size: 20px;
       flex-shrink: 0;
-    }
 
     .info-text {
       font-size: 14px;
       color: #333;
       line-height: 1.5;
-    }
 
     /* User Info */
     .user-info-card {
@@ -207,7 +178,6 @@
       background: var(--gray-light);
       border-radius: 8px;
       margin-bottom: 20px;
-    }
 
     .user-avatar {
       width: 60px;
@@ -220,22 +190,18 @@
       justify-content: center;
       font-size: 24px;
       font-weight: 600;
-    }
 
     .user-details {
       flex: 1;
-    }
 
     .user-name {
       font-size: 18px;
       font-weight: 500;
       margin-bottom: 5px;
-    }
 
     .user-email {
       font-size: 14px;
       color: #666;
-    }
 
     .user-role {
       display: inline-block;
@@ -246,20 +212,17 @@
       font-size: 12px;
       text-transform: uppercase;
       margin-top: 5px;
-    }
 
     /* Admin Only Section */
     .admin-only {
       border: 2px dashed var(--warning);
       background: #fffef7;
-    }
 
     /* Loading State */
     .loading {
       text-align: center;
       padding: 40px;
       color: #666;
-    }
 
     .spinner {
       border: 3px solid var(--gray-border);
@@ -269,27 +232,21 @@
       height: 40px;
       animation: spin 1s linear infinite;
       margin: 0 auto 15px;
-    }
 
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
-    }
 
     /* Responsive Design */
     @media (max-width: 768px) {
       .page-container {
         padding: 10px;
-      }
 
       .button-group {
         flex-direction: column;
-      }
 
       .btn {
         width: 100%;
-      }
-    }
   </style>
 </head>
 <body>
@@ -314,10 +271,6 @@
   <?!= include('pages/components/client-api'); ?>
 
   <script>
-    // Set user info in header
-    if (window.setUserInfo) {
-      window.setUserInfo(<?= JSON.stringify(user) ?>);
-    }
     // Global state
     let currentUser = <?= JSON.stringify(user) ?>;
     let emailTemplates = null;
@@ -327,6 +280,11 @@
      * Initialize settings page
      */
     window.addEventListener('DOMContentLoaded', function() {
+      // Set user info in header after DOM is ready
+      if (window.setUserInfo) {
+        window.setUserInfo(<?= JSON.stringify(user) ?>);
+      }
+
       loadSettings();
       setupBeforeUnload();
     });
@@ -339,9 +297,7 @@
         if (isDirty) {
           e.preventDefault();
           e.returnValue = '';
-        }
       });
-    }
 
     /**
      * Load settings data
@@ -354,8 +310,6 @@
       } catch (error) {
         console.error('Error loading settings:', error);
         showError('Erreur lors du chargement des paramètres: ' + error.message);
-      }
-    }
 
     /**
      * Render settings page
@@ -426,7 +380,6 @@
 
       // Attach event listeners for marking form as dirty
       attachFormListeners();
-    }
 
     /**
      * Render email templates editor
@@ -486,7 +439,6 @@
           </button>
         </div>
       `;
-    }
 
     /**
      * Render admin-only settings
@@ -541,14 +493,12 @@
           </div>
         </div>
       `;
-    }
 
     /**
      * Mark form as dirty (unsaved changes)
      */
     function markDirty() {
       isDirty = true;
-    }
 
     /**
      * Attach form listeners
@@ -558,7 +508,6 @@
       inputs.forEach(input => {
         input.addEventListener('input', markDirty);
       });
-    }
 
     /**
      * Save email templates
@@ -578,8 +527,6 @@
       } catch (error) {
         console.error('Error saving templates:', error);
         alert('Erreur lors de la sauvegarde: ' + error.message);
-      }
-    }
 
     /**
      * Reset email templates to defaults
@@ -587,7 +534,6 @@
     async function resetToDefaults() {
       if (!confirm('Êtes-vous sûr de vouloir réinitialiser tous les modèles d\'email?\nCette action est irréversible.')) {
         return;
-      }
 
       try {
         await API.resetEmailTemplates();
@@ -598,8 +544,6 @@
       } catch (error) {
         console.error('Error resetting templates:', error);
         alert('Erreur lors de la réinitialisation: ' + error.message);
-      }
-    }
 
     /**
      * View invoice counter details
@@ -611,8 +555,6 @@
       } catch (error) {
         console.error('Error getting counter:', error);
         alert('Erreur lors de la récupération du compteur: ' + error.message);
-      }
-    }
 
     /**
      * Confirm and reset invoice counter
@@ -636,7 +578,6 @@
       if (doubleConfirm !== 'RESET') {
         alert('Réinitialisation annulée.');
         return;
-      }
 
       try {
         await API.resetInvoiceCounter();
@@ -645,8 +586,6 @@
       } catch (error) {
         console.error('Error resetting counter:', error);
         alert('Erreur lors de la réinitialisation: ' + error.message);
-      }
-    }
 
     /**
      * Helper: Get user initials for avatar
@@ -656,9 +595,7 @@
       const parts = name.split(' ');
       if (parts.length >= 2) {
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-      }
       return name.substring(0, 2).toUpperCase();
-    }
 
     /**
      * Helper: Escape HTML
@@ -668,7 +605,6 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
-    }
 
     /**
      * Show error message
@@ -685,7 +621,6 @@
           </button>
         </div>
       `;
-    }
 
     /**
      * Show toast notification
@@ -718,7 +653,6 @@
         toast.style.animation = 'slideOut 0.3s ease-out';
         setTimeout(() => toast.remove(), 300);
       }, 3000);
-    }
   </script>
 </body>
 </html>
