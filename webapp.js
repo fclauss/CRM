@@ -305,3 +305,14 @@ function jsonResponse(data, statusCode = 200) {
 
   return output;
 }
+
+/**
+ * Include HTML file content (for template includes)
+ * Used by HTML templates to include shared components
+ *
+ * @param {string} filename - File path relative to project root
+ * @returns {string} File content as string
+ */
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}

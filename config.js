@@ -348,20 +348,20 @@ Tél: 06.38.70.45.76`
     // Allowed users (must match Google account email)
     // IMPORTANT: Update these with actual email addresses
     allowed_users: [
-      'your-email@example.com',        // Admin user (Fabien)
+      'fabien@optimal-ai.eu',        // Admin user (Fabien)
       'styleematiere@gmail.com'         // User (Style et Matière)
     ],
 
     // Admin users (full access including settings and reset)
     admins: [
-      'your-email@example.com'          // Fabien has admin access
+      'fabien@optimal-ai.eu'          // Fabien has admin access
     ],
 
     // Custom display names (optional)
     // If not specified, name is extracted from email
     user_names: {
-      'your-email@example.com': 'Fabien',
-      'styleematiere@gmail.com': 'Style et Matière'
+      'fabien@optimal-ai.eu': 'Fabien',
+      'styleematiere@gmail.com': 'Stéphane'
     }
   }
 };
