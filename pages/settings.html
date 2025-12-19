@@ -314,6 +314,10 @@
   <?!= include('pages/components/client-api'); ?>
 
   <script>
+    // Set user info in header
+    if (window.setUserInfo) {
+      window.setUserInfo(<?= JSON.stringify(user) ?>);
+    }
     // Global state
     let currentUser = <?= JSON.stringify(user) ?>;
     let emailTemplates = null;

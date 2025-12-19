@@ -111,10 +111,8 @@
     </nav>
 
     <div class="user-menu">
-      <span class="user-name"><?= user.name ?></span>
-      <?  if (user.role === 'admin') { ?>
-        <span class="user-role">Admin</span>
-      <? } ?>
+      <span class="user-name" id="user-name-display"></span>
+      <span class="user-role" id="user-role-display" style="display: none;"></span>
     </div>
   </div>
 </header>
@@ -128,4 +126,17 @@
       activeLink.classList.add('active');
     }
   })();
+
+  // Set user info from template variable
+  // This will be set by the parent page that includes this header
+  window.setUserInfo = function(user) {
+    if (user) {
+      document.getElementById('user-name-display').textContent = user.name;
+      if (user.role === 'admin') {
+        const roleSpan = document.getElementById('user-role-display');
+        roleSpan.textContent = 'Admin';
+        roleSpan.style.display = 'inline-block';
+      }
+    }
+  };
 </script>
