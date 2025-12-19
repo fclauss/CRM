@@ -16,10 +16,15 @@
 function authenticateRequest(e) {
   try {
     // Get current user from Apps Script session
-    const email = Session.getActiveUser().getEmail();
+    // Use getEffectiveUser() which is more reliable for web apps
+    const session = Session.getEffectiveUser();
+    const email = session.getEmail();
 
-    if (!email) {
-      Logger.log('Auth failed: No email in session');
+    // IMPORTANT: In web apps, getEmail() might return empty string
+    // if the user hasn't granted OAuth permissions yet
+    if (!email || email === '') {
+      Logger.log('Auth failed: No email in session (OAuth not granted or DOMAIN access issue)');
+      Logger.log('Deployment mode should be USER_ACCESSING, access should be DOMAIN or ANYONE');
       return null;
     }
 
