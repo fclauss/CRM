@@ -190,7 +190,7 @@
 
   <!-- User Data (from server) -->
   <script>
-    window.currentUser = <?= JSON.stringify(user) ?>;
+    window.currentUser = <?= typeof user !== "undefined" && user ? JSON.stringify(user) : "null" ?>;
   </script>
 
   <script>
