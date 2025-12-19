@@ -88,7 +88,8 @@ function routeRequest(page, params, user) {
     'dashboard': renderDashboard,
     'clients': renderClients,
     'calendar': renderCalendar,
-    'settings': renderSettings
+    'settings': renderSettings,
+    'test': renderTestPage
   };
 
   const handler = routes[page];
@@ -97,6 +98,15 @@ function routeRequest(page, params, user) {
   }
 
   return handler(params, user);
+}
+
+/**
+ * Renders test page (for debugging)
+ */
+function renderTestPage() {
+  return HtmlService.createHtmlOutputFromFile('pages/test-simple')
+    .setTitle('Test Page')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 /**
