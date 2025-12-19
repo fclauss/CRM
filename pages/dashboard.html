@@ -188,6 +188,11 @@
   <!-- Include Client API Component -->
   <?!= include('pages/components/client-api'); ?>
 
+  <!-- User Data (from server) -->
+  <script>
+    window.currentUser = <?= JSON.stringify(user) ?>;
+  </script>
+
   <script>
 
     // Global state
@@ -199,13 +204,8 @@
      */
     window.addEventListener('DOMContentLoaded', function() {
       // Set user info in header after DOM is ready
-      try {
-        if (window.setUserInfo) {
-          const userData = <?= JSON.stringify(user || {name: 'User', role: 'user'}) ?>;
-          window.setUserInfo(userData);
-        }
-      } catch (e) {
-        console.error('Error setting user info:', e);
+      if (window.setUserInfo && window.currentUser) {
+        window.setUserInfo(window.currentUser);
       }
 
       loadDashboardData();
