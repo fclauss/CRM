@@ -18,18 +18,24 @@ function doGet(e) {
     // Check authentication
     const user = authenticateRequest(e);
     if (!user) {
+      Logger.log('doGet: No user, rendering login page');
       return renderLoginPage();
     }
 
+    Logger.log('doGet: User authenticated, rendering page');
+
     // Extract route and parameters
-    const page = e.parameter.page || 'dashboard';
-    const params = e.parameter || {};
+    const page = (e && e.parameter && e.parameter.page) ? e.parameter.page : 'dashboard';
+    const params = (e && e.parameter) ? e.parameter : {};
+
+    Logger.log('doGet: Routing to page: ' + page);
 
     // Route to appropriate page
     return routeRequest(page, params, user);
 
   } catch (error) {
     Logger.log('doGet error: ' + error.message);
+    Logger.log('doGet error stack: ' + error.stack);
     return renderErrorPage(error.message);
   }
 }

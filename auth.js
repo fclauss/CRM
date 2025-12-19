@@ -147,12 +147,18 @@ function getClientConfig() {
   // Deep clone CONFIG
   const safeCONFIG = JSON.parse(JSON.stringify(CONFIG));
 
-  // Remove sensitive data
-  delete safeCONFIG.file_paths.crm_sheet_id;
+  // Remove sensitive data (with null checks)
+  if (safeCONFIG.file_paths) {
+    delete safeCONFIG.file_paths.crm_sheet_id;
+  }
+
   delete safeCONFIG.auth;
-  delete safeCONFIG.company_info.iban;
-  delete safeCONFIG.company_info.bic;
-  delete safeCONFIG.company_info.qr_code_api_endpoint;
+
+  if (safeCONFIG.company_info) {
+    delete safeCONFIG.company_info.iban;
+    delete safeCONFIG.company_info.bic;
+    delete safeCONFIG.company_info.qr_code_api_endpoint;
+  }
 
   return safeCONFIG;
 }
