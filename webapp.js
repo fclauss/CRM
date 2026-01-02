@@ -103,8 +103,16 @@ function routeRequest(page, params, user) {
 /**
  * Renders test page (for debugging)
  */
-function renderTestPage() {
-  return HtmlService.createHtmlOutputFromFile('pages/test-simple')
+function renderTestPage(params, user) {
+  const template = HtmlService.createTemplateFromFile('pages/test-simple');
+
+  // Test different ways of passing user data
+  template.user = user;
+  template.userName = user ? user.name : 'Guest';
+  template.userEmail = user ? user.email : 'none';
+  template.userRole = user ? user.role : 'none';
+
+  return template.evaluate()
     .setTitle('Test Page')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
@@ -120,6 +128,15 @@ function renderTestPage() {
 function renderDashboard(params, user) {
   const template = HtmlService.createTemplateFromFile('pages/dashboard');
   template.user = user;
+
+  // Safely serialize user object for client-side
+  try {
+    template.userJson = user ? JSON.stringify(user) : 'null';
+  } catch (e) {
+    Logger.log('Error serializing user object: ' + e.message);
+    template.userJson = 'null';
+  }
+
   template.config = getClientConfig();
 
   return template.evaluate()
@@ -139,6 +156,15 @@ function renderDashboard(params, user) {
 function renderClients(params, user) {
   const template = HtmlService.createTemplateFromFile('pages/clients');
   template.user = user;
+
+  // Safely serialize user object for client-side
+  try {
+    template.userJson = user ? JSON.stringify(user) : 'null';
+  } catch (e) {
+    Logger.log('Error serializing user object: ' + e.message);
+    template.userJson = 'null';
+  }
+
   template.config = getClientConfig();
 
   return template.evaluate()
@@ -158,6 +184,15 @@ function renderClients(params, user) {
 function renderCalendar(params, user) {
   const template = HtmlService.createTemplateFromFile('pages/calendar');
   template.user = user;
+
+  // Safely serialize user object for client-side
+  try {
+    template.userJson = user ? JSON.stringify(user) : 'null';
+  } catch (e) {
+    Logger.log('Error serializing user object: ' + e.message);
+    template.userJson = 'null';
+  }
+
   template.config = getClientConfig();
 
   return template.evaluate()
@@ -177,6 +212,15 @@ function renderCalendar(params, user) {
 function renderSettings(params, user) {
   const template = HtmlService.createTemplateFromFile('pages/settings');
   template.user = user;
+
+  // Safely serialize user object for client-side
+  try {
+    template.userJson = user ? JSON.stringify(user) : 'null';
+  } catch (e) {
+    Logger.log('Error serializing user object: ' + e.message);
+    template.userJson = 'null';
+  }
+
   template.config = getClientConfig();
 
   return template.evaluate()

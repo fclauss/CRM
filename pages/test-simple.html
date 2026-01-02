@@ -2,16 +2,111 @@
 <html>
 <head>
   <title>Simple Test Page</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+    .success { background: #e8f5e9; }
+    .error { background: #ffebee; }
+    pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+  </style>
 </head>
 <body>
-  <h1>Simple Test Page</h1>
-  <p>If you see this, the basic rendering works.</p>
+  <h1>User Data Injection Test Page</h1>
+  <p>Testing different methods to pass user data from server to client.</p>
 
-  <div id="user-info"></div>
+  <!-- Method 1: Direct primitive values (should always work) -->
+  <div class="test-section">
+    <h2>Method 1: Direct Primitive Values in Script</h2>
+    <div id="method1-result"></div>
+    <script>
+      try {
+        const userName = '<?!= userName ?>';
+        const userEmail = '<?!= userEmail ?>';
+        const userRole = '<?!= userRole ?>';
 
-  <script>
-    document.getElementById('user-info').textContent = 'JavaScript works!';
-    console.log('Test page loaded successfully');
-  </script>
+        document.getElementById('method1-result').innerHTML = `
+          <div class="success">
+            <strong>✓ Success</strong><br>
+            Name: ${userName}<br>
+            Email: ${userEmail}<br>
+            Role: ${userRole}
+          </div>
+        `;
+        console.log('Method 1 success:', { userName, userEmail, userRole });
+      } catch (e) {
+        document.getElementById('method1-result').innerHTML = `
+          <div class="error"><strong>✗ Error:</strong> ${e.message}</div>
+        `;
+        console.error('Method 1 failed:', e);
+      }
+    </script>
+  </div>
+
+  <!-- Method 2: Hidden input fields -->
+  <div class="test-section">
+    <h2>Method 2: Hidden Input Fields</h2>
+    <input type="hidden" id="user-name-input" value="<?!= userName ?>">
+    <input type="hidden" id="user-email-input" value="<?!= userEmail ?>">
+    <input type="hidden" id="user-role-input" value="<?!= userRole ?>">
+    <div id="method2-result"></div>
+    <script>
+      try {
+        const userName = document.getElementById('user-name-input').value;
+        const userEmail = document.getElementById('user-email-input').value;
+        const userRole = document.getElementById('user-role-input').value;
+
+        document.getElementById('method2-result').innerHTML = `
+          <div class="success">
+            <strong>✓ Success</strong><br>
+            Name: ${userName}<br>
+            Email: ${userEmail}<br>
+            Role: ${userRole}
+          </div>
+        `;
+        console.log('Method 2 success:', { userName, userEmail, userRole });
+      } catch (e) {
+        document.getElementById('method2-result').innerHTML = `
+          <div class="error"><strong>✗ Error:</strong> ${e.message}</div>
+        `;
+        console.error('Method 2 failed:', e);
+      }
+    </script>
+  </div>
+
+  <!-- Method 3: Meta tags -->
+  <div class="test-section">
+    <h2>Method 3: Meta Tags</h2>
+    <meta name="user-name" content="<?!= userName ?>">
+    <meta name="user-email" content="<?!= userEmail ?>">
+    <meta name="user-role" content="<?!= userRole ?>">
+    <div id="method3-result"></div>
+    <script>
+      try {
+        const userName = document.querySelector('meta[name="user-name"]').content;
+        const userEmail = document.querySelector('meta[name="user-email"]').content;
+        const userRole = document.querySelector('meta[name="user-role"]').content;
+
+        document.getElementById('method3-result').innerHTML = `
+          <div class="success">
+            <strong>✓ Success</strong><br>
+            Name: ${userName}<br>
+            Email: ${userEmail}<br>
+            Role: ${userRole}
+          </div>
+        `;
+        console.log('Method 3 success:', { userName, userEmail, userRole });
+      } catch (e) {
+        document.getElementById('method3-result').innerHTML = `
+          <div class="error"><strong>✗ Error:</strong> ${e.message}</div>
+        `;
+        console.error('Method 3 failed:', e);
+      }
+    </script>
+  </div>
+
+  <div class="test-section">
+    <h2>Console Output</h2>
+    <p>Check the browser console (F12) for detailed logs from each method.</p>
+  </div>
 </body>
 </html>

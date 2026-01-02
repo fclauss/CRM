@@ -60,6 +60,9 @@ const CONFIG = {
   // Change these if you rename sheets in your Google Sheets file
 
   file_paths: {
+    // Spreadsheet ID (needed for web app access)
+    crm_sheet_id: '1QMxpd2d1by0lfQdvKv27GyNtzckfJ_CL8BzJiPOi2SU',
+
     // Main sheet with client data (typically from Google Form responses)
     crm_sheet_name: 'Form Responses 1',
 

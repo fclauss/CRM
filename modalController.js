@@ -44,7 +44,7 @@ function openCRMModal() {
  *   - recentActivity: Array of recent quote generations
  */
 function getDashboardMetrics() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+  const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
     .getSheetByName(CONFIG.file_paths.crm_sheet_name);
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
@@ -251,7 +251,7 @@ function formatTimeAgo(date) {
  */
 function getClientsData() {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
       .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
     if (!sheet) {
@@ -312,7 +312,7 @@ function getClientsData() {
  *   - Internal notes
  */
 function getClientDetails(row) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+  const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
     .getSheetByName(CONFIG.file_paths.crm_sheet_name);
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const rowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
@@ -372,7 +372,7 @@ function getClientDetails(row) {
  */
 function updateClientStatus(row, newStatus) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
       .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
     if (!sheet) {
@@ -427,7 +427,7 @@ function updateClientStatus(row, newStatus) {
  */
 function updateProjectDetails(row, startDate, endDate, projectValue) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
       .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
     if (!sheet) {
@@ -499,7 +499,7 @@ function updateProjectDetails(row, startDate, endDate, projectValue) {
  */
 function getQuoteValue(row) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
       .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
@@ -524,7 +524,7 @@ function getQuoteValue(row) {
  */
 function saveClientNotes(row, notes) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
       .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
     if (!sheet) {
@@ -576,7 +576,7 @@ function saveClientNotes(row, notes) {
  *   - today: Today's date in yyyy-MM-dd format
  */
 function getCalendarData() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+  const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
     .getSheetByName(CONFIG.file_paths.crm_sheet_name);
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
@@ -676,7 +676,7 @@ function getCalendarData() {
  * @param {number} row - Row number in the sheet
  */
 function generateQuoteForRow(row) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+  const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
     .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
   sheet.getRange(row, 1).activate();
@@ -689,7 +689,7 @@ function generateQuoteForRow(row) {
  * @param {number} row - Row number in the sheet
  */
 function generateInvoiceForRow(row) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+  const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
     .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
   sheet.getRange(row, 1).activate();
@@ -709,7 +709,7 @@ function generateInvoiceForRow(row) {
  */
 function generateQuoteEmailDraft(row) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
       .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
@@ -784,7 +784,7 @@ function generateQuoteEmailDraft(row) {
  */
 function generateFollowUpEmailDraft(row) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
       .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
@@ -856,7 +856,7 @@ function generateFollowUpEmailDraft(row) {
  */
 function generateTestimonialEmailDraft(row) {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
       .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
