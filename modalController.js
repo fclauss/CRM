@@ -137,14 +137,25 @@ function getDashboardMetrics() {
     : 0;
 
   return {
+    // Main metrics (matching dashboard field names)
+    activeQuotes: pendingQuotes,
+    activeQuotesChange: 0, // TODO: Calculate from previous period
+    totalValue: pendingValue,
+    totalValueChange: 0, // TODO: Calculate from previous period
+    wonProjects: wonQuotes,
+    wonProjectsChange: 0, // TODO: Calculate from previous period
+    conversionRate: conversionRate,
+    conversionRateChange: 0, // TODO: Calculate from previous period
+
+    // Additional metrics for compatibility
     monthRevenue: monthRevenue,
     revenueChange: revenueChange,
     pendingQuotes: pendingQuotes,
     pendingValue: pendingValue,
     activeProjects: activeProjects,
     nextCompletion: activeProjects > 0 ? 'Dans 2 semaines' : 'Aucun',
-    conversionRate: conversionRate,
-    conversionTrend: 5,
+
+    // Actions and activity
     requiredActions: requiredActions,
     recentActivity: recentActivity
   };
