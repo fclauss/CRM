@@ -86,10 +86,12 @@ function doPost(e) {
 function routeRequest(page, params, user) {
   const routes = {
     'dashboard': renderDashboard,
+    'dashboard-simple': renderDashboardSimple,
     'clients': renderClients,
     'calendar': renderCalendar,
     'settings': renderSettings,
-    'test': renderTestPage
+    'test': renderTestPage,
+    'test-api': renderTestApi
   };
 
   const handler = routes[page];
@@ -114,6 +116,30 @@ function renderTestPage(params, user) {
 
   return template.evaluate()
     .setTitle('Test Page')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * Renders simple dashboard (debugging version)
+ */
+function renderDashboardSimple(params, user) {
+  const template = HtmlService.createTemplateFromFile('pages/dashboard-simple');
+  template.user = user;
+
+  return template.evaluate()
+    .setTitle('Dashboard Simple - Style et Matière')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * Renders test API page
+ */
+function renderTestApi(params, user) {
+  const template = HtmlService.createTemplateFromFile('pages/test-api');
+  template.user = user;
+
+  return template.evaluate()
+    .setTitle('API Test')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
