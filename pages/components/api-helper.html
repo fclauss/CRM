@@ -1,0 +1,180 @@
+<script>
+/**
+ * Simple API Helper using google.script.run
+ * Wraps google.script.run calls in promises for easier async/await usage
+ */
+
+const API = {
+  /**
+   * Dashboard APIs
+   */
+  getDashboardMetrics: function() {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getDashboardMetrics();
+    });
+  },
+
+  /**
+   * Client Management APIs
+   */
+  getClientsData: function() {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getClientsData();
+    });
+  },
+
+  getClientDetails: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getClientDetails(row);
+    });
+  },
+
+  updateClientStatus: function(row, status) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .updateClientStatus(row, status);
+    });
+  },
+
+  updateProjectDetails: function(row, startDate, endDate, value) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .updateProjectDetails(row, startDate, endDate, value);
+    });
+  },
+
+  saveClientNotes: function(row, notes) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .saveClientNotes(row, notes);
+    });
+  },
+
+  getQuoteValue: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getQuoteValue(row);
+    });
+  },
+
+  /**
+   * Calendar APIs
+   */
+  getCalendarData: function() {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getCalendarData();
+    });
+  },
+
+  /**
+   * Email APIs
+   */
+  generateQuoteEmailDraft: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .generateQuoteEmailDraft(row);
+    });
+  },
+
+  generateFollowUpEmailDraft: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .generateFollowUpEmailDraft(row);
+    });
+  },
+
+  generateTestimonialEmailDraft: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .generateTestimonialEmailDraft(row);
+    });
+  },
+
+  /**
+   * Template APIs
+   */
+  getEmailTemplates: function() {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getEmailTemplates();
+    });
+  },
+
+  saveEmailTemplates: function(templates) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .saveEmailTemplates(templates);
+    });
+  },
+
+  resetEmailTemplates: function() {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .resetEmailTemplates();
+    });
+  }
+};
+
+/**
+ * Show toast notification
+ */
+function showToast(message, type = 'info') {
+  const colors = {
+    success: '#4CAF50',
+    warning: '#FF9800',
+    error: '#F44336',
+    info: '#2196F3'
+  };
+
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: ${colors[type] || colors.info};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    z-index: 10000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+</script>
