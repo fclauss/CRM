@@ -33,15 +33,8 @@ function openCRMModal() {
  * PERFORMANCE OPTIMIZED: Uses direct array indexing instead of createObjectFromRow
  * Includes revenue, pending quotes, active projects, conversion rates, and activity feeds
  *
- * @returns {Object} Dashboard metrics object containing:
- *   - monthRevenue: Current month revenue from won/completed projects
- *   - revenueChange: Percentage change vs last month
- *   - pendingQuotes: Number of sent quotes awaiting response
- *   - pendingValue: Total value of pending quotes
- *   - activeProjects: Number of won projects in progress
- *   - conversionRate: Quote win rate percentage
- *   - requiredActions: Array of action items (follow-ups, etc.)
- *   - recentActivity: Array of recent quote generations
+ * @returns {DashboardMetrics} Dashboard metrics object
+ * @see types.js for DashboardMetrics type definition
  */
 function getDashboardMetrics() {
   const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
@@ -250,15 +243,8 @@ function formatTimeAgo(date) {
  * Retrieves all clients data in reverse chronological order (newest first)
  * Returns serialization-safe data (no Date objects)
  *
- * @returns {Array<Object>} Array of client objects with:
- *   - row: Row number in sheet
- *   - name: Client name
- *   - email: Client email
- *   - phone: Client phone
- *   - status: Current status
- *   - lastDocument: Latest quote number
- *   - amount: Quote amount (formatted)
- *   - lastAction: Time since last action (formatted)
+ * @returns {ClientListItem[]} Array of client list items
+ * @see types.js for ClientListItem type definition
  */
 function getClientsData() {
   try {
@@ -316,11 +302,8 @@ function getClientsData() {
  * Retrieves detailed information for a specific client
  *
  * @param {number} row - Row number in the CRM sheet
- * @returns {Object} Detailed client information including:
- *   - Personal info (name, email, phone, address)
- *   - Project details (work type, dates, value)
- *   - Documents (quote/invoice numbers and URLs)
- *   - Internal notes
+ * @returns {ClientDetails} Detailed client information
+ * @see types.js for ClientDetails type definition
  */
 function getClientDetails(row) {
   const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
@@ -581,10 +564,8 @@ function saveClientNotes(row, notes) {
  * Retrieves calendar data for 3-month project planning view
  * Returns projects with dates and unplanned projects
  *
- * @returns {Object} Calendar data containing:
- *   - weeks: Array with one element containing all projects in 3-month window
- *   - unplanned: Array of projects without dates
- *   - today: Today's date in yyyy-MM-dd format
+ * @returns {CalendarData} Calendar data with projects and timeline
+ * @see types.js for CalendarData type definition
  */
 function getCalendarData() {
   const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
