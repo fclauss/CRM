@@ -85,7 +85,8 @@ function doPost(e) {
  */
 function routeRequest(page, params, user) {
   const routes = {
-    'dashboard': renderDashboard,
+    'dashboard': renderDashboardWorking,
+    'dashboard-old': renderDashboard,
     'dashboard-simple': renderDashboardSimple,
     'clients': renderClients,
     'calendar': renderCalendar,
@@ -116,6 +117,18 @@ function renderTestPage(params, user) {
 
   return template.evaluate()
     .setTitle('Test Page')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * Renders working dashboard (uses google.script.run instead of POST)
+ */
+function renderDashboardWorking(params, user) {
+  const template = HtmlService.createTemplateFromFile('pages/dashboard-working');
+  template.user = user;
+
+  return template.evaluate()
+    .setTitle('Dashboard - Style et Matière')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
