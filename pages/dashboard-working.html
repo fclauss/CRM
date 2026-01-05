@@ -71,15 +71,17 @@
       <div class="logo">🎨 Style et Matière CRM</div>
 
       <nav class="nav">
-        <a href="?page=dashboard" class="active">📊 Tableau de Bord</a>
-        <a href="?page=clients">👥 Clients</a>
-        <a href="?page=calendar">📅 Calendrier</a>
-        <a href="?page=settings">⚙️ Paramètres</a>
+        <a href="?page=dashboard" class="nav-link" data-page="dashboard">📊 Tableau de Bord</a>
+        <a href="?page=clients" class="nav-link" data-page="clients">👥 Clients</a>
+        <a href="?page=calendar" class="nav-link" data-page="calendar">📅 Calendrier</a>
+        <a href="?page=settings" class="nav-link" data-page="settings">⚙️ Paramètres</a>
       </nav>
 
       <div class="user-info">
         <?= user ? user.name : 'Guest' ?>
-        <?= user && user.role === 'admin' ? ' <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">ADMIN</span>' : '' ?>
+        <? if (user && user.role === 'admin') { ?>
+          <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">ADMIN</span>
+        <? } ?>
       </div>
     </div>
   </div>
@@ -195,6 +197,16 @@
         maximumFractionDigits: 0
       }).format(value || 0);
     }
+
+    // Highlight active nav link
+    (function() {
+      const currentPage = new URLSearchParams(window.location.search).get('page') || 'dashboard';
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.dataset.page === currentPage) {
+          link.classList.add('active');
+        }
+      });
+    })();
 
     // Load on page ready
     window.addEventListener('DOMContentLoaded', loadDashboard);

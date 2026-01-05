@@ -341,12 +341,8 @@
      * Initialize calendar on page load
      */
     window.addEventListener('DOMContentLoaded', function() {
-      // Set user info in header after DOM is ready
-      if (window.setUserInfo) {
-        window.setUserInfo(<?= JSON.stringify(user) ?>);
-      }
-
       loadCalendarData();
+      highlightActiveNavLink();
     });
 
     /**
@@ -566,6 +562,19 @@
      */
     function refreshCalendar() {
       loadCalendarData();
+    /**
+     * Highlight active nav link
+     */
+    function highlightActiveNavLink() {
+      const currentPage = new URLSearchParams(window.location.search).get('page') || 'dashboard';
+      document.querySelectorAll('.app-header a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href.includes('page=' + currentPage)) {
+          link.style.background = 'rgba(255,255,255,0.2)';
+          link.style.fontWeight = '500';
+        }
+      });
+    }
   </script>
 </body>
 </html>

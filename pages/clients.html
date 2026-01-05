@@ -444,13 +444,9 @@
      * Initialize clients page on load
      */
     window.addEventListener('DOMContentLoaded', function() {
-      // Set user info in header after DOM is ready
-      if (window.setUserInfo) {
-        window.setUserInfo(<?= JSON.stringify(user) ?>);
-      }
-
       loadClientsData();
       checkUrlParameters();
+      highlightActiveNavLink();
     });
 
     /**
@@ -471,7 +467,7 @@
     async function loadClientsData() {
       try {
         const data = await API.getClientsData();
-        allClients = data.clients || [];
+        allClients = Array.isArray(data) ? data : [];
         filteredClients = [...allClients];
         currentPage = 1;
         renderCurrentPage();
@@ -920,6 +916,19 @@
         toast.style.animation = 'slideOut 0.3s ease-out';
         setTimeout(() => toast.remove(), 300);
       }, 3000);
+    }
+    /**
+     * Highlight active nav link
+     */
+    function highlightActiveNavLink() {
+      const currentPage = new URLSearchParams(window.location.search).get('page') || 'dashboard';
+      document.querySelectorAll('.app-header a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href.includes('page=' + currentPage)) {
+          link.style.background = 'rgba(255,255,255,0.2)';
+          link.style.fontWeight = '500';
+        }
+      });
     }
   </script>
 </body>
