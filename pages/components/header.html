@@ -138,13 +138,11 @@
 <script>
   // Highlight active page (runs after DOM is loaded)
   (function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const currentPage = urlParams.get('page') || 'dashboard';
+    const currentPage = window.CURRENT_PAGE || 'dashboard';
 
     // Debug logging
-    console.log('[Nav] Current URL:', window.location.href);
-    console.log('[Nav] URL search params:', window.location.search);
-    console.log('[Nav] Detected page:', currentPage);
+    console.log('[Nav] window.CURRENT_PAGE:', window.CURRENT_PAGE);
+    console.log('[Nav] Using currentPage:', currentPage);
 
     document.querySelectorAll('#main-nav a[data-page]').forEach(function(link) {
       const page = link.getAttribute('data-page');

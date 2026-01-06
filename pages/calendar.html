@@ -313,10 +313,11 @@
   </style>
 </head>
 <body>
-  <!-- Inject user data and web app URL for header -->
+  <!-- Inject user data, web app URL, and current page for header -->
   <script>
     window.USER_DATA = <?!= JSON.stringify(user || {}) ?>;
     window.WEB_APP_URL = <?!= JSON.stringify(webAppUrl || '') ?>;
+    window.CURRENT_PAGE = <?!= JSON.stringify(currentPage || 'dashboard') ?>;
   </script>
 
   <!-- Include Header Component -->
