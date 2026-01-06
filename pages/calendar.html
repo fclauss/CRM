@@ -313,9 +313,10 @@
   </style>
 </head>
 <body>
-  <!-- Inject user data for header -->
+  <!-- Inject user data and web app URL for header -->
   <script>
     window.USER_DATA = <?!= JSON.stringify(user || {}) ?>;
+    window.WEB_APP_URL = <?!= JSON.stringify(webAppUrl || '') ?>;
   </script>
 
   <!-- Include Header Component -->

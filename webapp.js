@@ -105,6 +105,7 @@ function routeRequest(page, params, user) {
 function renderDashboardWorking(params, user) {
   const template = HtmlService.createTemplateFromFile('pages/dashboard-working');
   template.user = user;
+  template.webAppUrl = ScriptApp.getService().getUrl();
 
   return template.evaluate()
     .setTitle('Dashboard - Style et Matière')
@@ -122,6 +123,7 @@ function renderDashboardWorking(params, user) {
 function renderClients(params, user) {
   const template = HtmlService.createTemplateFromFile('pages/clients');
   template.user = user;
+  template.webAppUrl = ScriptApp.getService().getUrl();
 
   // Safely serialize user object for client-side
   try {
@@ -150,6 +152,7 @@ function renderClients(params, user) {
 function renderCalendar(params, user) {
   const template = HtmlService.createTemplateFromFile('pages/calendar');
   template.user = user;
+  template.webAppUrl = ScriptApp.getService().getUrl();
 
   // Safely serialize user object for client-side
   try {
@@ -178,6 +181,7 @@ function renderCalendar(params, user) {
 function renderSettings(params, user) {
   const template = HtmlService.createTemplateFromFile('pages/settings');
   template.user = user;
+  template.webAppUrl = ScriptApp.getService().getUrl();
 
   // Safely serialize user object for client-side
   try {
