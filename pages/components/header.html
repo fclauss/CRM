@@ -112,9 +112,13 @@
 
     <div class="user-menu">
       <span class="user-name">
-        <?!= user ? user.name : 'Guest' ?>
+        <?! if (typeof user !== 'undefined' && user && user.name) { ?>
+          <?!= user.name ?>
+        <?! } else { ?>
+          Guest
+        <?! } ?>
       </span>
-      <?! if (user && user.role === 'admin') { ?>
+      <?! if (typeof user !== 'undefined' && user && user.role === 'admin') { ?>
         <span class="user-role">Admin</span>
       <?! } ?>
     </div>
