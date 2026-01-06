@@ -469,6 +469,9 @@
 
       if (clientId && action) {
         // Handle specific action for client
+        // TODO: Implement URL parameter handling
+      }
+    }
 
     /**
      * Load all clients data
@@ -494,6 +497,7 @@
       const end = start + CLIENTS_PER_PAGE;
       const pageClients = filteredClients.slice(start, end);
       renderClientList(pageClients);
+    }
 
     /**
      * Render client list
@@ -511,6 +515,7 @@
           </div>
         `;
         return;
+      }
 
       let html = '';
       clients.forEach(client => {
@@ -538,6 +543,7 @@
       });
 
       container.innerHTML = html;
+    }
 
     /**
      * Update pagination controls
@@ -551,6 +557,7 @@
       if (filteredClients.length === 0) {
         controls.style.display = 'none';
         return;
+      }
 
       controls.style.display = 'flex';
 
@@ -562,6 +569,7 @@
 
       prevBtn.disabled = currentPage === 1;
       nextBtn.disabled = end >= total;
+    }
 
     /**
      * Go to previous page
@@ -571,6 +579,8 @@
         currentPage--;
         renderCurrentPage();
         updatePaginationControls();
+      }
+    }
 
     /**
      * Go to next page
@@ -581,6 +591,8 @@
         currentPage++;
         renderCurrentPage();
         updatePaginationControls();
+      }
+    }
 
     /**
      * Filter clients based on search input
@@ -598,10 +610,12 @@
             (client.phone || '').toLowerCase().includes(searchTerm)
           );
         });
+      }
 
       currentPage = 1;
       renderCurrentPage();
       updatePaginationControls();
+    }
 
     /**
      * Select a client and show details
@@ -616,6 +630,8 @@
       } catch (error) {
         console.error('Error loading client details:', error);
         showDetailsError('Erreur lors du chargement des détails');
+      }
+    }
 
     /**
      * Render client details panel
@@ -685,6 +701,7 @@
           </div>
         </div>
       `;
+    }
 
     /**
      * Render project information section
@@ -692,6 +709,7 @@
     function renderProjectInfo(client) {
       if (!client.projectStartDate && !client.projectValue) {
         return '';
+      }
 
       return `
         <div class="detail-section">
@@ -716,6 +734,7 @@
           ` : ''}
         </div>
       `;
+    }
 
     /**
      * Render documents section
@@ -730,6 +749,7 @@
           date: client.quoteDate,
           link: client.quoteLink
         });
+      }
 
       if (client.invoiceLink) {
         documents.push({
@@ -738,6 +758,7 @@
           date: client.invoiceDate,
           link: client.invoiceLink
         });
+      }
 
       if (documents.length === 0) {
         return `
@@ -746,6 +767,7 @@
             <p style="color: #666; font-size: 14px;">Aucun document généré</p>
           </div>
         `;
+      }
 
       return `
         <div class="detail-section">
@@ -770,6 +792,7 @@
           </div>
         </div>
       `;
+    }
 
     /**
      * Update client status
@@ -782,17 +805,19 @@
         const client = allClients.find(c => c.row === row);
         if (client) {
           client.status = newStatus;
+        }
 
         renderCurrentPage(); // Re-render list to show updated status
 
         // Show success message
         showToast('Statut mis à jour avec succès');
-        } catch {
+      } catch (error) {
         console.error('Error updating status:', error);
         alert('Erreur lors de la mise à jour du statut: ' + error.message);
         loadClientsData(); // Reload to reset
-        }
       }
+    }
+
     /**
      * Open quote builder (will open modal for now)
      */
