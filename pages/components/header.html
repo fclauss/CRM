@@ -96,16 +96,16 @@
     </div>
 
     <nav class="main-nav" id="main-nav">
-      <a href="#" class="nav-link" data-page="dashboard">
+      <a href="?page=dashboard" class="nav-link" data-page="dashboard">
         📊 Tableau de Bord
       </a>
-      <a href="#" class="nav-link" data-page="clients">
+      <a href="?page=clients" class="nav-link" data-page="clients">
         👥 Clients
       </a>
-      <a href="#" class="nav-link" data-page="calendar">
+      <a href="?page=calendar" class="nav-link" data-page="calendar">
         📅 Calendrier
       </a>
-      <a href="#" class="nav-link" data-page="settings">
+      <a href="?page=settings" class="nav-link" data-page="settings">
         ⚙️ Paramètres
       </a>
     </nav>
@@ -118,23 +118,17 @@
 </header>
 
 <script>
-  // Setup navigation with correct absolute URLs
+  // Setup navigation - highlight active page
   (function() {
-    const baseUrl = window.location.origin + window.location.pathname;
     const currentPage = new URLSearchParams(window.location.search).get('page') || 'dashboard';
 
     document.querySelectorAll('#main-nav a').forEach(link => {
       const page = link.dataset.page;
 
-      // Set correct absolute URL
-      link.href = baseUrl + '?page=' + page;
-
       // Highlight active page
       if (page === currentPage) {
         link.classList.add('active');
       }
-
-      // Let links navigate naturally (remove preventDefault)
     });
 
     // Update user display if window.USER_DATA is available
