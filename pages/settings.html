@@ -253,6 +253,9 @@
   <!-- Include Header Component -->
   <?!= include('pages/components/header'); ?>
 
+  <!-- Include Utilities -->
+  <?!= include('pages/components/utilities'); ?>
+
   <div class="page-container">
     <div class="page-header">
       <h1 class="page-title">⚙️ Paramètres</h1>
@@ -593,75 +596,6 @@
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
       return name.substring(0, 2).toUpperCase();
 
-    /**
-     * Helper: Escape HTML
-     */
-    function escapeHtml(text) {
-      if (!text) return '';
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-
-    /**
-     * Show error message
-     */
-    function showError(message) {
-      const container = document.getElementById('settings-content');
-      container.innerHTML = `
-        <div style="text-align: center; padding: 40px;">
-          <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
-          <h3 style="color: var(--danger); margin-bottom: 10px;">Erreur</h3>
-          <p style="color: #666;">${message}</p>
-          <button class="btn btn-primary" onclick="loadSettings()" style="margin-top: 20px;">
-            Réessayer
-          </button>
-        </div>
-      `;
-
-    /**
-     * Show toast notification
-     */
-    function showToast(message, type = 'success') {
-      const colors = {
-        'success': 'var(--success)',
-        'warning': 'var(--warning)',
-        'danger': 'var(--danger)'
-      };
-
-      const toast = document.createElement('div');
-      toast.textContent = message;
-      toast.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: ${colors[type] || colors.success};
-        color: white;
-        padding: 15px 20px;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 10000;
-        animation: slideIn 0.3s ease-out;
-        max-width: 400px;
-      `;
-      document.body.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.animation = 'slideOut 0.3s ease-out';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    /**
-     * Highlight active nav link
-     */
-    function highlightActiveNavLink() {
-      const currentPage = new URLSearchParams(window.location.search).get('page') || 'dashboard';
-      document.querySelectorAll('.app-header a').forEach(link => {
-        const href = link.getAttribute('href');
-        if (href && href.includes('page=' + currentPage)) {
-          link.style.background = 'rgba(255,255,255,0.2)';
-          link.style.fontWeight = '500';
-        }
-      });
-    }
   </script>
 </body>
 </html>

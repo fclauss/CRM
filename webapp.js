@@ -86,13 +86,9 @@ function doPost(e) {
 function routeRequest(page, params, user) {
   const routes = {
     'dashboard': renderDashboardWorking,
-    'dashboard-old': renderDashboard,
-    'dashboard-simple': renderDashboardSimple,
     'clients': renderClients,
     'calendar': renderCalendar,
-    'settings': renderSettings,
-    'test': renderTestPage,
-    'test-api': renderTestApi
+    'settings': renderSettings
   };
 
   const handler = routes[page];
@@ -101,23 +97,6 @@ function routeRequest(page, params, user) {
   }
 
   return handler(params, user);
-}
-
-/**
- * Renders test page (for debugging)
- */
-function renderTestPage(params, user) {
-  const template = HtmlService.createTemplateFromFile('pages/test-simple');
-
-  // Test different ways of passing user data
-  template.user = user;
-  template.userName = user ? user.name : 'Guest';
-  template.userEmail = user ? user.email : 'none';
-  template.userRole = user ? user.role : 'none';
-
-  return template.evaluate()
-    .setTitle('Test Page')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 /**
@@ -130,58 +109,6 @@ function renderDashboardWorking(params, user) {
   return template.evaluate()
     .setTitle('Dashboard - Style et Matière')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-/**
- * Renders simple dashboard (debugging version)
- */
-function renderDashboardSimple(params, user) {
-  const template = HtmlService.createTemplateFromFile('pages/dashboard-simple');
-  template.user = user;
-
-  return template.evaluate()
-    .setTitle('Dashboard Simple - Style et Matière')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-/**
- * Renders test API page
- */
-function renderTestApi(params, user) {
-  const template = HtmlService.createTemplateFromFile('pages/test-api');
-  template.user = user;
-
-  return template.evaluate()
-    .setTitle('API Test')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-/**
- * Renders the dashboard page
- * Shows metrics, recent activity, and required actions
- *
- * @param {Object} params - URL parameters
- * @param {Object} user - Authenticated user
- * @returns {HtmlOutput} Dashboard page
- */
-function renderDashboard(params, user) {
-  const template = HtmlService.createTemplateFromFile('pages/dashboard');
-  template.user = user;
-
-  // Safely serialize user object for client-side
-  try {
-    template.userJson = user ? JSON.stringify(user) : 'null';
-  } catch (e) {
-    Logger.log('Error serializing user object: ' + e.message);
-    template.userJson = 'null';
-  }
-
-  template.config = getClientConfig();
-
-  return template.evaluate()
-    .setTitle('Style et Matière - Tableau de Bord')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
 }
 
 /**
@@ -405,13 +332,3 @@ function jsonResponse(data, statusCode = 200) {
   return output;
 }
 
-/**
- * Include HTML file content (for template includes)
- * Used by HTML templates to include shared components
- *
- * @param {string} filename - File path relative to project root
- * @returns {string} File content as string
- */
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
-}

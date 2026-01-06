@@ -132,13 +132,13 @@ function getDashboardMetrics() {
   return {
     // Main metrics (matching dashboard field names)
     activeQuotes: pendingQuotes,
-    activeQuotesChange: 0, // TODO: Calculate from previous period
+    activeQuotesChange: 0, // Change indicators not implemented - shows 0
     totalValue: pendingValue,
-    totalValueChange: 0, // TODO: Calculate from previous period
+    totalValueChange: 0, // Change indicators not implemented - shows 0
     wonProjects: wonQuotes,
-    wonProjectsChange: 0, // TODO: Calculate from previous period
+    wonProjectsChange: 0, // Change indicators not implemented - shows 0
     conversionRate: conversionRate,
-    conversionRateChange: 0, // TODO: Calculate from previous period
+    conversionRateChange: 0, // Change indicators not implemented - shows 0
 
     // Additional metrics for compatibility
     monthRevenue: monthRevenue,
@@ -197,17 +197,6 @@ function parseQuoteValueOptimized(quoteDataJson) {
   }
 }
 
-/**
- * Parses quote total value from JSON data
- * Calculates subtotal, applies discount, and adds VAT
- * DEPRECATED: Use parseQuoteValueOptimized for better performance
- *
- * @param {string} quoteDataJson - JSON string containing quote structure and business data
- * @returns {number} Total quote value including VAT, rounded to 2 decimals
- */
-function parseQuoteValue(quoteDataJson) {
-  return parseQuoteValueOptimized(quoteDataJson);
-}
 
 /**
  * Formats time difference in French (il y a X jours/heures/minutes)
@@ -271,7 +260,7 @@ function getClientsData() {
       const rowData = createObjectFromRow(row, headers);
 
       if (rowData[C.client_name]) {
-        const amount = parseQuoteValue(rowData[C.quote_data_json]);
+        const amount = parseQuoteValueOptimized(rowData[C.quote_data_json]);
         const quoteDate = rowData[C.quote_date] || rowData[C.timestamp];
 
         clients.push({
@@ -501,7 +490,7 @@ function getQuoteValue(row) {
     const client = createObjectFromRow(rowData, headers);
 
     const quoteDataJson = client[CONFIG.column_mappings.quote_data_json];
-    return parseQuoteValue(quoteDataJson);
+    return parseQuoteValueOptimized(quoteDataJson);
 
   } catch (e) {
     Logger.log('Error getting quote value: ' + e.message);

@@ -66,25 +66,11 @@
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="header-content">
-      <div class="logo">🎨 Style et Matière CRM</div>
+  <!-- Include Header Component -->
+  <?!= include('pages/components/header'); ?>
 
-      <nav class="nav">
-        <a href="?page=dashboard" class="nav-link" data-page="dashboard">📊 Tableau de Bord</a>
-        <a href="?page=clients" class="nav-link" data-page="clients">👥 Clients</a>
-        <a href="?page=calendar" class="nav-link" data-page="calendar">📅 Calendrier</a>
-        <a href="?page=settings" class="nav-link" data-page="settings">⚙️ Paramètres</a>
-      </nav>
-
-      <div class="user-info">
-        <?= user ? user.name : 'Guest' ?>
-        <? if (user && user.role === 'admin') { ?>
-          <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">ADMIN</span>
-        <? } ?>
-      </div>
-    </div>
-  </div>
+  <!-- Include Utilities -->
+  <?!= include('pages/components/utilities'); ?>
 
   <div class="container">
     <div id="content">
@@ -97,15 +83,11 @@
 
   <script>
     function loadDashboard() {
-      console.log('Loading dashboard using google.script.run...');
-
       google.script.run
         .withSuccessHandler(function(data) {
-          console.log('Success! Received data:', data);
           render(data);
         })
         .withFailureHandler(function(error) {
-          console.error('Error:', error);
           document.getElementById('content').innerHTML =
             '<div class="card error"><h2>Erreur</h2><p>' + error.message + '</p></div>';
         })
@@ -113,7 +95,6 @@
     }
 
     function render(data) {
-      console.log('Rendering dashboard with data:', data);
 
       document.getElementById('content').innerHTML = `
         <div class="metrics">
@@ -127,7 +108,7 @@
 
           <div class="card">
             <h3>Valeur totale</h3>
-            <div class="value">${formatCurrency(data.totalValue || 0)}</div>
+            <div class="value">${formatCurrency(data.totalValue || 0, true)}</div>
             <p style="margin-top: 8px; color: #666; font-size: 14px;">
               ${data.totalValueChange !== undefined ? (data.totalValueChange >= 0 ? '+' : '') + data.totalValueChange + '%' : ''}
             </p>
@@ -188,25 +169,6 @@
         ).join('') +
         '</ul>';
     }
-
-    function formatCurrency(value) {
-      return new Intl.NumberFormat('fr-FR', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(value || 0);
-    }
-
-    // Highlight active nav link
-    (function() {
-      const currentPage = new URLSearchParams(window.location.search).get('page') || 'dashboard';
-      document.querySelectorAll('.nav-link').forEach(link => {
-        if (link.dataset.page === currentPage) {
-          link.classList.add('active');
-        }
-      });
-    })();
 
     // Load on page ready
     window.addEventListener('DOMContentLoaded', loadDashboard);

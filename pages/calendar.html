@@ -316,6 +316,9 @@
   <!-- Include Header Component -->
   <?!= include('pages/components/header'); ?>
 
+  <!-- Include Utilities -->
+  <?!= include('pages/components/utilities'); ?>
+
   <div class="page-container">
     <div class="page-header">
       <h1 class="page-title">📅 Calendrier des Projets</h1>
@@ -342,7 +345,6 @@
      */
     window.addEventListener('DOMContentLoaded', function() {
       loadCalendarData();
-      highlightActiveNavLink();
     });
 
     /**
@@ -512,69 +514,14 @@
 
       return 'Dates non définies';
 
-    /**
-     * Format currency values
-     */
-    function formatCurrency(value) {
-      if (!value && value !== 0) return '0 €';
-      return new Intl.NumberFormat('fr-FR', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(value);
-
-    /**
-     * Escape HTML to prevent XSS
-     */
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-
-    /**
-     * Show error message
-     */
-    function showError(message) {
-      const container = document.getElementById('calendar-content');
-      container.innerHTML = `
-        <div style="text-align: center; padding: 40px;">
-          <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
-          <h3 style="color: var(--danger); margin-bottom: 10px;">Erreur</h3>
-          <p style="color: #666;">${message}</p>
-          <button onclick="loadCalendarData()" style="
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-          ">
-            Réessayer
-          </button>
-        </div>
-      `;
 
     /**
      * Manual refresh
      */
     function refreshCalendar() {
       loadCalendarData();
-    /**
-     * Highlight active nav link
-     */
-    function highlightActiveNavLink() {
-      const currentPage = new URLSearchParams(window.location.search).get('page') || 'dashboard';
-      document.querySelectorAll('.app-header a').forEach(link => {
-        const href = link.getAttribute('href');
-        if (href && href.includes('page=' + currentPage)) {
-          link.style.background = 'rgba(255,255,255,0.2)';
-          link.style.fontWeight = '500';
-        }
-      });
     }
+
   </script>
 </body>
 </html>
