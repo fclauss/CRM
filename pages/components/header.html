@@ -131,7 +131,13 @@
 <script>
   // Highlight active page (runs after DOM is loaded)
   (function() {
-    const currentPage = new URLSearchParams(window.location.search).get('page') || 'dashboard';
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentPage = urlParams.get('page') || 'dashboard';
+
+    // Debug logging
+    console.log('[Nav] Current URL:', window.location.href);
+    console.log('[Nav] URL search params:', window.location.search);
+    console.log('[Nav] Detected page:', currentPage);
 
     document.querySelectorAll('#main-nav a[data-page]').forEach(function(link) {
       const page = link.getAttribute('data-page');
@@ -142,6 +148,7 @@
       // Highlight only the current page
       if (page === currentPage) {
         link.classList.add('active');
+        console.log('[Nav] Highlighted:', page);
       }
     });
 
