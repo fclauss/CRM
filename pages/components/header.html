@@ -113,10 +113,17 @@
     <script>
       // Build navigation URLs immediately using deployment URL (not dev URL)
       (function() {
+        console.log('[Nav Build] window.WEB_APP_URL:', window.WEB_APP_URL);
+        console.log('[Nav Build] window.location.origin:', window.location.origin);
+        console.log('[Nav Build] window.location.pathname:', window.location.pathname);
+
         const baseUrl = window.WEB_APP_URL || (window.location.origin + window.location.pathname);
+        console.log('[Nav Build] Using baseUrl:', baseUrl);
+
         document.querySelectorAll('#main-nav a[data-page]').forEach(function(link) {
           const page = link.getAttribute('data-page');
           link.href = baseUrl + '?page=' + page;
+          console.log('[Nav Build] Set link', page, 'to:', link.href);
         });
       })();
     </script>
