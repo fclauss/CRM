@@ -364,7 +364,9 @@
         renderCalendar(data);
       } catch (error) {
         console.error('Error loading calendar:', error);
-        showError('Erreur lors du chargement du calendrier: ' + error.message);
+        showError('Erreur lors du chargement du calendrier: ' + error.message, 'calendar-content', 'loadCalendarData');
+      }
+    }
 
     /**
      * Render calendar with projects
@@ -405,6 +407,7 @@
           ` : ''}
         </div>
       `;
+    }
 
     /**
      * Render a section of projects
@@ -418,10 +421,12 @@
             <div class="empty-state-hint">${getEmptyStateHint(type)}</div>
           </div>
         `;
+      }
 
       const projectCards = projects.map(project => renderProjectCard(project, type)).join('');
 
       return `<div class="projects-grid">${projectCards}</div>`;
+    }
 
     /**
      * Render a single project card
@@ -459,6 +464,7 @@
           ` : ''}
         </div>
       `;
+    }
 
     /**
      * Get empty state icon based on section type
@@ -470,6 +476,7 @@
         'completed': '✅'
       };
       return icons[type] || '📅';
+    }
 
     /**
      * Get empty state text based on section type
@@ -481,6 +488,7 @@
         'completed': 'Aucun projet terminé récemment'
       };
       return texts[type] || 'Aucun projet';
+    }
 
     /**
      * Get empty state hint based on section type
@@ -492,6 +500,7 @@
         'completed': 'Les projets terminés dans les 30 derniers jours apparaîtront ici'
       };
       return hints[type] || '';
+    }
 
     /**
      * Format date range for display
@@ -518,9 +527,10 @@
         return `Début: ${start}`;
       } else if (end) {
         return `Fin: ${end}`;
+      }
 
       return 'Dates non définies';
-
+    }
 
     /**
      * Manual refresh
