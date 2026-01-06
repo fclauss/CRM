@@ -250,6 +250,11 @@
   </style>
 </head>
 <body>
+  <!-- Inject user data for header -->
+  <script>
+    window.USER_DATA = <?!= JSON.stringify(user || {}) ?>;
+  </script>
+
   <!-- Include Header Component -->
   <?!= include('pages/components/header'); ?>
 

@@ -111,16 +111,8 @@
     </nav>
 
     <div class="user-menu">
-      <span class="user-name">
-        <?! if (typeof user !== 'undefined' && user && user.name) { ?>
-          <?!= user.name ?>
-        <?! } else { ?>
-          Guest
-        <?! } ?>
-      </span>
-      <?! if (typeof user !== 'undefined' && user && user.role === 'admin') { ?>
-        <span class="user-role">Admin</span>
-      <?! } ?>
+      <span class="user-name" id="user-name-display">Guest</span>
+      <span class="user-role" id="user-role-badge" style="display: none;">Admin</span>
     </div>
   </div>
 </header>
@@ -148,5 +140,19 @@
         window.location.href = this.href;
       });
     });
+
+    // Update user display if window.USER_DATA is available
+    if (typeof window.USER_DATA !== 'undefined' && window.USER_DATA) {
+      const userNameEl = document.getElementById('user-name-display');
+      const userRoleBadge = document.getElementById('user-role-badge');
+
+      if (userNameEl && window.USER_DATA.name) {
+        userNameEl.textContent = window.USER_DATA.name;
+      }
+
+      if (userRoleBadge && window.USER_DATA.role === 'admin') {
+        userRoleBadge.style.display = 'inline-block';
+      }
+    }
   })();
 </script>
