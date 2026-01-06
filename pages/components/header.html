@@ -136,7 +136,10 @@
     document.querySelectorAll('#main-nav a[data-page]').forEach(function(link) {
       const page = link.getAttribute('data-page');
 
-      // Highlight active page
+      // Remove active class from all links first
+      link.classList.remove('active');
+
+      // Highlight only the current page
       if (page === currentPage) {
         link.classList.add('active');
       }
