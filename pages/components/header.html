@@ -134,11 +134,7 @@
         link.classList.add('active');
       }
 
-      // Handle click with navigation
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        window.location.href = this.href;
-      });
+      // Let links navigate naturally (remove preventDefault)
     });
 
     // Update user display if window.USER_DATA is available
