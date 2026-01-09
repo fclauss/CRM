@@ -643,6 +643,58 @@ function resetInvoiceCounter() {
   }
 }
 
+/**
+ * Gets the current invoice counter value
+ * Used by web app to display current counter
+ *
+ * @returns {number} Next invoice number that will be generated
+ */
+function getInvoiceCounter() {
+  const properties = PropertiesService.getScriptProperties();
+  let lastInvoiceNum = parseInt(properties.getProperty('LAST_INVOICE_NUMBER'), 10);
+
+  if (isNaN(lastInvoiceNum)) {
+    lastInvoiceNum = 115;
+  }
+
+  // Return the NEXT number that will be used
+  return lastInvoiceNum + 1;
+}
+
+/**
+ * Resets the invoice counter to a specific value
+ * Web app compatible version (no UI prompts)
+ *
+ * @param {number} nextNumber - The next invoice number to use
+ * @returns {Object} Success status and message
+ */
+function resetInvoiceCounterApi(nextNumber) {
+  try {
+    const num = parseInt(nextNumber, 10);
+
+    if (isNaN(num) || num <= 0) {
+      throw new Error('Veuillez entrer un nombre valide et positif.');
+    }
+
+    // Store the number before the next one
+    const numberToStore = num - 1;
+    const properties = PropertiesService.getScriptProperties();
+    properties.setProperty('LAST_INVOICE_NUMBER', numberToStore);
+
+    const formattedNumber = 'F' + String(num).padStart(5, '0');
+
+    return {
+      success: true,
+      message: 'Le compteur a été réinitialisé. La prochaine facture portera le numéro ' + formattedNumber + '.',
+      nextNumber: num,
+      formattedNumber: formattedNumber
+    };
+  } catch (e) {
+    Logger.log('Error in resetInvoiceCounterApi: ' + e.message);
+    throw new Error('Erreur lors de la réinitialisation: ' + e.message);
+  }
+}
+
 // =============================================================================
 // DOCUMENT GENERATION HELPERS
 // =============================================================================

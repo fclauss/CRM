@@ -187,6 +187,9 @@ function renderSettings(params, user) {
   template.webAppUrl = ScriptApp.getService().getUrl();
   template.currentPage = 'settings';
 
+  // Get spreadsheet URL for direct access link
+  template.spreadsheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+
   // Safely serialize user object for client-side
   try {
     template.userJson = user ? JSON.stringify(user) : 'null';

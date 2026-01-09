@@ -59,6 +59,10 @@ function handleApiRequest(action, data, user) {
       'saveEmailTemplates': (d) => saveEmailTemplates(d.templates),
       'resetEmailTemplates': () => resetEmailTemplates(),
 
+      // Invoice counter APIs
+      'getInvoiceCounter': () => getInvoiceCounter(),
+      'resetInvoiceCounter': (d) => resetInvoiceCounterApi(d.nextNumber),
+
       // Mentions API
       'getMentions': () => getMentions(),
 

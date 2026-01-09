@@ -298,6 +298,7 @@
     window.USER_DATA = <?!= JSON.stringify(user || {}) ?>;
     window.WEB_APP_URL = <?!= JSON.stringify(webAppUrl || '') ?>;
     window.CURRENT_PAGE = <?!= JSON.stringify(currentPage || 'dashboard') ?>;
+    window.SPREADSHEET_URL = <?!= JSON.stringify(spreadsheetUrl || '') ?>;
   </script>
 
   <!-- Include Header Component -->
@@ -358,6 +359,8 @@
         const data = await API.getEmailTemplates();
         emailTemplates = data;
         renderSettings();
+        // Load invoice counter after rendering
+        await refreshInvoiceCounter();
       } catch (error) {
         console.error('Error loading settings:', error);
         showError('Erreur lors du chargement des paramètres: ' + error.message, 'settings-content', 'loadSettings');
@@ -397,6 +400,29 @@
           </div>
         </div>
 
+        <!-- Quick Access Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            🔗 Accès rapide
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Feuille de calcul Google Sheets</label>
+            <p style="margin-bottom: 10px; color: #666; font-size: 14px;">
+              Accédez directement à la feuille de calcul pour consulter ou modifier les données brutes.
+            </p>
+            <a
+              href="${window.SPREADSHEET_URL}"
+              target="_blank"
+              class="btn btn-primary"
+              style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none;"
+            >
+              📊 Ouvrir la feuille de calcul
+              <span style="font-size: 12px;">↗</span>
+            </a>
+          </div>
+        </div>
+
         <!-- Email Templates Section -->
         <div class="settings-section">
           <div class="section-header">
@@ -404,6 +430,15 @@
           </div>
 
           ${renderEmailTemplates()}
+        </div>
+
+        <!-- Invoice Counter Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            🔢 Compteur de factures
+          </div>
+
+          ${renderInvoiceCounterSection()}
         </div>
 
         <!-- Admin Only Sections -->
@@ -496,6 +531,69 @@
     }
 
     /**
+     * Render invoice counter section
+     */
+    function renderInvoiceCounterSection() {
+      return `
+        <div class="info-box">
+          <span class="info-icon">💡</span>
+          <div class="info-text">
+            Le compteur de factures est géré automatiquement par le système.
+            Chaque nouvelle facture incrémente ce compteur.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Prochaine facture</label>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input
+              type="text"
+              class="form-input"
+              id="invoice-counter-display"
+              value="Chargement..."
+              readonly
+              style="max-width: 200px; font-weight: 600;"
+            >
+            <button class="btn btn-secondary" onclick="refreshInvoiceCounter()">
+              🔄 Rafraîchir
+            </button>
+          </div>
+          <div class="form-help">
+            Numéro qui sera attribué à la prochaine facture générée.
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 30px;">
+          <label class="form-label">Définir le prochain numéro de facture</label>
+          <div class="info-box warning" style="margin-bottom: 15px;">
+            <span class="info-icon">⚠️</span>
+            <div class="info-text">
+              <strong>Attention</strong><br>
+              Modifier le compteur peut créer des numéros de factures en double.
+              N'utilisez cette fonction qu'en cas de nécessité absolue (ex: correction manuelle d'une facture).
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input
+              type="number"
+              class="form-input"
+              id="new-invoice-number"
+              placeholder="Ex: 200"
+              min="1"
+              style="max-width: 150px;"
+            >
+            <button class="btn btn-primary" onclick="confirmSetInvoiceCounter()">
+              ✓ Définir le compteur
+            </button>
+          </div>
+          <div class="form-help">
+            Entrez le numéro que vous souhaitez utiliser pour la prochaine facture.
+          </div>
+        </div>
+      `;
+    }
+
+    /**
      * Render admin-only settings
      */
     function renderAdminSettings() {
@@ -513,38 +611,8 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Compteur de factures</label>
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <input
-                type="number"
-                class="form-input"
-                id="invoice-counter"
-                value="${emailTemplates?.invoiceCounter || 1}"
-                readonly
-                style="max-width: 150px;"
-              >
-              <button class="btn btn-secondary" onclick="viewInvoiceCounter()">
-                👁️ Voir
-              </button>
-            </div>
-            <div class="form-help">
-              Numéro de la prochaine facture. Géré automatiquement par le système.
-            </div>
-          </div>
-
-          <div class="info-box danger">
-            <span class="info-icon">🚨</span>
-            <div class="info-text">
-              <strong>Zone dangereuse</strong><br>
-              Les actions ci-dessous sont irréversibles. Assurez-vous de comprendre leurs conséquences.
-            </div>
-          </div>
-
-          <div class="button-group">
-            <button class="btn btn-danger" onclick="confirmResetInvoiceCounter()">
-              🔄 Réinitialiser le compteur de factures
-            </button>
+          <div class="info-text" style="font-size: 14px; padding: 20px 0;">
+            Aucun paramètre administrateur supplémentaire pour le moment.
           </div>
         </div>
       `;
@@ -609,49 +677,75 @@
     }
 
     /**
-     * View invoice counter details
+     * Refresh invoice counter display
      */
-    async function viewInvoiceCounter() {
+    async function refreshInvoiceCounter() {
       try {
         const counter = await API.getInvoiceCounter();
-        alert(`Compteur de factures actuel: ${counter}\n\nLa prochaine facture générée aura le numéro: ${counter}`);
+        const formattedNumber = 'F' + String(counter).padStart(5, '0');
+        const display = document.getElementById('invoice-counter-display');
+        if (display) {
+          display.value = formattedNumber + ' (N°' + counter + ')';
+        }
       } catch (error) {
         console.error('Error getting counter:', error);
-        alert('Erreur lors de la récupération du compteur: ' + error.message);
+        const display = document.getElementById('invoice-counter-display');
+        if (display) {
+          display.value = 'Erreur de chargement';
+        }
       }
     }
 
     /**
-     * Confirm and reset invoice counter
+     * Confirm and set invoice counter to specific value
      */
-    async function confirmResetInvoiceCounter() {
+    async function confirmSetInvoiceCounter() {
+      // Get value from input field
+      const input = document.getElementById('new-invoice-number');
+      const newNumber = input.value.trim();
+
+      if (!newNumber) {
+        alert('❌ Veuillez entrer un numéro de facture.');
+        input.focus();
+        return;
+      }
+
+      const nextNumber = parseInt(newNumber, 10);
+
+      if (isNaN(nextNumber) || nextNumber <= 0) {
+        alert('❌ Erreur: Veuillez entrer un nombre valide et positif.');
+        input.focus();
+        return;
+      }
+
+      // Get current counter for comparison
+      const currentCounter = await API.getInvoiceCounter();
+
+      // Confirmation
       const confirmed = confirm(
-        '⚠️ ATTENTION ⚠️\n\n' +
-        'Vous êtes sur le point de réinitialiser le compteur de factures.\n\n' +
-        'Cette action va:\n' +
-        '- Remettre le compteur à 1\n' +
-        '- Potentiellement créer des numéros de factures en double\n\n' +
-        'Êtes-vous ABSOLUMENT sûr de vouloir continuer?'
+        '⚠️ CONFIRMATION ⚠️\n\n' +
+        'Compteur actuel: F' + String(currentCounter).padStart(5, '0') + '\n' +
+        'Nouveau compteur: F' + String(nextNumber).padStart(5, '0') + '\n\n' +
+        'La prochaine facture générée aura le numéro F' + String(nextNumber).padStart(5, '0') + '.\n\n' +
+        'Confirmez-vous cette action?'
       );
 
-      if (!confirmed) return;
-
-      const doubleConfirm = prompt(
-        'Pour confirmer, tapez "RESET" en majuscules:'
-      );
-
-      if (doubleConfirm !== 'RESET') {
-        alert('Réinitialisation annulée.');
+      if (!confirmed) {
+        showToast('Opération annulée', 'info');
         return;
       }
 
       try {
-        await API.resetInvoiceCounter();
-        await loadSettings();
-        showToast('Compteur de factures réinitialisé', 'warning');
+        const result = await API.resetInvoiceCounter({ nextNumber: nextNumber });
+        await refreshInvoiceCounter();
+
+        // Clear the input field
+        input.value = '';
+
+        showToast('✅ Compteur défini avec succès', 'success');
       } catch (error) {
-        console.error('Error resetting counter:', error);
-        alert('Erreur lors de la réinitialisation: ' + error.message);
+        console.error('Error setting counter:', error);
+        alert('❌ Erreur lors de la modification: ' + error.message);
       }
     }
 

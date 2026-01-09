@@ -123,7 +123,6 @@ function getUserName(email) {
 function isAuthorizedAction(action, user) {
   // Admin-only actions
   const adminActions = [
-    'resetInvoiceCounter',
     'saveEmailTemplates',
     'resetEmailTemplates'
   ];

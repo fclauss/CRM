@@ -144,6 +144,27 @@ const API = {
         .withFailureHandler(reject)
         .resetEmailTemplates();
     });
+  },
+
+  /**
+   * Invoice Counter APIs
+   */
+  getInvoiceCounter: function() {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getInvoiceCounter();
+    });
+  },
+
+  resetInvoiceCounter: function(data) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .resetInvoiceCounterApi(data.nextNumber);
+    });
   }
 };
 
