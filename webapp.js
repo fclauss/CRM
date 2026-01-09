@@ -127,6 +127,9 @@ function renderClients(params, user) {
   template.webAppUrl = ScriptApp.getService().getUrl();
   template.currentPage = 'clients';
 
+  // Pass URL parameters to template (for status filter, row selection, etc.)
+  template.urlParams = params || {};
+
   // Safely serialize user object for client-side
   try {
     template.userJson = user ? JSON.stringify(user) : 'null';

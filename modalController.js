@@ -54,6 +54,24 @@ function getDashboardMetrics() {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
+  // Historical tracking for charts and trends
+  const last6Months = getLast6MonthNames();
+  const revenueByMonth = {}; // Format: { 'Jan 2026': 0, ... }
+  const statusCounts = {
+    [CONFIG.statuses.NEW]: 0,
+    [CONFIG.statuses.SENT]: 0,
+    [CONFIG.statuses.WON]: 0,
+    [CONFIG.statuses.COMPLETED]: 0,
+    [CONFIG.statuses.CANCELLED]: 0
+  };
+
+  // Previous month metrics for trend calculation
+  let lastMonthActiveQuotes = 0;
+  let lastMonthTotalValue = 0;
+  let lastMonthWonProjects = 0;
+  let lastMonthTotalQuotes = 0;
+  let lastMonthWonQuotes = 0;
+
   let monthRevenue = 0;
   let lastMonthRevenue = 0;
   let pendingQuotes = 0;
@@ -71,10 +89,19 @@ function getDashboardMetrics() {
     // Skip rows without status early
     if (!status) return;
 
+    // Count status distribution (for pie chart)
+    if (statusCounts.hasOwnProperty(status)) {
+      statusCounts[status]++;
+    }
+
     // Process won/completed quotes for revenue
     if (status === CONFIG.statuses.WON || status === CONFIG.statuses.COMPLETED) {
       const quoteDate = new Date(row[quoteDateIdx]);
       const amount = parseQuoteValueOptimized(row[quoteJsonIdx]);
+
+      // Track revenue by month (for line chart)
+      const monthKey = getMonthKey(quoteDate);
+      revenueByMonth[monthKey] = (revenueByMonth[monthKey] || 0) + amount;
 
       if (quoteDate >= startOfMonth) {
         monthRevenue += amount;
@@ -110,6 +137,24 @@ function getDashboardMetrics() {
       totalQuotes++;
     }
 
+    // Track previous month metrics for trend calculation
+    if (row[quoteDateIdx]) {
+      const quoteDate = new Date(row[quoteDateIdx]);
+      if (quoteDate >= startOfLastMonth && quoteDate < startOfMonth) {
+        if (status === CONFIG.statuses.SENT) {
+          lastMonthActiveQuotes++;
+          lastMonthTotalValue += parseQuoteValueOptimized(row[quoteJsonIdx]);
+        }
+        if (status === CONFIG.statuses.WON || status === CONFIG.statuses.COMPLETED) {
+          lastMonthWonProjects++;
+          lastMonthWonQuotes++;
+        }
+        if (row[quoteNumberIdx]) {
+          lastMonthTotalQuotes++;
+        }
+      }
+    }
+
     // Collect recent activity (limit to 5)
     if (row[quoteDateIdx] && recentActivity.length < 5) {
       const date = new Date(row[quoteDateIdx]);
@@ -129,20 +174,58 @@ function getDashboardMetrics() {
     ? Math.round((wonQuotes / totalQuotes) * 100)
     : 0;
 
-  return {
-    // Main metrics (matching dashboard field names)
-    activeQuotes: pendingQuotes,
-    activeQuotesChange: 0, // Change indicators not implemented - shows 0
-    totalValue: pendingValue,
-    totalValueChange: 0, // Change indicators not implemented - shows 0
-    wonProjects: wonQuotes,
-    wonProjectsChange: 0, // Change indicators not implemented - shows 0
-    conversionRate: conversionRate,
-    conversionRateChange: 0, // Change indicators not implemented - shows 0
+  // Calculate real trend indicators
+  const activeQuotesChange = lastMonthActiveQuotes > 0
+    ? Math.round(((pendingQuotes - lastMonthActiveQuotes) / lastMonthActiveQuotes) * 100)
+    : (pendingQuotes > 0 ? 100 : 0);
 
-    // Additional metrics for compatibility
+  const totalValueChange = lastMonthTotalValue > 0
+    ? Math.round(((pendingValue - lastMonthTotalValue) / lastMonthTotalValue) * 100)
+    : (pendingValue > 0 ? 100 : 0);
+
+  const wonProjectsChange = lastMonthWonProjects > 0
+    ? Math.round(((wonQuotes - lastMonthWonProjects) / lastMonthWonProjects) * 100)
+    : (wonQuotes > 0 ? 100 : 0);
+
+  const lastMonthConversionRate = lastMonthTotalQuotes > 0
+    ? Math.round((lastMonthWonQuotes / lastMonthTotalQuotes) * 100)
+    : 0;
+  const conversionRateChange = lastMonthConversionRate > 0
+    ? conversionRate - lastMonthConversionRate
+    : 0;
+
+  // Format chart data for frontend
+  const revenueChartData = {
+    labels: last6Months.map(m => m.name), // ['Août', 'Sept', 'Oct', 'Nov', 'Déc', 'Jan']
+    values: last6Months.map(m => revenueByMonth[m.key] || 0)
+  };
+
+  const statusDistribution = {
+    labels: Object.keys(statusCounts),
+    values: Object.values(statusCounts),
+    colors: ['#9E9E9E', '#FF9800', '#4CAF50', '#00796b', '#F44336']
+  };
+
+  return {
+    // Main metrics with REAL trend indicators
+    activeQuotes: pendingQuotes,
+    activeQuotesChange: activeQuotesChange,
+    totalValue: pendingValue,
+    totalValueChange: totalValueChange,
+    wonProjects: wonQuotes,
+    wonProjectsChange: wonProjectsChange,
+    conversionRate: conversionRate,
+    conversionRateChange: conversionRateChange,
+
+    // Primary revenue metric (already exists, keep it)
     monthRevenue: monthRevenue,
     revenueChange: revenueChange,
+
+    // NEW: Chart data
+    revenueChartData: revenueChartData,
+    statusDistribution: statusDistribution,
+
+    // Existing fields (keep for compatibility)
     pendingQuotes: pendingQuotes,
     pendingValue: pendingValue,
     activeProjects: activeProjects,
@@ -152,6 +235,38 @@ function getDashboardMetrics() {
     requiredActions: requiredActions,
     recentActivity: recentActivity
   };
+}
+
+/**
+ * Get last 6 month names and keys in French
+ * @returns {Array<{name: string, key: string}>} Array of month objects with display name and grouping key
+ */
+function getLast6MonthNames() {
+  const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+  const result = [];
+  const now = new Date();
+
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthName = months[date.getMonth()];
+    const year = date.getFullYear();
+    result.push({
+      name: monthName,
+      key: `${monthName} ${year}`
+    });
+  }
+
+  return result;
+}
+
+/**
+ * Get month key for grouping revenue data (e.g., "Jan 2026")
+ * @param {Date} date - Date to extract month key from
+ * @returns {string} Month key in format "MonthName Year"
+ */
+function getMonthKey(date) {
+  const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+  return `${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 /**

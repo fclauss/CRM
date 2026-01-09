@@ -390,11 +390,12 @@
   </style>
 </head>
 <body>
-  <!-- Inject user data, web app URL, and current page for header -->
+  <!-- Inject user data, web app URL, current page, and URL parameters for header -->
   <script>
     window.USER_DATA = <?!= JSON.stringify(user || {}) ?>;
     window.WEB_APP_URL = <?!= JSON.stringify(webAppUrl || '') ?>;
     window.CURRENT_PAGE = <?!= JSON.stringify(currentPage || 'dashboard') ?>;
+    window.URL_PARAMS = <?!= JSON.stringify(urlParams || {}) ?>;
   </script>
 
   <!-- Include Header Component -->
@@ -414,6 +415,18 @@
             placeholder="Rechercher un client..."
             oninput="filterClients()"
           >
+          <!-- Status Filter Dropdown -->
+          <div style="margin-top: 8px;">
+            <label for="status-filter-select" style="font-size: 13px; color: #666; margin-right: 8px;">Filtrer par statut:</label>
+            <select id="status-filter-select" onchange="changeStatusFilter()" style="padding: 6px 10px; border: 1px solid var(--gray-border); border-radius: 4px; font-size: 14px; background: white; cursor: pointer;">
+              <option value="">Tous les statuts</option>
+              <option value="Nouveau">Nouveau</option>
+              <option value="Devis envoyé">Devis envoyé</option>
+              <option value="Projet gagné">Projet gagné</option>
+              <option value="Terminé">Terminé</option>
+              <option value="Annulé">Annulé</option>
+            </select>
+          </div>
         </div>
 
         <div class="client-list-items" id="client-list-items">
@@ -449,6 +462,7 @@
     let selectedClientRow = null;
     let currentPage = 1;
     let pendingClientSelection = null; // Store row from URL parameter for auto-selection
+    let statusFilter = null; // Store status filter from URL parameter
     const CLIENTS_PER_PAGE = 50;
 
     /**
@@ -465,9 +479,21 @@
      * Supports: ?page=clients&row=15 (URL) or sessionStorage
      */
     function checkUrlParameters() {
-      // First, check URL parameters
-      const params = new URLSearchParams(window.location.search);
-      const urlRow = params.get('row');
+      // Use server-injected URL parameters (not iframe URL)
+      const params = window.URL_PARAMS || {};
+
+      const urlRow = params.row;
+      const urlStatus = params.status;
+
+      // Check for status filter from URL (for dashboard quick actions)
+      if (urlStatus) {
+        statusFilter = urlStatus;
+        // Set the dropdown value to match
+        const dropdown = document.getElementById('status-filter-select');
+        if (dropdown) {
+          dropdown.value = urlStatus;
+        }
+      }
 
       if (urlRow) {
         const rowNumber = parseInt(urlRow, 10);
@@ -497,35 +523,28 @@
       try {
         const data = await API.getClientsData();
         allClients = Array.isArray(data) ? data : [];
-        filteredClients = [...allClients];
+
+        // Apply filters (including status filter from URL)
+        // filterClients() calls renderCurrentPage() and updatePaginationControls()
+        filterClients();
 
         // Check for pending selection from URL parameter or sessionStorage
         if (pendingClientSelection) {
-          const clientIndex = allClients.findIndex(c => c.row === pendingClientSelection);
+          const clientIndex = filteredClients.findIndex(c => c.row === pendingClientSelection);
 
           if (clientIndex !== -1) {
-            // Calculate which page this client is on
+            // Calculate which page this client is on (in filtered list)
             currentPage = Math.floor(clientIndex / CLIENTS_PER_PAGE) + 1;
             renderCurrentPage();
+            updatePaginationControls();
 
             // Auto-select the client
             await selectClient(pendingClientSelection);
 
             // Clear pending selection
             pendingClientSelection = null;
-          } else {
-            // Client not found, show normal page
-            currentPage = 1;
-            renderCurrentPage();
-            pendingClientSelection = null;
           }
-        } else {
-          // Normal load without pre-selection
-          currentPage = 1;
-          renderCurrentPage();
         }
-
-        updatePaginationControls();
       } catch (error) {
         showError('Erreur lors du chargement des clients: ' + error.message, 'client-list-items', 'loadClientsData');
       }
@@ -637,26 +656,37 @@
     }
 
     /**
-     * Filter clients based on search input
+     * Filter clients based on search input and status filter
      */
     function filterClients() {
       const searchTerm = document.getElementById('client-search-input').value.toLowerCase();
 
-      if (!searchTerm) {
-        filteredClients = [...allClients];
-      } else {
-        filteredClients = allClients.filter(client => {
-          return (
-            (client.name || '').toLowerCase().includes(searchTerm) ||
-            (client.email || '').toLowerCase().includes(searchTerm) ||
-            (client.phone || '').toLowerCase().includes(searchTerm)
-          );
-        });
-      }
+      filteredClients = allClients.filter(client => {
+        // Apply search term filter
+        const matchesSearch = !searchTerm || (
+          (client.name || '').toLowerCase().includes(searchTerm) ||
+          (client.email || '').toLowerCase().includes(searchTerm) ||
+          (client.phone || '').toLowerCase().includes(searchTerm)
+        );
+
+        // Apply status filter (from URL parameter or dropdown)
+        const matchesStatus = !statusFilter || (client.status === statusFilter);
+
+        return matchesSearch && matchesStatus;
+      });
 
       currentPage = 1;
       renderCurrentPage();
       updatePaginationControls();
+    }
+
+    /**
+     * Handle status filter dropdown change
+     */
+    function changeStatusFilter() {
+      const dropdown = document.getElementById('status-filter-select');
+      statusFilter = dropdown.value || null;
+      filterClients();
     }
 
     /**
