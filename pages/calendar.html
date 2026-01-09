@@ -289,12 +289,228 @@
       color: #666;
     }
 
+    /* 3-Month Calendar Styles */
+    .months-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .month-column {
+      border: 2px solid var(--gray-border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .month-header {
+      background: var(--primary);
+      color: white;
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .month-header.current {
+      background: var(--primary-dark);
+    }
+
+    .calendar-grid {
+      padding: 10px;
+    }
+
+    .week-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+      margin-bottom: 3px;
+    }
+
+    .day-header {
+      font-weight: 600;
+      font-size: 11px;
+      text-align: center;
+      padding: 8px 4px;
+      background: #f5f5f5;
+      border-radius: 3px;
+      color: #666;
+    }
+
+    .day-cell {
+      padding: 8px 4px;
+      text-align: center;
+      font-size: 12px;
+      border-radius: 4px;
+      min-height: 35px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .day-cell:hover {
+      border-color: var(--primary);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transform: scale(1.05);
+    }
+
+    .day-cell.other-month {
+      color: #ccc;
+      background: #fafafa;
+      cursor: default;
+    }
+
+    .day-cell.other-month:hover {
+      transform: none;
+      border-color: #e0e0e0;
+      box-shadow: none;
+    }
+
+    .day-cell.today {
+      background: #f44336;
+      color: white;
+      font-weight: bold;
+      border: 3px solid #f44336;
+      box-shadow: 0 0 0 1px #f44336;
+    }
+
+    .day-cell.weekend {
+      background: #f8f8f8;
+    }
+
+    .day-cell.has-project {
+      font-weight: 600;
+      color: white;
+      border: none;
+    }
+
+    .day-cell.project-planned {
+      background: #2196F3;
+    }
+
+    .day-cell.project-in-progress {
+      background: #4CAF50;
+    }
+
+    .day-cell.project-completed {
+      background: #9e9e9e;
+    }
+
+    .project-info {
+      font-size: 8px;
+      margin-top: 2px;
+      opacity: 0.9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Unplanned Projects Section */
+    .unplanned-section {
+      background: #fff8e1;
+      border: 2px solid #ffc107;
+      border-left: 5px solid var(--warning);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+
+    .unplanned-title {
+      margin: 0 0 15px 0;
+      color: var(--warning);
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .unplanned-projects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .unplanned-item {
+      background: white;
+      border: 2px solid var(--warning);
+      border-radius: 6px;
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .unplanned-item:hover {
+      background: var(--warning);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+    }
+
+    .unplanned-item .client-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .unplanned-item .work-type {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    /* Legend */
+    .calendar-legend {
+      margin-top: 25px;
+      padding: 20px;
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+    }
+
+    .legend-title {
+      font-weight: 600;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .legend-items {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-color {
+      width: 30px;
+      height: 20px;
+      border-radius: 3px;
+    }
+
+    .legend-label {
+      font-size: 14px;
+      color: #666;
+    }
+
     /* Responsive Design */
+    @media (max-width: 1200px) {
+      .months-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 1024px) {
       .projects-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       }
     }
+
     @media (max-width: 768px) {
       .page-container {
         padding: 10px;
@@ -308,8 +524,17 @@
       .section-header {
         font-size: 18px;
       }
+      .unplanned-section {
+        padding: 15px;
+      }
+      .calendar-legend {
+        padding: 15px;
+      }
+      .legend-items {
+        gap: 15px;
+      }
     }
-    
+
   </style>
 </head>
 <body>
@@ -374,162 +599,229 @@
     function renderCalendar(data) {
       const container = document.getElementById('calendar-content');
 
-      const currentProjects = data.currentProjects || [];
-      const upcomingProjects = data.upcomingProjects || [];
-      const completedProjects = data.completedProjects || [];
-
       container.innerHTML = `
         <div class="fade-in">
-          <!-- Current Projects -->
-          <div class="calendar-section">
-            <div class="section-header">
-              🟢 Projets en cours (${currentProjects.length})
-            </div>
-            ${renderProjectsSection(currentProjects, 'current')}
-          </div>
-
-          <!-- Upcoming Projects -->
-          <div class="calendar-section">
-            <div class="section-header">
-              🟡 Projets à venir (${upcomingProjects.length})
-            </div>
-            ${renderProjectsSection(upcomingProjects, 'upcoming')}
-          </div>
-
-          <!-- Completed Projects (last 30 days) -->
-          ${completedProjects.length > 0 ? `
-            <div class="calendar-section">
-              <div class="section-header">
-                🔵 Projets terminés récemment (${completedProjects.length})
-              </div>
-              ${renderProjectsSection(completedProjects, 'completed')}
-            </div>
-          ` : ''}
-        </div>
-      `;
-    }
-
-    /**
-     * Render a section of projects
-     */
-    function renderProjectsSection(projects, type) {
-      if (!projects || projects.length === 0) {
-        return `
-          <div class="empty-state">
-            <div class="empty-state-icon">${getEmptyStateIcon(type)}</div>
-            <div class="empty-state-text">${getEmptyStateText(type)}</div>
-            <div class="empty-state-hint">${getEmptyStateHint(type)}</div>
-          </div>
-        `;
-      }
-
-      const projectCards = projects.map(project => renderProjectCard(project, type)).join('');
-
-      return `<div class="projects-grid">${projectCards}</div>`;
-    }
-
-    /**
-     * Render a single project card
-     */
-    function renderProjectCard(project, type) {
-      return `
-        <div class="project-card ${type}">
-          <div class="project-title">${escapeHtml(project.clientName || 'Sans nom')}</div>
-
-          <div class="project-dates">
-            📅 ${formatDateRange(project.startDate, project.endDate)}
-          </div>
-
-          ${project.duration ? `
-            <div class="project-duration">⏱️ ${project.duration}</div>
-          ` : ''}
-
-          ${project.value ? `
-            <div class="project-value">${formatCurrency(project.value)}</div>
-          ` : ''}
-
-          ${type === 'current' && project.progress !== undefined ? `
-            <div class="project-progress">
-              <div class="progress-label">Progression: ${project.progress}%</div>
-              <div class="progress-bar-container">
-                <div class="progress-bar" style="width: ${project.progress}%"></div>
+          <!-- Unplanned Projects Section -->
+          <div class="unplanned-section">
+            <h3 class="unplanned-title">📋 Projets à Planifier</h3>
+            <div class="unplanned-projects" id="unplanned-projects">
+              <div class="loading">
+                <div class="spinner"></div>
               </div>
             </div>
-          ` : ''}
+          </div>
 
-          ${project.notes ? `
-            <div class="project-meta">
-              💬 ${escapeHtml(project.notes)}
+          <!-- 3-Month Calendar Grid -->
+          <div class="months-grid" id="months-grid">
+            <div class="loading" style="grid-column: 1 / -1; padding: 20px;">
+              <div class="spinner"></div>
             </div>
-          ` : ''}
+          </div>
+
+          <!-- Legend -->
+          <div class="calendar-legend">
+            <div class="legend-title">Légende:</div>
+            <div class="legend-items">
+              <div class="legend-item">
+                <div class="legend-color" style="background: #2196F3;"></div>
+                <span class="legend-label">Planifié</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #4CAF50;"></div>
+                <span class="legend-label">En cours</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #9e9e9e;"></div>
+                <span class="legend-label">Terminé</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #f44336;"></div>
+                <span class="legend-label">Aujourd'hui</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #f8f8f8; border: 1px solid #e0e0e0;"></div>
+                <span class="legend-label">Week-end</span>
+              </div>
+            </div>
+          </div>
         </div>
       `;
+
+      // Now populate the calendar
+      displayCalendarTimeline(data);
     }
 
     /**
-     * Get empty state icon based on section type
+     * Display 3-month calendar grid with colored project days
      */
-    function getEmptyStateIcon(type) {
-      const icons = {
-        'current': '🏗️',
-        'upcoming': '📋',
-        'completed': '✅'
-      };
-      return icons[type] || '📅';
-    }
+    function displayCalendarTimeline(data) {
+      const monthsGrid = document.getElementById('months-grid');
+      const unplannedContainer = document.getElementById('unplanned-projects');
 
-    /**
-     * Get empty state text based on section type
-     */
-    function getEmptyStateText(type) {
-      const texts = {
-        'current': 'Aucun projet en cours',
-        'upcoming': 'Aucun projet planifié',
-        'completed': 'Aucun projet terminé récemment'
-      };
-      return texts[type] || 'Aucun projet';
-    }
-
-    /**
-     * Get empty state hint based on section type
-     */
-    function getEmptyStateHint(type) {
-      const hints = {
-        'current': 'Les projets gagnés avec une date de début apparaîtront ici',
-        'upcoming': 'Les projets avec une date de début future apparaîtront ici',
-        'completed': 'Les projets terminés dans les 30 derniers jours apparaîtront ici'
-      };
-      return hints[type] || '';
-    }
-
-    /**
-     * Format date range for display
-     */
-    function formatDateRange(startDate, endDate) {
-      if (!startDate && !endDate) return 'Dates non définies';
-
-      const formatDate = (dateString) => {
-        if (!dateString) return null;
-        const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-          day: 'numeric',
-          month: 'short',
-          year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+      // Display unplanned projects
+      if (data.unplanned && data.unplanned.length > 0) {
+        let unplannedHtml = '';
+        data.unplanned.forEach(project => {
+          unplannedHtml += `
+            <div class="unplanned-item" onclick="viewProject(${project.row})">
+              <div class="client-name">${escapeHtml(project.clientName)}</div>
+              <div class="work-type">${escapeHtml(project.workType || 'Non défini')}</div>
+            </div>
+          `;
         });
-      };
-
-      const start = formatDate(startDate);
-      const end = formatDate(endDate);
-
-      if (start && end) {
-        return `${start} → ${end}`;
-      } else if (start) {
-        return `Début: ${start}`;
-      } else if (end) {
-        return `Fin: ${end}`;
+        unplannedContainer.innerHTML = unplannedHtml;
+      } else {
+        unplannedContainer.innerHTML = '<p style="color: #999; margin: 0;">Aucun projet à planifier</p>';
       }
 
-      return 'Dates non définies';
+      // Extract all projects from weeks and build date map
+      const projectsByDate = {};
+
+      if (data.weeks && data.weeks.length > 0) {
+        data.weeks.forEach(week => {
+          if (week.projects && week.projects.length > 0) {
+            week.projects.forEach(project => {
+              if (project.startDate && project.endDate) {
+                const start = parseDate(project.startDate);
+                const end = parseDate(project.endDate);
+
+                if (start && end) {
+                  // Fill all days in project duration
+                  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                    projectsByDate[key] = {
+                      clientName: project.clientName,
+                      status: project.status,
+                      row: project.row
+                    };
+                  }
+                }
+              }
+            });
+          }
+        });
+      }
+
+      // Parse today's date from backend
+      const today = data.today ? new Date(data.today) : new Date();
+
+      // Generate 3 months
+      const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                         'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+      const dayNames = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+
+      let calendarHtml = '';
+
+      for (let i = 0; i < 3; i++) {
+        const month = (today.getMonth() + i) % 12;
+        const year = today.getFullYear() + Math.floor((today.getMonth() + i) / 12);
+        const isCurrentMonth = i === 0;
+
+        calendarHtml += `
+          <div class="month-column">
+            <div class="month-header ${isCurrentMonth ? 'current' : ''}">
+              ${monthNames[month]} ${year}
+            </div>
+            <div class="calendar-grid">
+        `;
+
+        // Day headers
+        calendarHtml += '<div class="week-row">';
+        dayNames.forEach(day => {
+          calendarHtml += `<div class="day-header">${day}</div>`;
+        });
+        calendarHtml += '</div>';
+
+        // Calculate month days
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startingDayOfWeek = (firstDay.getDay() + 6) % 7; // Monday = 0, Sunday = 6
+        const totalDays = lastDay.getDate();
+
+        let dayCounter = 1;
+
+        // Generate weeks
+        for (let week = 0; week < 6 && dayCounter <= totalDays; week++) {
+          calendarHtml += '<div class="week-row">';
+
+          for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+            if (week === 0 && dayOfWeek < startingDayOfWeek) {
+              calendarHtml += '<div class="day-cell other-month"></div>';
+            } else if (dayCounter > totalDays) {
+              calendarHtml += '<div class="day-cell other-month"></div>';
+            } else {
+              const dateKey = `${year}-${month}-${dayCounter}`;
+              const project = projectsByDate[dateKey];
+
+              let classes = ['day-cell'];
+              let onclick = '';
+              let title = '';
+              let projectInfo = '';
+
+              // Weekend
+              if (dayOfWeek === 5 || dayOfWeek === 6) {
+                classes.push('weekend');
+              }
+
+              // Today
+              if (dayCounter === today.getDate() &&
+                  month === today.getMonth() &&
+                  year === today.getFullYear()) {
+                classes.push('today');
+              }
+
+              // Project coloring
+              if (project) {
+                classes.push('has-project');
+                if (project.status === 'planned') classes.push('project-planned');
+                else if (project.status === 'in-progress') classes.push('project-in-progress');
+                else if (project.status === 'completed') classes.push('project-completed');
+
+                onclick = `onclick="viewProject(${project.row})"`;
+                title = `title="${escapeHtml(project.clientName)}"`;
+                projectInfo = `<div class="project-info">${escapeHtml(project.clientName)}</div>`;
+              }
+
+              calendarHtml += `
+                <div class="${classes.join(' ')}" ${onclick} ${title}>
+                  ${dayCounter}
+                  ${projectInfo}
+                </div>
+              `;
+
+              dayCounter++;
+            }
+          }
+
+          calendarHtml += '</div>';
+        }
+
+        calendarHtml += '</div></div>';
+      }
+
+      monthsGrid.innerHTML = calendarHtml;
+    }
+
+    /**
+     * Parse DD/MM/YYYY date string to Date object
+     */
+    function parseDate(dateStr) {
+      if (!dateStr) return null;
+      const parts = dateStr.split('/');
+      if (parts.length !== 3) return null;
+      // Parse as integers to ensure proper Date construction
+      return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    }
+
+    /**
+     * View project details (navigate to clients page)
+     */
+    function viewProject(row) {
+      if (row) {
+        // Store row in sessionStorage since URL parameters get lost in Google Apps Script redirects
+        sessionStorage.setItem('pendingClientSelection', row);
+        window.location.href = window.WEB_APP_URL + '?page=clients';
+      }
     }
 
     /**

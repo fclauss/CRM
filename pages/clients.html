@@ -448,28 +448,45 @@
     let filteredClients = [];
     let selectedClientRow = null;
     let currentPage = 1;
+    let pendingClientSelection = null; // Store row from URL parameter for auto-selection
     const CLIENTS_PER_PAGE = 50;
 
     /**
      * Initialize clients page on load
      */
     window.addEventListener('DOMContentLoaded', function() {
-      loadClientsData();
-      checkUrlParameters();
+      checkUrlParameters();    // Must run first to set pendingClientSelection
+      loadClientsData();        // Then load data and check for pending selection
       highlightActiveNavLink();
     });
 
     /**
-     * Check URL parameters for pre-selected client or action
+     * Check URL parameters and sessionStorage for pre-selected client
+     * Supports: ?page=clients&row=15 (URL) or sessionStorage
      */
     function checkUrlParameters() {
+      // First, check URL parameters
       const params = new URLSearchParams(window.location.search);
-      const clientId = params.get('client');
-      const action = params.get('action');
+      const urlRow = params.get('row');
 
-      if (clientId && action) {
-        // Handle specific action for client
-        // TODO: Implement URL parameter handling
+      if (urlRow) {
+        const rowNumber = parseInt(urlRow, 10);
+        if (!isNaN(rowNumber) && rowNumber > 0) {
+          pendingClientSelection = rowNumber;
+          return;
+        }
+      }
+
+      // If no URL parameter, check sessionStorage
+      const sessionRow = sessionStorage.getItem('pendingClientSelection');
+
+      if (sessionRow) {
+        const rowNumber = parseInt(sessionRow, 10);
+        if (!isNaN(rowNumber) && rowNumber > 0) {
+          pendingClientSelection = rowNumber;
+          // Clear sessionStorage after reading
+          sessionStorage.removeItem('pendingClientSelection');
+        }
       }
     }
 
@@ -481,8 +498,33 @@
         const data = await API.getClientsData();
         allClients = Array.isArray(data) ? data : [];
         filteredClients = [...allClients];
-        currentPage = 1;
-        renderCurrentPage();
+
+        // Check for pending selection from URL parameter or sessionStorage
+        if (pendingClientSelection) {
+          const clientIndex = allClients.findIndex(c => c.row === pendingClientSelection);
+
+          if (clientIndex !== -1) {
+            // Calculate which page this client is on
+            currentPage = Math.floor(clientIndex / CLIENTS_PER_PAGE) + 1;
+            renderCurrentPage();
+
+            // Auto-select the client
+            await selectClient(pendingClientSelection);
+
+            // Clear pending selection
+            pendingClientSelection = null;
+          } else {
+            // Client not found, show normal page
+            currentPage = 1;
+            renderCurrentPage();
+            pendingClientSelection = null;
+          }
+        } else {
+          // Normal load without pre-selection
+          currentPage = 1;
+          renderCurrentPage();
+        }
+
         updatePaginationControls();
       } catch (error) {
         showError('Erreur lors du chargement des clients: ' + error.message, 'client-list-items', 'loadClientsData');
