@@ -891,18 +891,19 @@
     }
 
     /**
-     * Open quote builder (will open modal for now)
+     * Open quote builder in webapp
      */
     function openQuoteBuilder(row) {
-      // TODO: Implement quote builder in web app
-      alert('Le générateur de devis ouvrira bientôt dans cette interface.\nPour l\'instant, utilisez le menu CRM dans Google Sheets.');
+      const returnPath = encodeURIComponent(`?page=clients&row=${row}`);
+      window.location.href = `${window.WEB_APP_URL}?page=quote-builder&row=${row}&returnPath=${returnPath}`;
     }
+
     /**
-     * Open invoice builder (will open modal for now)
+     * Open invoice builder in webapp
      */
     function openInvoiceBuilder(row) {
-      // TODO: Implement invoice builder in web app
-      alert('Le générateur de facture ouvrira bientôt dans cette interface.\nPour l\'instant, utilisez le menu CRM dans Google Sheets.');
+      const returnPath = encodeURIComponent(`?page=clients&row=${row}`);
+      window.location.href = `${window.WEB_APP_URL}?page=invoice-builder&row=${row}&returnPath=${returnPath}`;
     }
     /**
      * Send email to client

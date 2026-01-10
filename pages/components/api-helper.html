@@ -165,6 +165,90 @@ const API = {
         .withFailureHandler(reject)
         .resetInvoiceCounterApi(data.nextNumber);
     });
+  },
+
+  /**
+   * Quote/Invoice Builder APIs
+   */
+  getServices: function() {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getServices();
+    });
+  },
+
+  getInitialBusinessData: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getInitialBusinessData(row);
+    });
+  },
+
+  getMentions: function() {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getMentions();
+    });
+  },
+
+  addNewService: function(serviceData) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .addNewService(serviceData);
+    });
+  },
+
+  generateQuote: function(quoteStructure, businessData, row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .generateQuoteWithServices(quoteStructure, businessData, row);
+    });
+  },
+
+  generateInvoice: function(invoiceStructure, businessData, row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .generateInvoiceWithServices(invoiceStructure, businessData, row);
+    });
+  },
+
+  getQuoteDraft: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getQuoteDraft(row);
+    });
+  },
+
+  saveQuoteDraft: function(row, quoteStructure, businessData) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .saveQuoteDraft(row, quoteStructure, businessData);
+    });
+  },
+
+  clearQuoteDraft: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .clearQuoteDraft(row);
+    });
   }
 };
 

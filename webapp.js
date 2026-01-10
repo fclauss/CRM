@@ -88,7 +88,9 @@ function routeRequest(page, params, user) {
     'dashboard': renderDashboardWorking,
     'clients': renderClients,
     'calendar': renderCalendar,
-    'settings': renderSettings
+    'settings': renderSettings,
+    'quote-builder': renderQuoteBuilder,
+    'invoice-builder': renderInvoiceBuilder
   };
 
   const handler = routes[page];
@@ -205,6 +207,86 @@ function renderSettings(params, user) {
 
   return template.evaluate()
     .setTitle('Style et Matière - Paramètres')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+}
+
+/**
+ * Renders the quote builder page
+ * Dual-mode builder for quotes (launchMode: 'quote')
+ *
+ * @param {Object} params - URL parameters (must include row)
+ * @param {Object} user - Authenticated user
+ * @returns {HtmlOutput} Quote builder page
+ */
+function renderQuoteBuilder(params, user) {
+  // Validate row parameter
+  const row = parseInt(params.row);
+  if (!row || row < 2) {
+    Logger.log('renderQuoteBuilder: Invalid row parameter');
+    return renderErrorPage('Ligne invalide. Veuillez sélectionner un client depuis la page Clients.');
+  }
+
+  const template = HtmlService.createTemplateFromFile('pages/quote-builder');
+  template.user = user;
+  template.webAppUrl = ScriptApp.getService().getUrl();
+  template.currentPage = 'quote-builder';
+  template.selectedRow = row;
+  template.launchMode = 'quote';
+  template.returnPath = params.returnPath ? decodeURIComponent(params.returnPath) : ('?page=clients&row=' + row);
+
+  // Safely serialize user object for client-side
+  try {
+    template.userJson = user ? JSON.stringify(user) : 'null';
+  } catch (e) {
+    Logger.log('Error serializing user object: ' + e.message);
+    template.userJson = 'null';
+  }
+
+  template.config = getClientConfig();
+
+  return template.evaluate()
+    .setTitle('Créer un devis - Style et Matière')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+}
+
+/**
+ * Renders the invoice builder page
+ * Dual-mode builder for invoices (launchMode: 'invoice')
+ *
+ * @param {Object} params - URL parameters (must include row)
+ * @param {Object} user - Authenticated user
+ * @returns {HtmlOutput} Invoice builder page
+ */
+function renderInvoiceBuilder(params, user) {
+  // Validate row parameter
+  const row = parseInt(params.row);
+  if (!row || row < 2) {
+    Logger.log('renderInvoiceBuilder: Invalid row parameter');
+    return renderErrorPage('Ligne invalide. Veuillez sélectionner un client depuis la page Clients.');
+  }
+
+  const template = HtmlService.createTemplateFromFile('pages/quote-builder');
+  template.user = user;
+  template.webAppUrl = ScriptApp.getService().getUrl();
+  template.currentPage = 'invoice-builder';
+  template.selectedRow = row;
+  template.launchMode = 'invoice';
+  template.returnPath = params.returnPath ? decodeURIComponent(params.returnPath) : ('?page=clients&row=' + row);
+
+  // Safely serialize user object for client-side
+  try {
+    template.userJson = user ? JSON.stringify(user) : 'null';
+  } catch (e) {
+    Logger.log('Error serializing user object: ' + e.message);
+    template.userJson = 'null';
+  }
+
+  template.config = getClientConfig();
+
+  return template.evaluate()
+    .setTitle('Créer une facture - Style et Matière')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
 }
