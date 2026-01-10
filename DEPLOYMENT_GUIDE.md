@@ -265,6 +265,10 @@ Both systems share the same backend functions in Code.js and modalController.js.
    - Migrate Invoice Builder to web app
    - Deprecate modal system (optional)
 
+4. Future features
+   - User authentification
+   - Multilangual handling
+   - Automations 
 ---
 
 **Need Help?**
