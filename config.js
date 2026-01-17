@@ -146,7 +146,8 @@ const CONFIG = {
     invoice_data_json: 'Invoice Data (JSON)',                   // Complete invoice structure
 
     // Internal use
-    internal_notes: 'Notes Internes'                            // Private notes (not on documents)
+    internal_notes: 'Notes Internes',                           // Private notes (not on documents)
+    status_history_json: 'Historique Statut (JSON)'             // Status change log (JSON array)
   },
 
   // ===========================================================================

@@ -441,17 +441,43 @@ function getClientDetails(row) {
 
   const projectValue = client[C.project_value] || 0;
 
+  let quoteDate = '';
+  let invoiceDate = '';
+
+  if (client[C.quote_date]) {
+    try {
+      const date = new Date(client[C.quote_date]);
+      quoteDate = Utilities.formatDate(date, Session.getScriptTimeZone(), 'dd/MM/yyyy');
+    } catch (e) {
+      Logger.log('Error formatting quote date: ' + e.message);
+    }
+  }
+
+  if (client[C.invoice_date]) {
+    try {
+      const date = new Date(client[C.invoice_date]);
+      invoiceDate = Utilities.formatDate(date, Session.getScriptTimeZone(), 'dd/MM/yyyy');
+    } catch (e) {
+      Logger.log('Error formatting invoice date: ' + e.message);
+    }
+  }
+
   return {
     name: client[C.client_name],
     email: client[C.client_email],
     phone: client[C.phone],
     address: client[C.address] + ', ' + client[C.postal_code] + ' ' + client[C.city],
+    addressStreet: client[C.address] || '',
+    postalCode: client[C.postal_code] || '',
+    city: client[C.city] || '',
     workType: client[C.work_type],
     status: client[C.status] || 'Nouveau',
     quoteNumber: client[C.quote_number],
     quoteUrl: client[C.quote_link],
+    quoteDate: quoteDate,
     invoiceNumber: client[C.invoice_number],
     invoiceUrl: client[C.invoice_link],
+    invoiceDate: invoiceDate,
     notes: client[C.internal_notes] || '',
     projectStartDate: projectStartDate,
     projectEndDate: projectEndDate,
@@ -486,6 +512,25 @@ function updateClientStatus(row, newStatus) {
     }
 
     sheet.getRange(row, statusColIndex + 1).setValue(newStatus);
+
+    // Log status change to history
+    const historyColIndex = headers.indexOf(C.status_history_json);
+    if (historyColIndex !== -1) {
+      let history = [];
+      const existingHistory = sheet.getRange(row, historyColIndex + 1).getValue();
+      if (existingHistory) {
+        try {
+          history = JSON.parse(existingHistory);
+        } catch (e) {
+          history = [];
+        }
+      }
+      history.push({
+        date: new Date().toISOString(),
+        status: newStatus
+      });
+      sheet.getRange(row, historyColIndex + 1).setValue(JSON.stringify(history));
+    }
 
     if (newStatus === CONFIG.statuses.WON) {
       const projectStartColIndex = headers.indexOf(C.project_start_date);
@@ -658,6 +703,295 @@ function saveClientNotes(row, notes) {
       message: error.message
     };
   }
+}
+
+// =============================================================================
+// CLIENT DETAILS ENHANCEMENTS
+// =============================================================================
+
+/**
+ * Helper: Parse French date format (dd/MM/yyyy) to Date object
+ * @param {string} dateStr - Date string in dd/MM/yyyy format
+ * @returns {Date} Date object or epoch if invalid
+ */
+function parseDate(dateStr) {
+  if (!dateStr) return new Date(0);
+  const parts = dateStr.split('/');
+  if (parts.length !== 3) return new Date(0);
+  return new Date(parts[2], parts[1] - 1, parts[0]);
+}
+
+/**
+ * Helper: Validate email format
+ * @param {string} email - Email address to validate
+ * @returns {boolean} True if valid email format
+ */
+function isValidEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
+/**
+ * Helper: Get icon for a given status
+ * @param {string} status - Status value from CONFIG.statuses
+ * @returns {string} Emoji icon for the status
+ */
+function getStatusIcon(status) {
+  const icons = {
+    'Nouveau': '🆕',
+    'Devis envoyé': '📨',
+    'Projet gagné': '🎉',
+    'Terminé': '✅',
+    'Annulé': '❌'
+  };
+  return icons[status] || '📋';
+}
+
+/**
+ * Helper: Extract Google Drive file ID from URL
+ * @param {string} url - Google Drive file URL
+ * @returns {string} File ID or empty string if not found
+ */
+function getDocIdFromUrl(url) {
+  if (!url) return '';
+
+  try {
+    const patterns = [
+      /\/d\/([a-zA-Z0-9-_]+)/,
+      /id=([a-zA-Z0-9-_]+)/,
+      /\/file\/d\/([a-zA-Z0-9-_]+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    return '';
+  } catch (e) {
+    Logger.log('Error extracting file ID from URL: ' + e.message);
+    return '';
+  }
+}
+
+/**
+ * Updates a single contact field for a client
+ * Used for inline editing in Info tab
+ *
+ * @param {number} row - Row number in the sheet
+ * @param {string} field - Field name (email, phone, address, postal_code, city)
+ * @param {string} value - New value for the field
+ * @returns {Object} Result object with success flag and message
+ */
+function updateClientContact(row, field, value) {
+  try {
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
+      .getSheetByName(CONFIG.file_paths.crm_sheet_name);
+
+    if (!sheet) {
+      throw new Error('Feuille CRM introuvable');
+    }
+
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const C = CONFIG.column_mappings;
+
+    const fieldMap = {
+      'email': C.client_email,
+      'phone': C.phone,
+      'address': C.address,
+      'postal_code': C.postal_code,
+      'city': C.city
+    };
+
+    const columnName = fieldMap[field];
+    if (!columnName) {
+      throw new Error('Champ non valide: ' + field);
+    }
+
+    const colIndex = headers.indexOf(columnName);
+    if (colIndex === -1) {
+      throw new Error('Colonne introuvable: ' + columnName);
+    }
+
+    if (field === 'email' && value && !isValidEmail(value)) {
+      throw new Error('Format email invalide');
+    }
+
+    if (value && value.length > 200) {
+      throw new Error('La valeur ne peut pas dépasser 200 caractères');
+    }
+
+    sheet.getRange(row, colIndex + 1).setValue(value);
+
+    Logger.log('Contact field updated for row ' + row + ': ' + field + ' = ' + value);
+
+    return {
+      success: true,
+      message: 'Contact mis à jour',
+      field: field,
+      value: value
+    };
+
+  } catch (error) {
+    Logger.log('Error updating contact: ' + error.message);
+    return {
+      success: false,
+      message: error.message
+    };
+  }
+}
+
+/**
+ * Retrieves activity history for a client
+ * Reconstructs timeline from existing data (backward compatible)
+ *
+ * @param {number} row - Row number in the sheet
+ * @returns {Array<Object>} Array of history events
+ */
+function getClientHistory(row) {
+  try {
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
+      .getSheetByName(CONFIG.file_paths.crm_sheet_name);
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const rowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const client = createObjectFromRow(rowData, headers);
+
+    const C = CONFIG.column_mappings;
+    const events = [];
+
+    if (client[C.timestamp]) {
+      const ts = new Date(client[C.timestamp]);
+      events.push({
+        date: formatDate(ts),
+        sortTime: ts.getTime(),
+        type: 'creation',
+        icon: '📝',
+        title: 'Client créé',
+        description: 'Formulaire de contact soumis'
+      });
+    }
+
+    if (client[C.quote_date]) {
+      const qd = new Date(client[C.quote_date]);
+      events.push({
+        date: formatDate(qd),
+        sortTime: qd.getTime(),
+        type: 'quote',
+        icon: '📄',
+        title: 'Devis ' + (client[C.quote_number] || ''),
+        description: 'Devis généré et enregistré'
+      });
+    }
+
+    // Read status history from JSON column
+    const statusHistoryJson = client[C.status_history_json];
+    if (statusHistoryJson) {
+      try {
+        const statusHistory = JSON.parse(statusHistoryJson);
+        statusHistory.forEach(entry => {
+          const entryDate = new Date(entry.date);
+          events.push({
+            date: formatDate(entryDate),
+            sortTime: entryDate.getTime(),
+            type: 'status',
+            icon: getStatusIcon(entry.status),
+            title: entry.status,
+            description: 'Changement de statut'
+          });
+        });
+      } catch (e) {
+        Logger.log('Error parsing status history: ' + e.message);
+      }
+    }
+
+    if (client[C.invoice_date]) {
+      const id = new Date(client[C.invoice_date]);
+      events.push({
+        date: formatDate(id),
+        sortTime: id.getTime(),
+        type: 'invoice',
+        icon: '🧾',
+        title: 'Facture ' + (client[C.invoice_number] || ''),
+        description: 'Facture générée'
+      });
+    }
+
+    const invoiceStatus = client[C.invoice_status];
+    if (invoiceStatus === CONFIG.invoice_statuses.PAID && client[C.invoice_date]) {
+      const pd = new Date(client[C.invoice_date]);
+      events.push({
+        date: formatDate(pd),
+        sortTime: pd.getTime() + 1, // Slightly after invoice creation
+        type: 'payment',
+        icon: '💰',
+        title: 'Facture payée',
+        description: 'Paiement reçu et confirmé'
+      });
+    }
+
+    // Sort by timestamp (newest first)
+    events.sort((a, b) => b.sortTime - a.sortTime);
+
+    return events;
+
+  } catch (error) {
+    Logger.log('Error in getClientHistory: ' + error.message);
+    return [];
+  }
+}
+
+/**
+ * Generates thumbnail URL for a Google Drive PDF
+ * Uses Drive API thumbnailLink property
+ *
+ * @param {string} fileId - Drive file ID
+ * @returns {string} Thumbnail URL or empty string if unavailable
+ */
+function getDocumentThumbnail(fileId) {
+  try {
+    if (!fileId) return '';
+
+    return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w300-h400';
+
+  } catch (error) {
+    Logger.log('Error generating thumbnail for ' + fileId + ': ' + error.message);
+    return '';
+  }
+}
+
+/**
+ * Enhanced getClientDetails with document thumbnails
+ * Adds thumbnail URLs to quote and invoice links
+ *
+ * @param {number} row - Row number in the sheet
+ * @returns {Object} Enhanced client details with thumbnails
+ */
+function getClientDetailsWithThumbnails(row) {
+  const client = getClientDetails(row);
+
+  if (client.quoteUrl) {
+    try {
+      const quoteId = getDocIdFromUrl(client.quoteUrl);
+      client.quoteThumbnail = getDocumentThumbnail(quoteId);
+    } catch (e) {
+      Logger.log('Error getting quote thumbnail: ' + e.message);
+      client.quoteThumbnail = '';
+    }
+  }
+
+  if (client.invoiceUrl) {
+    try {
+      const invoiceId = getDocIdFromUrl(client.invoiceUrl);
+      client.invoiceThumbnail = getDocumentThumbnail(invoiceId);
+    } catch (e) {
+      Logger.log('Error getting invoice thumbnail: ' + e.message);
+      client.invoiceThumbnail = '';
+    }
+  }
+
+  return client;
 }
 
 // =============================================================================

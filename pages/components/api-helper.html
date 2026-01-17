@@ -65,6 +65,33 @@ const API = {
     });
   },
 
+  updateClientContact: function(row, field, value) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .updateClientContact(row, field, value);
+    });
+  },
+
+  getClientHistory: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getClientHistory(row);
+    });
+  },
+
+  getClientDetailsWithThumbnails: function(row) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getClientDetailsWithThumbnails(row);
+    });
+  },
+
   getQuoteValue: function(row) {
     return new Promise((resolve, reject) => {
       google.script.run

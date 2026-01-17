@@ -359,6 +359,699 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* Tab Navigation */
+    .tab-navigation {
+      display: flex;
+      border-bottom: 2px solid var(--gray-border);
+      margin-bottom: 20px;
+      gap: 5px;
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      transition: all 0.2s;
+      position: relative;
+      top: 2px;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      min-height: 300px;
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Editable Field Styles */
+    .editable-field {
+      margin-bottom: 15px;
+    }
+
+    .editable-field label {
+      display: block;
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 5px;
+      font-size: 13px;
+    }
+
+    .field-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .field-display:hover {
+      background: var(--gray-light);
+    }
+
+    .field-display span {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    .edit-btn {
+      padding: 4px 8px;
+      background: transparent;
+      border: 1px solid var(--gray-border);
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .edit-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .field-editor {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .field-editor input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 2px solid var(--primary);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .field-editor input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.1);
+    }
+
+    .field-editor .save-btn,
+    .field-editor .cancel-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .field-editor .save-btn {
+      background: var(--success);
+      color: white;
+    }
+
+    .field-editor .save-btn:hover {
+      background: #45a049;
+    }
+
+    .field-editor .cancel-btn {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .field-editor .cancel-btn:hover {
+      background: #d0d0d0;
+    }
+
+    /* Document Cards */
+    .document-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .document-card {
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .document-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .document-thumbnail {
+      width: 100%;
+      height: 200px;
+      background: var(--gray-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .document-thumbnail img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .document-details {
+      padding: 15px;
+    }
+
+    .document-details h4 {
+      margin: 0 0 5px 0;
+      font-size: 15px;
+    }
+
+    .document-date {
+      font-size: 12px;
+      color: #999;
+      margin: 0 0 5px 0;
+    }
+
+    .document-amount {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .document-actions {
+      padding: 10px 15px;
+      background: var(--gray-light);
+      display: flex;
+      gap: 8px;
+    }
+
+    .document-actions button {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--primary);
+      border-radius: 4px;
+      background: white;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .document-actions button:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Timeline Styles */
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--gray-border);
+    }
+
+    .timeline-event {
+      position: relative;
+      margin-bottom: 30px;
+      display: flex;
+      gap: 15px;
+    }
+
+    .timeline-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--gray-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      position: relative;
+      left: -27px;
+      z-index: 1;
+    }
+
+    .timeline-icon.creation {
+      border-color: #4CAF50;
+      background: #e8f5e9;
+    }
+
+    .timeline-icon.quote {
+      border-color: #2196F3;
+      background: #e3f2fd;
+    }
+
+    .timeline-icon.status {
+      border-color: #ff9800;
+      background: #fff3e0;
+    }
+
+    .timeline-icon.invoice {
+      border-color: #9C27B0;
+      background: #f3e5f5;
+    }
+
+    .timeline-icon.payment {
+      border-color: #4CAF50;
+      background: #e8f5e9;
+    }
+
+    .timeline-content {
+      flex: 1;
+      padding: 12px;
+      background: var(--gray-light);
+      border-radius: 6px;
+      margin-left: -10px;
+    }
+
+    .timeline-content h4 {
+      margin: 0 0 5px 0;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .timeline-date {
+      font-size: 12px;
+      color: #999;
+      margin: 0 0 8px 0;
+    }
+
+    .timeline-content p {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* Notes Editor */
+    .notes-editor {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #notes-textarea {
+      flex: 1;
+      min-height: 300px;
+      padding: 15px;
+      border: 2px solid var(--gray-border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+
+    #notes-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.1);
+    }
+
+    .notes-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--gray-border);
+    }
+
+    .char-counter {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .notes-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notes-actions .save-btn {
+      padding: 8px 16px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .notes-actions .save-btn:hover:not(:disabled) {
+      background: #45a049;
+    }
+
+    .notes-actions .save-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .notes-status {
+      font-size: 12px;
+      color: var(--success);
+    }
+
+    .notes-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 15px;
+      color: #666;
+      font-size: 13px;
+    }
+
+    /* Empty State */
+    .empty-state-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+      font-size: 14px;
+    }
+
+    /* Info Cards Layout */
+    .info-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 100%);
+      border: 1px solid var(--gray-border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .info-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .info-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--gray-border);
+    }
+
+    .info-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .info-card-icon.contact { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); }
+    .info-card-icon.location { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); }
+
+    .info-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-field {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px dashed #e8e8e8;
+    }
+
+    .info-field:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-field-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .info-field-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .info-field-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 2px;
+    }
+
+    .info-field-value {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .info-field-value.empty {
+      color: #bbb;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .info-field-edit {
+      padding: 6px 10px;
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+      margin-left: 8px;
+    }
+
+    .info-field-edit:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Project Tab Styles */
+    .project-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .project-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+    }
+
+    .project-status-badge .status-dot {
+      font-size: 12px;
+    }
+
+    .project-status-select {
+      margin-left: auto;
+      padding: 8px 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .project-status-select:hover {
+      border-color: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.2);
+    }
+
+    .project-status-select:focus {
+      outline: none;
+      border-color: white;
+    }
+
+    .project-status-select option {
+      color: #333;
+      background: white;
+    }
+
+    .project-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .project-stat {
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .project-stat:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .project-stat-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .project-stat-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .project-stat-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .project-stat.highlight {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      border-color: #a5d6a7;
+    }
+
+    .project-stat.highlight .project-stat-value {
+      color: var(--primary-dark);
+    }
+
+    /* Quick Actions Grid */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .quick-action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 20px 12px;
+      background: white;
+      border: 2px solid var(--gray-border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .quick-action-btn:hover {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,121,107,0.15);
+    }
+
+    .quick-action-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--gray-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: all 0.2s;
+    }
+
+    .quick-action-btn:hover .quick-action-icon {
+      background: white;
+    }
+
+    .quick-action-label {
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+      .project-summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     /* Responsive Design */
     @media (max-width: 1024px) {
       .clients-container {
@@ -594,7 +1287,7 @@
               📧 ${client.email || 'Pas d\'email'}
             </div>
             <div class="client-meta">
-              📄 ${client.lastDocument || 'Aucun document'} • ${formatCurrency(client.amount || 0)}
+              📄 ${client.lastDocument || 'Aucun document'} • ${client.amount || '0 €'}
             </div>
             <div class="client-meta" style="font-size: 11px;">
               ${client.lastAction || 'Aucune action'}
@@ -705,20 +1398,28 @@
       }
     }
 
+    // Tab state management
+    let activeTab = 'project';
+    let clientData = null;
+    let historyLoaded = false;
+    let documentsLoaded = false;
+    let editingField = null;
+    let originalNotes = '';
+    let notesModified = false;
+    let autoSaveTimer = null;
+
     /**
-     * Render client details panel
+     * Render client details panel with tabbed interface
      */
     function renderClientDetails(client) {
+      clientData = client;
+      historyLoaded = false;
+      documentsLoaded = false;
+      editingField = null;
+      activeTab = 'project';
+
       const container = document.getElementById('client-details');
       container.className = 'client-details';
-
-      const statusOptions = [
-        'Nouveau',
-        'Devis envoyé',
-        'Projet gagné',
-        'Terminé',
-        'Annulé'
-      ];
 
       container.innerHTML = `
         <div class="detail-header">
@@ -728,25 +1429,252 @@
           </h2>
         </div>
 
-        <div class="detail-section">
-          <h3>Informations de contact</h3>
-          <div class="info-row">
-            <span class="info-label">Email:</span>
-            <span class="info-value">${client.email || 'N/A'}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Téléphone:</span>
-            <span class="info-value">${client.phone || 'N/A'}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Adresse:</span>
-            <span class="info-value">${client.address || 'N/A'}</span>
-          </div>
+        <div class="tab-navigation">
+          <button class="tab-btn active" onclick="switchTab('project')" data-tab="project">
+            Projet
+          </button>
+          <button class="tab-btn" onclick="switchTab('info')" data-tab="info">
+            Informations
+          </button>
+          <button class="tab-btn" onclick="switchTab('documents')" data-tab="documents">
+            Documents
+          </button>
+          <button class="tab-btn" onclick="switchTab('history')" data-tab="history">
+            Historique
+          </button>
+          <button class="tab-btn" onclick="switchTab('notes')" data-tab="notes">
+            Notes
+          </button>
         </div>
 
-        <div class="detail-section">
-          <h3>Statut du projet</h3>
-          <select class="status-dropdown" onchange="updateClientStatus(${client.row}, this.value)">
+        <div class="tab-content">
+          <div id="tab-project" class="tab-panel active"></div>
+          <div id="tab-info" class="tab-panel"></div>
+          <div id="tab-documents" class="tab-panel"></div>
+          <div id="tab-history" class="tab-panel"></div>
+          <div id="tab-notes" class="tab-panel"></div>
+        </div>
+      `;
+
+      renderProjectTab(client);
+      renderInfoTab(client);
+      renderNotesTab(client);
+    }
+
+    /**
+     * Switch between tabs
+     */
+    function switchTab(tabName) {
+      activeTab = tabName;
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === `tab-${tabName}`);
+      });
+
+      if (tabName === 'history' && !historyLoaded) {
+        loadHistoryTab(clientData.row);
+      } else if (tabName === 'documents' && !documentsLoaded) {
+        loadDocumentsTab(clientData.row);
+      }
+    }
+
+    /**
+     * Render Info Tab with card-based layout
+     */
+    function renderInfoTab(client) {
+      const container = document.getElementById('tab-info');
+
+      container.innerHTML = `
+        <div class="info-cards">
+          <!-- Contact Card -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <div class="info-card-icon contact">📱</div>
+              <span class="info-card-title">Contact</span>
+            </div>
+
+            <div class="info-field" id="field-email-container">
+              <div class="info-field-icon">✉️</div>
+              <div class="info-field-content">
+                <div class="info-field-label">Email</div>
+                <div class="info-field-value ${!client.email ? 'empty' : ''}" id="field-email-display">
+                  ${escapeHtml(client.email || 'Non renseigné')}
+                </div>
+              </div>
+              <button class="info-field-edit" onclick="editField('email')" id="field-email-edit-btn">✏️</button>
+              <div class="field-editor" id="field-email-editor" style="display: none;">
+                <input type="email" id="field-email-input" value="${escapeHtml(client.email || '')}">
+                <button class="save-btn" onclick="saveField('email')">✓</button>
+                <button class="cancel-btn" onclick="cancelEdit('email')">✕</button>
+              </div>
+            </div>
+
+            <div class="info-field" id="field-phone-container">
+              <div class="info-field-icon">📞</div>
+              <div class="info-field-content">
+                <div class="info-field-label">Téléphone</div>
+                <div class="info-field-value ${!client.phone ? 'empty' : ''}" id="field-phone-display">
+                  ${escapeHtml(client.phone || 'Non renseigné')}
+                </div>
+              </div>
+              <button class="info-field-edit" onclick="editField('phone')" id="field-phone-edit-btn">✏️</button>
+              <div class="field-editor" id="field-phone-editor" style="display: none;">
+                <input type="text" id="field-phone-input" value="${escapeHtml(client.phone || '')}">
+                <button class="save-btn" onclick="saveField('phone')">✓</button>
+                <button class="cancel-btn" onclick="cancelEdit('phone')">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Card -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <div class="info-card-icon location">📍</div>
+              <span class="info-card-title">Adresse</span>
+            </div>
+
+            <div class="info-field" id="field-address-container">
+              <div class="info-field-icon">🏠</div>
+              <div class="info-field-content">
+                <div class="info-field-label">Rue</div>
+                <div class="info-field-value ${!client.addressStreet ? 'empty' : ''}" id="field-address-display">
+                  ${escapeHtml(client.addressStreet || 'Non renseigné')}
+                </div>
+              </div>
+              <button class="info-field-edit" onclick="editField('address')" id="field-address-edit-btn">✏️</button>
+              <div class="field-editor" id="field-address-editor" style="display: none;">
+                <input type="text" id="field-address-input" value="${escapeHtml(client.addressStreet || '')}">
+                <button class="save-btn" onclick="saveField('address')">✓</button>
+                <button class="cancel-btn" onclick="cancelEdit('address')">✕</button>
+              </div>
+            </div>
+
+            <div class="info-field" id="field-postal_code-container">
+              <div class="info-field-icon">📮</div>
+              <div class="info-field-content">
+                <div class="info-field-label">Code Postal</div>
+                <div class="info-field-value ${!client.postalCode ? 'empty' : ''}" id="field-postal_code-display">
+                  ${escapeHtml(client.postalCode || 'Non renseigné')}
+                </div>
+              </div>
+              <button class="info-field-edit" onclick="editField('postal_code')" id="field-postal_code-edit-btn">✏️</button>
+              <div class="field-editor" id="field-postal_code-editor" style="display: none;">
+                <input type="text" id="field-postal_code-input" value="${escapeHtml(client.postalCode || '')}">
+                <button class="save-btn" onclick="saveField('postal_code')">✓</button>
+                <button class="cancel-btn" onclick="cancelEdit('postal_code')">✕</button>
+              </div>
+            </div>
+
+            <div class="info-field" id="field-city-container">
+              <div class="info-field-icon">🏙️</div>
+              <div class="info-field-content">
+                <div class="info-field-label">Ville</div>
+                <div class="info-field-value ${!client.city ? 'empty' : ''}" id="field-city-display">
+                  ${escapeHtml(client.city || 'Non renseigné')}
+                </div>
+              </div>
+              <button class="info-field-edit" onclick="editField('city')" id="field-city-edit-btn">✏️</button>
+              <div class="field-editor" id="field-city-editor" style="display: none;">
+                <input type="text" id="field-city-input" value="${escapeHtml(client.city || '')}">
+                <button class="save-btn" onclick="saveField('city')">✓</button>
+                <button class="cancel-btn" onclick="cancelEdit('city')">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Inline editing functions
+     */
+    function editField(fieldName) {
+      if (editingField) cancelEdit(editingField);
+
+      editingField = fieldName;
+      // Hide display elements, show editor
+      const displayEl = document.getElementById(`field-${fieldName}-display`);
+      const editBtn = document.getElementById(`field-${fieldName}-edit-btn`);
+      const editorEl = document.getElementById(`field-${fieldName}-editor`);
+
+      if (displayEl) displayEl.style.display = 'none';
+      if (editBtn) editBtn.style.display = 'none';
+      if (editorEl) editorEl.style.display = 'flex';
+
+      document.getElementById(`field-${fieldName}-input`).focus();
+    }
+
+    async function saveField(fieldName) {
+      const input = document.getElementById(`field-${fieldName}-input`);
+      const newValue = input.value.trim();
+
+      try {
+        const result = await API.updateClientContact(selectedClientRow, fieldName, newValue);
+
+        if (result.success) {
+          const displayEl = document.getElementById(`field-${fieldName}-display`);
+          displayEl.textContent = newValue || 'Non renseigné';
+          displayEl.className = `info-field-value ${!newValue ? 'empty' : ''}`;
+          cancelEdit(fieldName);
+
+          // Update clientData
+          if (fieldName === 'email') clientData.email = newValue;
+          else if (fieldName === 'phone') clientData.phone = newValue;
+          else if (fieldName === 'address') clientData.addressStreet = newValue;
+          else if (fieldName === 'postal_code') clientData.postalCode = newValue;
+          else if (fieldName === 'city') clientData.city = newValue;
+
+          showToast('Contact mis à jour', 'success');
+        } else {
+          alert('Erreur: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error saving field:', error);
+        alert('Erreur de connexion: ' + error.message);
+      }
+    }
+
+    function cancelEdit(fieldName) {
+      const displayEl = document.getElementById(`field-${fieldName}-display`);
+      const editBtn = document.getElementById(`field-${fieldName}-edit-btn`);
+      const editorEl = document.getElementById(`field-${fieldName}-editor`);
+
+      if (displayEl) displayEl.style.display = 'block';
+      if (editBtn) editBtn.style.display = 'block';
+      if (editorEl) editorEl.style.display = 'none';
+
+      editingField = null;
+    }
+
+    /**
+     * Render Project Tab
+     */
+    function renderProjectTab(client) {
+      const container = document.getElementById('tab-project');
+
+      const statusOptions = [
+        'Nouveau',
+        'Devis envoyé',
+        'Projet gagné',
+        'Terminé',
+        'Annulé'
+      ];
+
+      // Build project summary stats
+      const hasProjectData = client.projectStartDate || client.projectEndDate || client.projectValue || client.workType;
+
+      container.innerHTML = `
+        <!-- Project Status Header -->
+        <div class="project-header">
+          <div class="project-status-badge">
+            <span class="status-dot">${getStatusDot(client.status)}</span>
+            <span>${client.status || 'Nouveau'}</span>
+          </div>
+          <select class="project-status-select" onchange="updateClientStatus(${client.row}, this.value)">
             ${statusOptions.map(status => `
               <option value="${status}" ${client.status === status ? 'selected' : ''}>
                 ${status}
@@ -755,20 +1683,45 @@
           </select>
         </div>
 
-        ${renderProjectInfo(client)}
-        ${renderDocuments(client)}
+        <!-- Project Summary Cards -->
+        <div class="project-summary">
+          <div class="project-stat ${client.projectValue ? 'highlight' : ''}">
+            <div class="project-stat-icon">💰</div>
+            <div class="project-stat-value">${client.projectValue ? formatCurrency(client.projectValue) : '—'}</div>
+            <div class="project-stat-label">Valeur</div>
+          </div>
+          <div class="project-stat">
+            <div class="project-stat-icon">📅</div>
+            <div class="project-stat-value">${client.projectStartDate ? formatDate(client.projectStartDate) : '—'}</div>
+            <div class="project-stat-label">Début</div>
+          </div>
+          <div class="project-stat">
+            <div class="project-stat-icon">🏁</div>
+            <div class="project-stat-value">${client.projectEndDate ? formatDate(client.projectEndDate) : '—'}</div>
+            <div class="project-stat-label">Fin prévue</div>
+          </div>
+          <div class="project-stat">
+            <div class="project-stat-icon">🔧</div>
+            <div class="project-stat-value" style="font-size: 13px;">${client.workType ? escapeHtml(client.workType.split('(')[0].trim()) : '—'}</div>
+            <div class="project-stat-label">Type</div>
+          </div>
+        </div>
 
+        <!-- Quick Actions -->
         <div class="detail-section">
-          <h3>Actions rapides</h3>
-          <div class="action-buttons">
-            <button class="action-button" onclick="openQuoteBuilder(${client.row})">
-              📝 Créer devis
+          <h3 style="margin-bottom: 16px;">Actions rapides</h3>
+          <div class="quick-actions">
+            <button class="quick-action-btn" onclick="openQuoteBuilder(${client.row})">
+              <div class="quick-action-icon">📝</div>
+              <span class="quick-action-label">Créer devis</span>
             </button>
-            <button class="action-button" onclick="openInvoiceBuilder(${client.row})">
-              🧾 Créer facture
+            <button class="quick-action-btn" onclick="openInvoiceBuilder(${client.row})">
+              <div class="quick-action-icon">🧾</div>
+              <span class="quick-action-label">Créer facture</span>
             </button>
-            <button class="action-button full-width" onclick="sendEmail(${client.row}, 'quote')">
-              ✉️ Envoyer email de suivi
+            <button class="quick-action-btn" onclick="sendEmail(${client.row}, 'followup')">
+              <div class="quick-action-icon">✉️</div>
+              <span class="quick-action-label">Email de suivi</span>
             </button>
           </div>
         </div>
@@ -776,94 +1729,218 @@
     }
 
     /**
-     * Render project information section
+     * Render Notes Tab with auto-save
      */
-    function renderProjectInfo(client) {
-      if (!client.projectStartDate && !client.projectValue) {
-        return '';
-      }
+    function renderNotesTab(client) {
+      const container = document.getElementById('tab-notes');
+      originalNotes = client.notes || '';
+      notesModified = false;
 
-      return `
-        <div class="detail-section">
-          <h3>Informations du projet</h3>
-          ${client.projectStartDate ? `
-            <div class="info-row">
-              <span class="info-label">Date de début:</span>
-              <span class="info-value">${formatDate(client.projectStartDate)}</span>
+      container.innerHTML = `
+        <div class="notes-header">
+          <span>🔒</span>
+          <span>Notes confidentielles (usage interne uniquement)</span>
+        </div>
+        <div class="notes-editor">
+          <textarea
+            id="notes-textarea"
+            placeholder="Notes internes (max 1000 caractères)..."
+            maxlength="1000"
+            oninput="onNotesInput()"
+          >${escapeHtml(originalNotes)}</textarea>
+          <div class="notes-footer">
+            <span class="char-counter">
+              <span id="notes-count">${originalNotes.length}</span> / 1000 caractères
+            </span>
+            <div class="notes-actions">
+              <button class="save-btn" onclick="saveNotes()" id="save-notes-btn" disabled>
+                💾 Enregistrer
+              </button>
+              <span id="notes-status" class="notes-status"></span>
             </div>
-          ` : ''}
-          ${client.projectEndDate ? `
-            <div class="info-row">
-              <span class="info-label">Date de fin:</span>
-              <span class="info-value">${formatDate(client.projectEndDate)}</span>
-            </div>
-          ` : ''}
-          ${client.projectValue ? `
-            <div class="info-row">
-              <span class="info-label">Valeur:</span>
-              <span class="info-value">${formatCurrency(client.projectValue)}</span>
-            </div>
-          ` : ''}
+          </div>
         </div>
       `;
     }
 
+    function onNotesInput() {
+      const textarea = document.getElementById('notes-textarea');
+      notesModified = textarea.value !== originalNotes;
+
+      const counter = document.getElementById('notes-count');
+      counter.textContent = textarea.value.length;
+
+      if (textarea.value.length > 900) {
+        counter.style.color = '#ff9800';
+      } else {
+        counter.style.color = '#666';
+      }
+
+      const btn = document.getElementById('save-notes-btn');
+      btn.disabled = !notesModified;
+
+      clearTimeout(autoSaveTimer);
+      if (notesModified) {
+        autoSaveTimer = setTimeout(() => saveNotes(true), 3000);
+      }
+    }
+
+    async function saveNotes(isAutoSave = false) {
+      const textarea = document.getElementById('notes-textarea');
+      const statusSpan = document.getElementById('notes-status');
+
+      try {
+        statusSpan.textContent = 'Enregistrement...';
+        statusSpan.style.color = '#666';
+
+        const result = await API.saveClientNotes(selectedClientRow, textarea.value);
+
+        if (result.success) {
+          originalNotes = textarea.value;
+          notesModified = false;
+          document.getElementById('save-notes-btn').disabled = true;
+
+          statusSpan.textContent = isAutoSave ? '✓ Auto-sauvegardé' : '✓ Enregistré';
+          statusSpan.style.color = '#4CAF50';
+
+          setTimeout(() => {
+            statusSpan.textContent = '';
+          }, 3000);
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        statusSpan.textContent = '✗ Erreur';
+        statusSpan.style.color = '#f44336';
+        console.error('Error saving notes:', error);
+      }
+    }
+
     /**
-     * Render documents section
+     * Load Documents Tab with thumbnails
      */
-    function renderDocuments(client) {
+    async function loadDocumentsTab(row) {
+      if (documentsLoaded) return;
+
+      const container = document.getElementById('tab-documents');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Chargement des documents...</p></div>';
+
+      try {
+        const client = await API.getClientDetailsWithThumbnails(row);
+        renderDocumentsTab(client);
+        documentsLoaded = true;
+      } catch (error) {
+        console.error('Error loading documents:', error);
+        container.innerHTML = '<p class="empty-state-message" style="color: #f44336;">Erreur de chargement</p>';
+      }
+    }
+
+    function renderDocumentsTab(client) {
+      const container = document.getElementById('tab-documents');
+
       const documents = [];
 
-      if (client.quoteLink) {
+      if (client.quoteUrl) {
         documents.push({
           type: 'Devis',
+          icon: '📄',
           number: client.quoteNumber || 'N/A',
-          date: client.quoteDate,
-          link: client.quoteLink
+          date: client.quoteDate || 'N/A',
+          link: client.quoteUrl,
+          thumbnail: client.quoteThumbnail || ''
         });
       }
 
-      if (client.invoiceLink) {
+      if (client.invoiceUrl) {
         documents.push({
           type: 'Facture',
+          icon: '🧾',
           number: client.invoiceNumber || 'N/A',
-          date: client.invoiceDate,
-          link: client.invoiceLink
+          date: client.invoiceDate || 'N/A',
+          link: client.invoiceUrl,
+          thumbnail: client.invoiceThumbnail || ''
         });
       }
 
       if (documents.length === 0) {
-        return `
-          <div class="detail-section">
-            <h3>Documents</h3>
-            <p style="color: #666; font-size: 14px;">Aucun document généré</p>
-          </div>
-        `;
+        container.innerHTML = '<p class="empty-state-message">Aucun document généré</p>';
+        return;
       }
 
-      return `
-        <div class="detail-section">
-          <h3>Documents</h3>
-          <div class="document-list">
-            ${documents.map(doc => `
-              <div class="document-item">
-                <div class="document-info">
-                  <div class="document-type">${doc.type} ${doc.number}</div>
-                  <div class="document-meta">${formatDate(doc.date)}</div>
-                </div>
-                <div class="document-actions">
-                  <button class="mini-btn" onclick="window.open('${doc.link}', '_blank')">
-                    Ouvrir
-                  </button>
-                  <button class="mini-btn secondary" onclick="sendEmail(${client.row}, '${doc.type.toLowerCase()}')">
-                    Envoyer
-                  </button>
-                </div>
+      const fallbackSvg = 'data:image/svg+xml,%3Csvg width="200" height="250" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="200" height="250" fill="%23f5f5f5"/%3E%3Ctext x="100" y="125" text-anchor="middle" font-size="48"%3E%F0%9F%93%84%3C/text%3E%3C/svg%3E';
+
+      container.innerHTML = `
+        <div class="document-cards">
+          ${documents.map(doc => `
+            <div class="document-card">
+              <div class="document-thumbnail">
+                <img
+                  src="${doc.thumbnail || fallbackSvg}"
+                  alt="${doc.type}"
+                  onerror="this.src='${fallbackSvg}'"
+                />
               </div>
-            `).join('')}
-          </div>
+              <div class="document-details">
+                <h4>${doc.icon} ${doc.type} ${escapeHtml(doc.number)}</h4>
+                <p class="document-date">Créé le: ${doc.date}</p>
+              </div>
+              <div class="document-actions">
+                <button onclick="window.open('${doc.link}', '_blank')">
+                  Ouvrir
+                </button>
+                <button onclick="sendEmail(${client.row}, '${doc.type.toLowerCase()}')">
+                  Envoyer
+                </button>
+              </div>
+            </div>
+          `).join('')}
         </div>
       `;
+    }
+
+    /**
+     * Load History Tab with timeline
+     */
+    async function loadHistoryTab(row) {
+      if (historyLoaded) return;
+
+      const container = document.getElementById('tab-history');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Chargement de l\'historique...</p></div>';
+
+      try {
+        const events = await API.getClientHistory(row);
+        renderHistoryTab(events);
+        historyLoaded = true;
+      } catch (error) {
+        console.error('Error loading history:', error);
+        container.innerHTML = '<p class="empty-state-message" style="color: #f44336;">Erreur de chargement</p>';
+      }
+    }
+
+    function renderHistoryTab(events) {
+      const container = document.getElementById('tab-history');
+
+      if (events.length === 0) {
+        container.innerHTML = '<p class="empty-state-message">Aucun événement enregistré</p>';
+        return;
+      }
+
+      let html = '<div class="timeline">';
+      events.forEach(event => {
+        html += `
+          <div class="timeline-event">
+            <div class="timeline-icon ${event.type}">${event.icon}</div>
+            <div class="timeline-content">
+              <h4>${escapeHtml(event.title)}</h4>
+              <p class="timeline-date">${event.date}</p>
+              <p>${escapeHtml(event.description)}</p>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      container.innerHTML = html;
     }
 
     /**
@@ -880,6 +1957,11 @@
         }
 
         renderCurrentPage(); // Re-render list to show updated status
+
+        // Reload the client details if it's the currently selected client
+        if (clientData && clientData.row === row) {
+          await selectClient(row);
+        }
 
         // Show success message
         showToast('Statut mis à jour avec succès');
