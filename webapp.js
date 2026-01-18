@@ -15,19 +15,25 @@
  */
 function doGet(e) {
   try {
-    // Check authentication
-    const user = authenticateRequest(e);
-    if (!user) {
-      Logger.log('doGet: No user, rendering login page');
-      return renderLoginPage();
-    }
-
-    Logger.log('doGet: User authenticated, rendering page');
-
-    // Extract route and parameters
+    // Extract page parameter
     const page = (e && e.parameter && e.parameter.page) ? e.parameter.page : 'dashboard';
     const params = (e && e.parameter) ? e.parameter : {};
 
+    // PUBLIC ROUTES: These pages don't require authentication
+    if (page === 'contact-form') {
+      Logger.log('doGet: Rendering public contact form');
+      return renderContactForm(params);
+    }
+
+    // Check authentication for all other pages
+    const authResult = authenticateRequestWithDebug(e);
+    if (!authResult.user) {
+      Logger.log('doGet: No user, rendering login page. Detected email: ' + authResult.detectedEmail);
+      return renderLoginPage(authResult.detectedEmail);
+    }
+    const user = authResult.user;
+
+    Logger.log('doGet: User authenticated, rendering page');
     Logger.log('doGet: Routing to page: ' + page);
 
     // Route to appropriate page
@@ -192,8 +198,8 @@ function renderSettings(params, user) {
   template.webAppUrl = ScriptApp.getService().getUrl();
   template.currentPage = 'settings';
 
-  // Get spreadsheet URL for direct access link
-  template.spreadsheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  // Get spreadsheet URL for direct access link (use CONFIG ID, not bound spreadsheet)
+  template.spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/' + CONFIG.file_paths.crm_sheet_id + '/edit';
 
   // Safely serialize user object for client-side
   try {
@@ -292,12 +298,34 @@ function renderInvoiceBuilder(params, user) {
 }
 
 /**
+ * Renders the public contact/quote request form
+ * This page is publicly accessible (no authentication required)
+ *
+ * @param {Object} params - URL parameters
+ * @returns {HtmlOutput} Contact form page
+ */
+function renderContactForm(params) {
+  const template = HtmlService.createTemplateFromFile('pages/contact-form');
+  template.webAppUrl = ScriptApp.getService().getUrl();
+
+  // Pass work types from CONFIG for the dropdown
+  template.workTypes = CONFIG.work_types;
+
+  return template.evaluate()
+    .setTitle('Demande de devis - Style et Matière')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+}
+
+/**
  * Renders login/unauthorized page
  *
+ * @param {string} detectedEmail - Email detected from session (for debugging)
  * @returns {HtmlOutput} Login page
  */
-function renderLoginPage() {
+function renderLoginPage(detectedEmail) {
   const template = HtmlService.createTemplateFromFile('pages/login');
+  template.detectedEmail = detectedEmail || '';
 
   return template.evaluate()
     .setTitle('Style et Matière - Connexion')

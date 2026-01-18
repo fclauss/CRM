@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demande de devis - Style et Matiere</title>
+
+  <style>
+    :root {
+      --primary: #00796b;
+      --primary-dark: #004d40;
+      --secondary: #f2eb2d;
+      --gray-light: #f5f7fa;
+      --gray-border: #e0e6ed;
+      --success: #4CAF50;
+      --warning: #ff9800;
+      --danger: #f44336;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--gray-light);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .form-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .header-logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .header-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .header-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    /* Offline Banner */
+    .offline-banner {
+      background: var(--warning);
+      color: #333;
+      padding: 12px 20px;
+      text-align: center;
+      display: none;
+      font-weight: 500;
+    }
+
+    .offline-banner.visible {
+      display: block;
+    }
+
+    .offline-banner span {
+      margin-right: 8px;
+    }
+
+    /* Container */
+    .page-container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Form Card */
+    .form-card {
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .form-card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .form-card-subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 25px;
+    }
+
+    /* Form Elements */
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .form-row.single {
+      display: block;
+    }
+
+    .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .form-group.full {
+      flex: 1 1 100%;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .form-label .required {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--gray-border);
+      border-radius: 6px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.1);
+    }
+
+    .form-input.error,
+    .form-textarea.error,
+    .form-select.error {
+      border-color: var(--danger);
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-help {
+      font-size: 13px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .form-error {
+      font-size: 13px;
+      color: var(--danger);
+      margin-top: 5px;
+      display: none;
+    }
+
+    .form-error.visible {
+      display: block;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #666;
+      border: 1px solid var(--gray-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-light);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #43a047;
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Success Message */
+    .success-message {
+      text-align: center;
+      padding: 40px 20px;
+      display: none;
+    }
+
+    .success-message.visible {
+      display: block;
+    }
+
+    .success-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .success-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--success);
+      margin-bottom: 10px;
+    }
+
+    .success-text {
+      font-size: 16px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* Saved Forms Section */
+    .saved-forms-section {
+      background: #fff8e1;
+      border: 1px solid var(--warning);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .saved-forms-section.visible {
+      display: block;
+    }
+
+    .saved-forms-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .saved-forms-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .saved-forms-list {
+      margin-bottom: 15px;
+    }
+
+    .saved-form-item {
+      background: white;
+      border: 1px solid var(--gray-border);
+      border-radius: 6px;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .saved-form-info {
+      flex: 1;
+    }
+
+    .saved-form-name {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .saved-form-date {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .saved-form-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    /* Modal Dialog */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.visible {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 100%;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .modal-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .modal-text {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+    }
+
+    /* Footer */
+    .form-footer {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .form-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    /* Spinner */
+    .spinner {
+      border: 3px solid var(--gray-border);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .toast.visible {
+      opacity: 1;
+    }
+
+    .toast.success {
+      background: var(--success);
+    }
+
+    .toast.error {
+      background: var(--danger);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-card {
+        padding: 20px;
+      }
+
+      .header-title {
+        font-size: 24px;
+      }
+
+      .modal-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Offline Banner -->
+  <div class="offline-banner" id="offline-banner">
+    <span>Vous etes hors ligne</span> - Le formulaire sera sauvegarde localement
+  </div>
+
+  <!-- Header -->
+  <div class="form-header">
+    <div class="header-logo">🎨</div>
+    <h1 class="header-title">Style et Matiere</h1>
+    <p class="header-subtitle">Demande de devis ou d'information</p>
+  </div>
+
+  <div class="page-container">
+    <!-- Saved Forms Section (visible when there are locally saved forms) -->
+    <div class="saved-forms-section" id="saved-forms-section">
+      <div class="saved-forms-header">
+        <div class="saved-forms-title">
+          <span>📋</span> Formulaires en attente d'envoi
+        </div>
+        <button class="btn btn-success btn-small" onclick="syncAllSavedForms()">
+          Tout envoyer
+        </button>
+      </div>
+      <div class="saved-forms-list" id="saved-forms-list">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+
+    <!-- Main Form -->
+    <div class="form-card" id="form-card">
+      <h2 class="form-card-title">Formulaire de contact</h2>
+      <p class="form-card-subtitle">Remplissez ce formulaire pour nous contacter. Les champs marques * sont obligatoires.</p>
+
+      <form id="contact-form" onsubmit="handleSubmit(event)">
+        <!-- Type de demande -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Type de demande <span class="required">*</span></label>
+            <select class="form-select" id="requestType" name="requestType" required>
+              <option value="">Selectionnez...</option>
+              <option value="Demande de devis">Demande de devis</option>
+              <option value="Demande d'information">Demande d'information</option>
+              <option value="Demande de rendez-vous">Demande de rendez-vous</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Type de client -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Type de client <span class="required">*</span></label>
+            <select class="form-select" id="clientType" name="clientType" required>
+              <option value="">Selectionnez...</option>
+              <option value="Particulier">Particulier</option>
+              <option value="Professionnel">Professionnel</option>
+              <option value="Collectivite">Collectivite</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Nom du client -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Nom / Raison sociale <span class="required">*</span></label>
+            <input type="text" class="form-input" id="clientName" name="clientName" placeholder="Votre nom ou le nom de votre entreprise" required>
+          </div>
+        </div>
+
+        <!-- Contact principal (optional) -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Nom du contact principal</label>
+            <input type="text" class="form-input" id="contactName" name="contactName" placeholder="Si different du nom ci-dessus">
+          </div>
+        </div>
+
+        <!-- Adresse -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Adresse <span class="required">*</span></label>
+            <input type="text" class="form-input" id="address" name="address" placeholder="Numero et nom de rue" required>
+          </div>
+        </div>
+
+        <!-- Code postal + Ville -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Code postal <span class="required">*</span></label>
+            <input type="text" class="form-input" id="postalCode" name="postalCode" placeholder="67000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ville <span class="required">*</span></label>
+            <input type="text" class="form-input" id="city" name="city" placeholder="Strasbourg" required>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Adresse email <span class="required">*</span></label>
+            <input type="email" class="form-input" id="email" name="email" placeholder="votre@email.com" required>
+            <div class="form-error" id="email-error">Format d'email invalide</div>
+          </div>
+        </div>
+
+        <!-- Telephone -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Numero de telephone</label>
+            <input type="tel" class="form-input" id="phone" name="phone" placeholder="06 12 34 56 78">
+          </div>
+        </div>
+
+        <!-- Detail du projet -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Detail du projet</label>
+            <textarea class="form-textarea" id="projectDetails" name="projectDetails" placeholder="Decrivez votre projet ou votre demande..."></textarea>
+          </div>
+        </div>
+
+        <!-- Type de travaux -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Type de travaux</label>
+            <select class="form-select" id="workType" name="workType">
+              <option value="">Selectionnez...</option>
+              <? for (var key in workTypes) { ?>
+                <option value="<?= workTypes[key] ?>"><?= workTypes[key] ?></option>
+              <? } ?>
+            </select>
+            <div class="form-help">Utile pour le calcul de la TVA applicable</div>
+          </div>
+        </div>
+
+        <!-- Comment avez-vous entendu parler de nous -->
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label">Comment avez-vous entendu parler de nous ?</label>
+            <select class="form-select" id="referralSource" name="referralSource">
+              <option value="">Selectionnez...</option>
+              <option value="Bouche a oreille">Bouche a oreille</option>
+              <option value="Recherche internet">Recherche internet</option>
+              <option value="Reseaux sociaux">Reseaux sociaux</option>
+              <option value="Panneau de chantier">Panneau de chantier</option>
+              <option value="Recommandation">Recommandation</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary" id="submit-btn">
+          <span id="submit-text">Envoyer ma demande</span>
+        </button>
+      </form>
+
+      <!-- Success Message (hidden by default) -->
+      <div class="success-message" id="success-message">
+        <div class="success-icon">✅</div>
+        <h3 class="success-title">Demande envoyee !</h3>
+        <p class="success-text">
+          Merci pour votre demande. Nous l'avons bien recue et nous vous contacterons dans les plus brefs delais.
+        </p>
+        <button class="btn btn-primary" onclick="resetForm()" style="margin-top: 20px;">
+          Nouvelle demande
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="form-footer">
+      Style et Matiere - Artisan du batiment<br>
+      <a href="tel:+33638704576">06 38 70 45 76</a>
+    </div>
+  </div>
+
+  <!-- Offline Save Dialog -->
+  <div class="modal-overlay" id="offline-modal">
+    <div class="modal-content">
+      <div class="modal-icon">📴</div>
+      <h3 class="modal-title">Vous etes hors ligne</h3>
+      <p class="modal-text">
+        Impossible d'envoyer votre demande pour le moment. Que souhaitez-vous faire ?
+      </p>
+      <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="saveFormLocally()">
+          💾 Sauvegarder localement
+        </button>
+        <button class="btn btn-secondary" onclick="retrySubmit()">
+          🔄 Reessayer
+        </button>
+        <button class="btn btn-secondary" onclick="closeOfflineModal()">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ==========================================================================
+    // CONFIGURATION
+    // ==========================================================================
+    const STORAGE_KEY = 'styleetmatiere_pending_forms';
+    let pendingFormData = null;
+
+    // ==========================================================================
+    // INITIALIZATION
+    // ==========================================================================
+    window.addEventListener('DOMContentLoaded', function() {
+      // Setup online/offline listeners
+      setupConnectivityListeners();
+
+      // Check initial online status
+      updateOnlineStatus();
+
+      // Load any saved forms
+      displaySavedForms();
+
+      // Setup email validation
+      document.getElementById('email').addEventListener('blur', validateEmail);
+    });
+
+    // ==========================================================================
+    // CONNECTIVITY HANDLING
+    // ==========================================================================
+
+    /**
+     * Setup event listeners for online/offline events
+     */
+    function setupConnectivityListeners() {
+      window.addEventListener('online', function() {
+        updateOnlineStatus();
+        showToast('Connexion retablie', 'success');
+        displaySavedForms();
+      });
+
+      window.addEventListener('offline', function() {
+        updateOnlineStatus();
+        showToast('Connexion perdue', 'error');
+      });
+    }
+
+    /**
+     * Update UI based on online status
+     */
+    function updateOnlineStatus() {
+      const banner = document.getElementById('offline-banner');
+      if (navigator.onLine) {
+        banner.classList.remove('visible');
+      } else {
+        banner.classList.add('visible');
+      }
+    }
+
+    /**
+     * Check if currently online
+     */
+    function isOnline() {
+      return navigator.onLine;
+    }
+
+    // ==========================================================================
+    // FORM SUBMISSION
+    // ==========================================================================
+
+    /**
+     * Handle form submission
+     */
+    function handleSubmit(event) {
+      event.preventDefault();
+
+      // Validate form
+      if (!validateForm()) {
+        return;
+      }
+
+      // Collect form data
+      const formData = collectFormData();
+
+      // Check if online
+      if (!isOnline()) {
+        // Store for later and show offline modal
+        pendingFormData = formData;
+        showOfflineModal();
+        return;
+      }
+
+      // Submit form
+      submitForm(formData);
+    }
+
+    /**
+     * Validate form fields
+     */
+    function validateForm() {
+      let isValid = true;
+
+      // Validate email
+      if (!validateEmail()) {
+        isValid = false;
+      }
+
+      // Check required fields (phone is now optional, address/postalCode/city are required)
+      const requiredFields = ['requestType', 'clientType', 'clientName', 'email', 'address', 'postalCode', 'city'];
+      requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (!field.value.trim()) {
+          field.classList.add('error');
+          isValid = false;
+        } else {
+          field.classList.remove('error');
+        }
+      });
+
+      return isValid;
+    }
+
+    /**
+     * Validate email field
+     */
+    function validateEmail() {
+      const emailField = document.getElementById('email');
+      const errorDiv = document.getElementById('email-error');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (emailField.value && !emailRegex.test(emailField.value)) {
+        emailField.classList.add('error');
+        errorDiv.classList.add('visible');
+        return false;
+      } else {
+        emailField.classList.remove('error');
+        errorDiv.classList.remove('visible');
+        return true;
+      }
+    }
+
+    /**
+     * Collect form data into object
+     */
+    function collectFormData() {
+      return {
+        requestType: document.getElementById('requestType').value,
+        clientType: document.getElementById('clientType').value,
+        clientName: document.getElementById('clientName').value,
+        contactName: document.getElementById('contactName').value,
+        address: document.getElementById('address').value,
+        postalCode: document.getElementById('postalCode').value,
+        city: document.getElementById('city').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        projectDetails: document.getElementById('projectDetails').value,
+        workType: document.getElementById('workType').value,
+        referralSource: document.getElementById('referralSource').value,
+        savedAt: new Date().toISOString()
+      };
+    }
+
+    /**
+     * Submit form to server
+     */
+    function submitForm(formData) {
+      const submitBtn = document.getElementById('submit-btn');
+      const submitText = document.getElementById('submit-text');
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitText.innerHTML = '<span class="spinner"></span> Envoi en cours...';
+
+      // Call server function
+      google.script.run
+        .withSuccessHandler(function(result) {
+          submitBtn.disabled = false;
+          submitText.textContent = 'Envoyer ma demande';
+
+          if (result.success) {
+            showSuccessMessage();
+          } else {
+            showToast(result.error || 'Une erreur est survenue', 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          submitBtn.disabled = false;
+          submitText.textContent = 'Envoyer ma demande';
+
+          // If network error, offer to save locally
+          if (!isOnline()) {
+            pendingFormData = formData;
+            showOfflineModal();
+          } else {
+            showToast('Erreur: ' + error.message, 'error');
+          }
+        })
+        .submitContactForm(formData);
+    }
+
+    /**
+     * Show success message
+     */
+    function showSuccessMessage() {
+      document.getElementById('contact-form').style.display = 'none';
+      document.getElementById('success-message').classList.add('visible');
+    }
+
+    /**
+     * Reset form for new submission
+     */
+    function resetForm() {
+      document.getElementById('contact-form').reset();
+      document.getElementById('contact-form').style.display = 'block';
+      document.getElementById('success-message').classList.remove('visible');
+    }
+
+    // ==========================================================================
+    // OFFLINE MODAL
+    // ==========================================================================
+
+    /**
+     * Show offline save dialog
+     */
+    function showOfflineModal() {
+      document.getElementById('offline-modal').classList.add('visible');
+    }
+
+    /**
+     * Close offline modal
+     */
+    function closeOfflineModal() {
+      document.getElementById('offline-modal').classList.remove('visible');
+      pendingFormData = null;
+    }
+
+    /**
+     * Save form data to localStorage
+     */
+    function saveFormLocally() {
+      if (!pendingFormData) return;
+
+      try {
+        // Get existing saved forms
+        let savedForms = getSavedForms();
+
+        // Add new form with unique ID
+        pendingFormData.id = 'form_' + Date.now();
+        savedForms.push(pendingFormData);
+
+        // Save to localStorage
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(savedForms));
+
+        // Close modal and show confirmation
+        closeOfflineModal();
+        showToast('Formulaire sauvegarde localement', 'success');
+
+        // Reset form
+        document.getElementById('contact-form').reset();
+
+        // Update saved forms display
+        displaySavedForms();
+
+      } catch (error) {
+        console.error('Error saving form:', error);
+        showToast('Erreur lors de la sauvegarde', 'error');
+      }
+    }
+
+    /**
+     * Retry submission
+     */
+    function retrySubmit() {
+      closeOfflineModal();
+
+      if (isOnline() && pendingFormData) {
+        submitForm(pendingFormData);
+      } else if (!isOnline()) {
+        showToast('Toujours hors ligne', 'error');
+        setTimeout(showOfflineModal, 500);
+      }
+    }
+
+    // ==========================================================================
+    // SAVED FORMS MANAGEMENT
+    // ==========================================================================
+
+    /**
+     * Get saved forms from localStorage
+     */
+    function getSavedForms() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : [];
+      } catch (error) {
+        console.error('Error reading saved forms:', error);
+        return [];
+      }
+    }
+
+    /**
+     * Display saved forms if any exist
+     */
+    function displaySavedForms() {
+      const section = document.getElementById('saved-forms-section');
+      const list = document.getElementById('saved-forms-list');
+      const savedForms = getSavedForms();
+
+      if (savedForms.length === 0 || !isOnline()) {
+        section.classList.remove('visible');
+        return;
+      }
+
+      // Show section
+      section.classList.add('visible');
+
+      // Build list HTML
+      let html = '';
+      savedForms.forEach(form => {
+        const date = new Date(form.savedAt);
+        const dateStr = date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+        html += `
+          <div class="saved-form-item" data-id="${form.id}">
+            <div class="saved-form-info">
+              <div class="saved-form-name">${escapeHtml(form.clientName)}</div>
+              <div class="saved-form-date">Sauvegarde le ${dateStr}</div>
+            </div>
+            <div class="saved-form-actions">
+              <button class="btn btn-success btn-small" onclick="syncSavedForm('${form.id}')">
+                Envoyer
+              </button>
+              <button class="btn btn-secondary btn-small" onclick="deleteSavedForm('${form.id}')">
+                Supprimer
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      list.innerHTML = html;
+    }
+
+    /**
+     * Sync a single saved form
+     */
+    function syncSavedForm(formId) {
+      const savedForms = getSavedForms();
+      const form = savedForms.find(f => f.id === formId);
+
+      if (!form) {
+        showToast('Formulaire introuvable', 'error');
+        return;
+      }
+
+      if (!isOnline()) {
+        showToast('Connexion requise pour envoyer', 'error');
+        return;
+      }
+
+      // Remove ID and savedAt before submitting
+      const formData = { ...form };
+      delete formData.id;
+      delete formData.savedAt;
+
+      // Disable the sync button
+      const item = document.querySelector(`[data-id="${formId}"]`);
+      if (item) {
+        const btn = item.querySelector('.btn-success');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>';
+      }
+
+      // Submit to server
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            // Remove from localStorage
+            removeSavedForm(formId);
+            showToast('Formulaire envoye avec succes', 'success');
+            displaySavedForms();
+          } else {
+            showToast(result.error || 'Erreur lors de l\'envoi', 'error');
+            // Re-enable button
+            if (item) {
+              const btn = item.querySelector('.btn-success');
+              btn.disabled = false;
+              btn.textContent = 'Envoyer';
+            }
+          }
+        })
+        .withFailureHandler(function(error) {
+          showToast('Erreur: ' + error.message, 'error');
+          // Re-enable button
+          if (item) {
+            const btn = item.querySelector('.btn-success');
+            btn.disabled = false;
+            btn.textContent = 'Envoyer';
+          }
+        })
+        .submitContactForm(formData);
+    }
+
+    /**
+     * Sync all saved forms
+     */
+    async function syncAllSavedForms() {
+      const savedForms = getSavedForms();
+
+      if (savedForms.length === 0) {
+        showToast('Aucun formulaire a envoyer', 'error');
+        return;
+      }
+
+      if (!isOnline()) {
+        showToast('Connexion requise pour envoyer', 'error');
+        return;
+      }
+
+      // Sync each form
+      for (const form of savedForms) {
+        await syncSavedFormAsync(form.id);
+      }
+
+      showToast('Tous les formulaires ont ete envoyes', 'success');
+    }
+
+    /**
+     * Async wrapper for syncing a form
+     */
+    function syncSavedFormAsync(formId) {
+      return new Promise((resolve) => {
+        const savedForms = getSavedForms();
+        const form = savedForms.find(f => f.id === formId);
+
+        if (!form) {
+          resolve();
+          return;
+        }
+
+        const formData = { ...form };
+        delete formData.id;
+        delete formData.savedAt;
+
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result.success) {
+              removeSavedForm(formId);
+              displaySavedForms();
+            }
+            resolve();
+          })
+          .withFailureHandler(function() {
+            resolve();
+          })
+          .submitContactForm(formData);
+      });
+    }
+
+    /**
+     * Delete a saved form
+     */
+    function deleteSavedForm(formId) {
+      if (!confirm('Supprimer ce formulaire sauvegarde ?')) {
+        return;
+      }
+
+      removeSavedForm(formId);
+      displaySavedForms();
+      showToast('Formulaire supprime', 'success');
+    }
+
+    /**
+     * Remove a form from localStorage
+     */
+    function removeSavedForm(formId) {
+      let savedForms = getSavedForms();
+      savedForms = savedForms.filter(f => f.id !== formId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedForms));
+    }
+
+    // ==========================================================================
+    // UTILITIES
+    // ==========================================================================
+
+    /**
+     * Show toast notification
+     */
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast visible ' + type;
+
+      setTimeout(() => {
+        toast.classList.remove('visible');
+      }, 3000);
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     */
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

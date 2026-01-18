@@ -240,6 +240,16 @@
         </div>
       </div>
 
+      <? if (detectedEmail) { ?>
+      <div class="message-box" style="background: #e3f2fd; border-color: #2196f3;">
+        <span class="message-icon">ℹ️</span>
+        <div class="message-text">
+          <strong>Email détecté:</strong> <?= detectedEmail ?><br>
+          <small>Si cet email est incorrect, déconnectez-vous de Google et reconnectez-vous avec le bon compte.</small>
+        </div>
+      </div>
+      <? } ?>
+
       <div class="info-section">
         <div class="info-title">Comment se connecter?</div>
         <div class="info-text">
@@ -280,8 +290,8 @@
 
   <script>
     /**
-     * Attempt to login by reloading the page
-     * Google Apps Script will handle the authentication flow
+     * Attempt to login by navigating to the top-level window
+     * This ensures we break out of any iframe and trigger Google OAuth properly
      */
     function attemptLogin() {
       // Show loading state
@@ -289,10 +299,17 @@
       button.disabled = true;
       button.innerHTML = '<span>⏳</span><span>Redirection...</span>';
 
-      // Reload to trigger Google authentication
-      // The doGet() function will handle authentication and redirect appropriately
+      // Get the webapp URL and navigate in top window to trigger OAuth
+      // Google Apps Script webapps run in an iframe, so we need top.location
+      const currentUrl = window.location.href.split('?')[0]; // Base URL without params
+
       setTimeout(() => {
-        window.location.href = window.location.href;
+        // Try to navigate the top window (breaks out of iframe)
+        if (window.top !== window.self) {
+          window.top.location.href = currentUrl + '?page=dashboard';
+        } else {
+          window.location.href = currentUrl + '?page=dashboard';
+        }
       }, 500);
     }
 

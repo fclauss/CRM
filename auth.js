@@ -14,6 +14,18 @@
  * @returns {Object|null} User object with {email, name, role} or null if not authenticated
  */
 function authenticateRequest(e) {
+  const result = authenticateRequestWithDebug(e);
+  return result.user;
+}
+
+/**
+ * Authenticates incoming request and returns debug info
+ * Used by doGet to show detected email on login page for troubleshooting
+ *
+ * @param {Object} e - Event object with request data
+ * @returns {Object} Object with {user, detectedEmail, failReason}
+ */
+function authenticateRequestWithDebug(e) {
   try {
     // Get current user from Apps Script session
     // Use getEffectiveUser() which is more reliable for web apps
@@ -25,13 +37,13 @@ function authenticateRequest(e) {
     if (!email || email === '') {
       Logger.log('Auth failed: No email in session (OAuth not granted or DOMAIN access issue)');
       Logger.log('Deployment mode should be USER_ACCESSING, access should be DOMAIN or ANYONE');
-      return null;
+      return { user: null, detectedEmail: '(vide)', failReason: 'no_email' };
     }
 
     // Check if user is authorized
     if (!isAuthorizedUser(email)) {
       Logger.log('Auth failed: User not authorized: ' + email);
-      return null;
+      return { user: null, detectedEmail: email, failReason: 'not_authorized' };
     }
 
     // Get user details
@@ -41,14 +53,18 @@ function authenticateRequest(e) {
     Logger.log('Auth success: ' + email + ' (role: ' + role + ')');
 
     return {
-      email: email,
-      name: name,
-      role: role
+      user: {
+        email: email,
+        name: name,
+        role: role
+      },
+      detectedEmail: email,
+      failReason: null
     };
 
   } catch (error) {
     Logger.log('Auth error: ' + error.message);
-    return null;
+    return { user: null, detectedEmail: '(erreur: ' + error.message + ')', failReason: 'error' };
   }
 }
 

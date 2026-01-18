@@ -635,6 +635,83 @@ function updateProjectDetails(row, startDate, endDate, projectValue) {
 }
 
 /**
+ * Updates all project information including work type
+ * Used by the project editor form in clients page
+ *
+ * @param {number} row - Row number in the sheet
+ * @param {Object} projectData - Project data object
+ * @param {string} projectData.startDate - Project start date (YYYY-MM-DD)
+ * @param {string} projectData.endDate - Project end date (YYYY-MM-DD)
+ * @param {number} projectData.value - Project value
+ * @param {string} projectData.workType - Type of work (determines VAT rate)
+ * @returns {Object} Result with success status
+ */
+function updateProjectInfo(row, projectData) {
+  try {
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
+      .getSheetByName(CONFIG.file_paths.crm_sheet_name);
+
+    if (!sheet) {
+      throw new Error('Feuille CRM introuvable');
+    }
+
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const C = CONFIG.column_mappings;
+    const updatedFields = [];
+
+    // Update start date
+    if (projectData.startDate) {
+      const colIndex = headers.indexOf(C.project_start_date);
+      if (colIndex !== -1) {
+        sheet.getRange(row, colIndex + 1).setValue(new Date(projectData.startDate));
+        updatedFields.push('Date de début');
+      }
+    }
+
+    // Update end date
+    if (projectData.endDate) {
+      const colIndex = headers.indexOf(C.project_end_date);
+      if (colIndex !== -1) {
+        sheet.getRange(row, colIndex + 1).setValue(new Date(projectData.endDate));
+        updatedFields.push('Date de fin');
+      }
+    }
+
+    // Update project value
+    if (projectData.value) {
+      const colIndex = headers.indexOf(C.project_value);
+      if (colIndex !== -1) {
+        sheet.getRange(row, colIndex + 1).setValue(parseFloat(projectData.value));
+        updatedFields.push('Valeur');
+      }
+    }
+
+    // Update work type
+    if (projectData.workType) {
+      const colIndex = headers.indexOf(C.work_type);
+      if (colIndex !== -1) {
+        sheet.getRange(row, colIndex + 1).setValue(projectData.workType);
+        updatedFields.push('Type de travaux');
+      }
+    }
+
+    Logger.log('Project info updated for row ' + row + ': ' + updatedFields.join(', '));
+
+    return {
+      success: true,
+      message: 'Projet mis à jour (' + updatedFields.join(', ') + ')'
+    };
+
+  } catch (error) {
+    Logger.log('Error updating project info: ' + error.message);
+    return {
+      success: false,
+      message: 'Erreur: ' + error.message
+    };
+  }
+}
+
+/**
  * Retrieves the quote value for a client (used to pre-fill project value)
  *
  * @param {number} row - Row number in the sheet
@@ -1476,4 +1553,159 @@ function resetEmailTemplates() {
       message: error.message
     };
   }
+}
+
+// =============================================================================
+// PUBLIC CONTACT FORM
+// =============================================================================
+
+/**
+ * Submits a contact/quote request form to the CRM sheet
+ * This function is called from the public contact form (no authentication required)
+ *
+ * @param {Object} formData - Form data object
+ * @param {string} formData.requestType - Type de demande
+ * @param {string} formData.clientType - Type de client
+ * @param {string} formData.clientName - Nom du Client / Raison Sociale
+ * @param {string} formData.contactName - Nom du Contact Principal (optional)
+ * @param {string} formData.address - Adresse (optional)
+ * @param {string} formData.postalCode - Code Postal (optional)
+ * @param {string} formData.city - Ville (optional)
+ * @param {string} formData.email - Adresse Email
+ * @param {string} formData.phone - Numéro de Téléphone
+ * @param {string} formData.projectDetails - Détail du Projet (optional)
+ * @param {string} formData.workType - Type de travaux (optional)
+ * @returns {Object} Result object with success flag and message
+ */
+function submitContactForm(formData) {
+  try {
+    // Validate required fields
+    if (!formData.clientName || !formData.clientName.trim()) {
+      return {
+        success: false,
+        error: 'Le nom du client est requis'
+      };
+    }
+
+    if (!formData.email || !formData.email.trim()) {
+      return {
+        success: false,
+        error: 'L\'adresse email est requise'
+      };
+    }
+
+    // Validate email format
+    if (!isValidEmail(formData.email.trim())) {
+      return {
+        success: false,
+        error: 'Format d\'email invalide'
+      };
+    }
+
+    // Address, postal code, and city are required
+    if (!formData.address || !formData.address.trim()) {
+      return {
+        success: false,
+        error: 'L\'adresse est requise'
+      };
+    }
+
+    if (!formData.postalCode || !formData.postalCode.trim()) {
+      return {
+        success: false,
+        error: 'Le code postal est requis'
+      };
+    }
+
+    if (!formData.city || !formData.city.trim()) {
+      return {
+        success: false,
+        error: 'La ville est requise'
+      };
+    }
+
+    // Get the CRM sheet
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
+      .getSheetByName(CONFIG.file_paths.crm_sheet_name);
+
+    if (!sheet) {
+      throw new Error('Feuille CRM introuvable');
+    }
+
+    // Get headers to find column indices
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const C = CONFIG.column_mappings;
+
+    // Find the actual last row with data (to avoid issues with formatted empty rows)
+    const timestampColIdx = headers.indexOf(C.timestamp);
+    const lastRow = findLastRowWithData(sheet, timestampColIdx + 1);
+    const insertRow = lastRow + 1;
+
+    // Build row data array matching column order
+    const newRow = new Array(headers.length).fill('');
+
+    // Helper function to set value by column name
+    const setColumnValue = (columnName, value) => {
+      const idx = headers.indexOf(columnName);
+      if (idx !== -1) {
+        newRow[idx] = value || '';
+      }
+    };
+
+    // Set values for form fields
+    setColumnValue(C.timestamp, new Date());                              // Timestamp
+    setColumnValue(C.request_type, formData.requestType || '');           // Type de demande
+    setColumnValue(C.client_type, formData.clientType || '');             // Type de client
+    setColumnValue(C.client_name, formData.clientName.trim());            // Nom du Client
+    setColumnValue(C.contact_principal, formData.contactName || '');      // Nom du Contact Principal
+    setColumnValue(C.address, formData.address.trim());                   // Adresse
+    setColumnValue(C.postal_code, formData.postalCode.trim());            // Code Postal
+    setColumnValue(C.city, formData.city.trim());                         // Ville
+    setColumnValue(C.client_email, formData.email.trim());                // Adresse Email
+    setColumnValue(C.phone, formData.phone || '');                        // Numéro de Téléphone (optional)
+    setColumnValue(C.project_details, formData.projectDetails || '');     // Détail du Projet
+    setColumnValue(C.work_type, formData.workType || '');                 // Type de travaux
+    setColumnValue(C.referral_source, formData.referralSource || '');     // Comment avez-vous entendu parler de nous
+
+    // Set default status for new entries
+    setColumnValue(C.status, CONFIG.statuses.NEW);
+
+    // Insert at the correct row (after actual data, not at sheet end)
+    sheet.getRange(insertRow, 1, 1, newRow.length).setValues([newRow]);
+
+    Logger.log('Contact form submitted successfully at row ' + insertRow + ': ' + formData.clientName);
+
+    return {
+      success: true,
+      message: 'Votre demande a été envoyée avec succès. Nous vous contacterons rapidement.'
+    };
+
+  } catch (error) {
+    Logger.log('Error submitting contact form: ' + error.message);
+    return {
+      success: false,
+      error: 'Une erreur est survenue lors de l\'envoi. Veuillez réessayer.'
+    };
+  }
+}
+
+/**
+ * Finds the last row with actual data in a specific column
+ * This avoids issues with formatted empty rows that extend beyond data
+ *
+ * @param {Sheet} sheet - The sheet to search
+ * @param {number} column - The column number (1-indexed) to check for data
+ * @returns {number} The last row number with data
+ */
+function findLastRowWithData(sheet, column) {
+  const data = sheet.getRange(1, column, sheet.getLastRow(), 1).getValues();
+
+  // Find last non-empty row
+  for (let i = data.length - 1; i >= 0; i--) {
+    if (data[i][0] !== '' && data[i][0] !== null) {
+      return i + 1; // Convert to 1-indexed
+    }
+  }
+
+  return 1; // Return 1 if only header exists
 }

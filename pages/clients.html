@@ -1684,7 +1684,7 @@
         </div>
 
         <!-- Project Summary Cards -->
-        <div class="project-summary">
+        <div class="project-summary" id="project-summary-display">
           <div class="project-stat ${client.projectValue ? 'highlight' : ''}">
             <div class="project-stat-icon">💰</div>
             <div class="project-stat-value">${client.projectValue ? formatCurrency(client.projectValue) : '—'}</div>
@@ -1704,6 +1704,53 @@
             <div class="project-stat-icon">🔧</div>
             <div class="project-stat-value" style="font-size: 13px;">${client.workType ? escapeHtml(client.workType.split('(')[0].trim()) : '—'}</div>
             <div class="project-stat-label">Type</div>
+          </div>
+        </div>
+
+        <!-- Edit Project Button -->
+        <div style="text-align: center; margin-bottom: 20px;">
+          <button class="action-button" onclick="showProjectEditor()" id="edit-project-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;">
+            ✏️ Modifier les informations du projet
+          </button>
+        </div>
+
+        <!-- Project Editor Form (hidden by default) -->
+        <div id="project-editor-form" style="display: none; background: var(--gray-light); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <h4 style="margin: 0 0 16px 0; color: var(--primary);">Modifier le projet</h4>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+            <div>
+              <label style="display: block; font-size: 13px; color: #666; margin-bottom: 5px;">Date de début</label>
+              <input type="date" id="project-start-date" value="${client.projectStartDate ? formatDateForInput(client.projectStartDate) : ''}"
+                style="width: 100%; padding: 10px; border: 2px solid var(--gray-border); border-radius: 6px; font-size: 14px;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; color: #666; margin-bottom: 5px;">Date de fin prévue</label>
+              <input type="date" id="project-end-date" value="${client.projectEndDate ? formatDateForInput(client.projectEndDate) : ''}"
+                style="width: 100%; padding: 10px; border: 2px solid var(--gray-border); border-radius: 6px; font-size: 14px;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; color: #666; margin-bottom: 5px;">Valeur du projet (€)</label>
+              <input type="number" id="project-value" value="${client.projectValue || ''}" placeholder="0.00" step="0.01"
+                style="width: 100%; padding: 10px; border: 2px solid var(--gray-border); border-radius: 6px; font-size: 14px;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; color: #666; margin-bottom: 5px;">Type de travaux</label>
+              <select id="project-work-type" style="width: 100%; padding: 10px; border: 2px solid var(--gray-border); border-radius: 6px; font-size: 14px;">
+                <option value="">— Sélectionner —</option>
+                <option value="Rénovation (TVA 10%)" ${client.workType === 'Rénovation (TVA 10%)' ? 'selected' : ''}>Rénovation (TVA 10%)</option>
+                <option value="Construction neuve -2ans (TVA 20%)" ${client.workType === 'Construction neuve -2ans (TVA 20%)' ? 'selected' : ''}>Construction neuve -2ans (TVA 20%)</option>
+                <option value="Sous-traitance (TVA 20%)" ${client.workType === 'Sous-traitance (TVA 20%)' ? 'selected' : ''}>Sous-traitance (TVA 20%)</option>
+                <option value="Collectivité (TVA 20%)" ${client.workType === 'Collectivité (TVA 20%)' ? 'selected' : ''}>Collectivité (TVA 20%)</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end;">
+            <button onclick="hideProjectEditor()" style="padding: 10px 20px; background: #e0e0e0; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+              Annuler
+            </button>
+            <button onclick="saveProjectInfo(${client.row})" style="padding: 10px 20px; background: var(--success); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+              💾 Enregistrer
+            </button>
           </div>
         </div>
 
@@ -2032,6 +2079,68 @@
       const container = document.getElementById('client-details');
       container.className = 'client-details empty-state';
       container.innerHTML = `<p style="color: var(--danger);">${escapeHtml(message)}</p>`;
+    }
+
+    /**
+     * Show project editor form
+     */
+    function showProjectEditor() {
+      document.getElementById('project-editor-form').style.display = 'block';
+      document.getElementById('edit-project-btn').style.display = 'none';
+    }
+
+    /**
+     * Hide project editor form
+     */
+    function hideProjectEditor() {
+      document.getElementById('project-editor-form').style.display = 'none';
+      document.getElementById('edit-project-btn').style.display = 'inline-flex';
+    }
+
+    /**
+     * Save project information
+     */
+    async function saveProjectInfo(row) {
+      const startDate = document.getElementById('project-start-date').value;
+      const endDate = document.getElementById('project-end-date').value;
+      const value = document.getElementById('project-value').value;
+      const workType = document.getElementById('project-work-type').value;
+
+      try {
+        const result = await API.updateProjectInfo(row, {
+          startDate: startDate,
+          endDate: endDate,
+          value: value,
+          workType: workType
+        });
+
+        if (result.success) {
+          showToast('Projet mis à jour avec succès', 'success');
+          hideProjectEditor();
+          // Reload client details to reflect changes
+          await selectClient(row);
+        } else {
+          alert('Erreur: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error saving project info:', error);
+        alert('Erreur lors de la sauvegarde: ' + error.message);
+      }
+    }
+
+    /**
+     * Format date for HTML date input (YYYY-MM-DD)
+     */
+    function formatDateForInput(dateStr) {
+      if (!dateStr) return '';
+      // If already in YYYY-MM-DD format
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+      // If in DD/MM/YYYY format
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+      return '';
     }
   </script>
 </body>

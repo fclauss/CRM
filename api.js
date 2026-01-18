@@ -39,6 +39,7 @@ function handleApiRequest(action, data, user) {
       'getClientDetails': (d) => getClientDetails(d.row),
       'updateClientStatus': (d) => updateClientStatus(d.row, d.status),
       'updateProjectDetails': (d) => updateProjectDetails(d.row, d.startDate, d.endDate, d.value),
+      'updateProjectInfo': (d) => updateProjectInfo(d.row, d.projectData),
       'saveClientNotes': (d) => saveClientNotes(d.row, d.notes),
       'getQuoteValue': (d) => getQuoteValue(d.row),
 

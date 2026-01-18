@@ -56,6 +56,15 @@ const API = {
     });
   },
 
+  updateProjectInfo: function(row, projectData) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .updateProjectInfo(row, projectData);
+    });
+  },
+
   saveClientNotes: function(row, notes) {
     return new Promise((resolve, reject) => {
       google.script.run

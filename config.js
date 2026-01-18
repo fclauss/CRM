@@ -24,7 +24,7 @@ const CONFIG = {
 
   google_api: {
     // Template document for quote generation (Google Doc)
-    quote_template_id: '1wqy9BREhSO458CCYEreSqyK8JBla5JHIRFuKYjacQFQ',
+    quote_template_id: '1E18nJ6jtXGs0pjkfaYLjcXWrufzu1UQ1JOg4ubLYs28',
 
     // Folder where generated quote PDFs will be saved
     quote_destination_folder_id: '1xJR8IZY2-iFAZYij77SWCPj5SQ-8XF3C',
@@ -61,7 +61,7 @@ const CONFIG = {
 
   file_paths: {
     // Spreadsheet ID (needed for web app access)
-    crm_sheet_id: '1QMxpd2d1by0lfQdvKv27GyNtzckfJ_CL8BzJiPOi2SU',
+    crm_sheet_id: '1W_NXSLvZ8ZdwL2OgUIZ6Kd9IdfzyBQeXucoA3qNrgL8',
 
     // Main sheet with client data (typically from Google Form responses)
     crm_sheet_name: 'Form Responses 1',
@@ -123,6 +123,7 @@ const CONFIG = {
     // Project details
     project_details: 'Détail du Projet / Information complémentaires',  // Project description
     work_type: 'Type de travaux (pour calcul TVA)',             // Work type (determines VAT rate)
+    referral_source: 'Comment avez-vous entendu parler de nous ?',  // How did you hear about us
 
     // Quote information
     quote_number: 'Devis N°',                                   // Generated quote number (YYYY-NNNN)
@@ -353,7 +354,7 @@ Tél: 06.38.70.45.76`
     // IMPORTANT: Update these with actual email addresses
     allowed_users: [
       'fabien@optimal-ai.eu',        // Admin user (Fabien)
-      'styleematiere@gmail.com'         // User (Style et Matière)
+      'ms.styleetmatiere@gmail.com'  // User (Style et Matière)
     ],
 
     // Admin users (full access including settings and reset)
@@ -365,7 +366,7 @@ Tél: 06.38.70.45.76`
     // If not specified, name is extracted from email
     user_names: {
       'fabien@optimal-ai.eu': 'Fabien',
-      'styleematiere@gmail.com': 'Stéphane'
+      'ms.styleetmatiere@gmail.com': 'Stéphane'
     }
   }
 };

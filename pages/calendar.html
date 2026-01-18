@@ -289,7 +289,7 @@
       color: #666;
     }
 
-    /* 3-Month Calendar Styles */
+    /* 12-Month Calendar Styles */
     .months-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -641,7 +641,7 @@
             </div>
           </div>
 
-          <!-- 3-Month Calendar Grid -->
+          <!-- 12-Month Calendar Grid -->
           <div class="months-grid" id="months-grid">
             <div class="loading" style="grid-column: 1 / -1; padding: 20px;">
               <div class="spinner"></div>
@@ -682,7 +682,7 @@
     }
 
     /**
-     * Display 3-month calendar grid with colored project days
+     * Display 12-month calendar grid with colored project days
      */
     function displayCalendarTimeline(data) {
       const monthsGrid = document.getElementById('months-grid');
@@ -716,8 +716,11 @@
                 const end = parseDate(project.endDate);
 
                 if (start && end) {
-                  // Fill all days in project duration
+                  // Fill all days in project duration (excluding weekends)
                   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    // Skip weekends (0 = Sunday, 6 = Saturday)
+                    if (d.getDay() === 0 || d.getDay() === 6) continue;
+
                     const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
                     projectsByDate[key] = {
                       clientName: project.clientName,
@@ -735,14 +738,14 @@
       // Parse today's date from backend
       const today = data.today ? new Date(data.today) : new Date();
 
-      // Generate 3 months
+      // Generate 12 months
       const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
                          'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
       const dayNames = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
       let calendarHtml = '';
 
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 12; i++) {
         const month = (today.getMonth() + i) % 12;
         const year = today.getFullYear() + Math.floor((today.getMonth() + i) / 12);
         const isCurrentMonth = i === 0;
