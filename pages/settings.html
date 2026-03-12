@@ -441,6 +441,30 @@
           ${renderInvoiceCounterSection()}
         </div>
 
+        <!-- System Section (visible to all users) -->
+        <div class="settings-section">
+          <div class="section-header">
+            🔧 Système
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">🔑 Autorisations Google</label>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+              Si vous rencontrez des problèmes d'autorisation (pages vides, erreurs de permission),
+              cliquez sur le bouton ci-dessous pour forcer la ré-autorisation de l'application.
+            </p>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-primary" onclick="triggerReauthorization()" id="reauth-btn">
+                🔄 Forcer la ré-autorisation
+              </button>
+              <span id="reauth-status" style="font-size: 14px; color: #666;"></span>
+            </div>
+            <div class="form-help" style="margin-top: 10px;">
+              Cette action vérifie toutes les autorisations: Sheets, Drive, Docs, Gmail, etc.
+            </div>
+          </div>
+        </div>
+
         <!-- Admin Only Sections -->
         ${currentUser.role === 'admin' ? renderAdminSettings() : ''}
 
@@ -616,6 +640,52 @@
           </div>
         </div>
       `;
+    }
+
+    /**
+     * Trigger reauthorization of all Google services
+     */
+    async function triggerReauthorization() {
+      const btn = document.getElementById('reauth-btn');
+      const status = document.getElementById('reauth-status');
+
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Vérification...';
+      status.textContent = '';
+
+      try {
+        const result = await API.triggerReauthorization();
+
+        if (result.success) {
+          status.innerHTML = '✅ ' + result.message;
+          status.style.color = '#4CAF50';
+          showToast('Autorisations vérifiées avec succès', 'success');
+        } else {
+          status.innerHTML = '❌ ' + (result.error || 'Erreur inconnue');
+          status.style.color = '#f44336';
+          showToast('Erreur: ' + result.error, 'error');
+        }
+      } catch (error) {
+        console.error('Reauthorization error:', error);
+        status.innerHTML = '❌ ' + error.message;
+        status.style.color = '#f44336';
+
+        // If authorization is needed, show instructions
+        if (error.message.includes('authorization') || error.message.includes('permission')) {
+          alert(
+            '🔑 Autorisation requise\n\n' +
+            'Pour ré-autoriser l\'application:\n\n' +
+            '1. Ouvrez l\'éditeur Apps Script\n' +
+            '2. Sélectionnez la fonction "triggerReauthorization"\n' +
+            '3. Cliquez sur Exécuter ▶️\n' +
+            '4. Suivez les instructions de Google pour autoriser\n\n' +
+            'Ensuite, rechargez cette page.'
+          );
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🔄 Forcer la ré-autorisation';
+      }
     }
 
     /**

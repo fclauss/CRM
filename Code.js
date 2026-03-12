@@ -321,7 +321,7 @@ function addNewService(serviceData) {
  * @throws {Error} If quote generation fails
  */
 function generateQuoteWithServices(structuredQuoteData, businessData, selectedRow) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+  const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
     .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
   try {
@@ -508,7 +508,7 @@ function openInvoiceEditor() {
  * @throws {Error} If invoice generation fails
  */
 function generateInvoiceWithServices(structuredInvoiceData, businessData, selectedRow) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+  const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
     .getSheetByName(CONFIG.file_paths.crm_sheet_name);
 
   try {

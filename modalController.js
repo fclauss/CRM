@@ -1562,6 +1562,7 @@ function resetEmailTemplates() {
 /**
  * Submits a contact/quote request form to the CRM sheet
  * This function is called from the public contact form (no authentication required)
+ * Includes recurring customer detection unless forceNew option is set
  *
  * @param {Object} formData - Form data object
  * @param {string} formData.requestType - Type de demande
@@ -1575,10 +1576,14 @@ function resetEmailTemplates() {
  * @param {string} formData.phone - Numéro de Téléphone
  * @param {string} formData.projectDetails - Détail du Projet (optional)
  * @param {string} formData.workType - Type de travaux (optional)
- * @returns {Object} Result object with success flag and message
+ * @param {Object} options - Optional settings
+ * @param {boolean} options.forceNew - Skip recurring customer check if true
+ * @returns {Object} Result object with success flag and message, or recurring customer info
  */
-function submitContactForm(formData) {
+function submitContactForm(formData, options) {
   try {
+    options = options || {};
+
     // Validate required fields
     if (!formData.clientName || !formData.clientName.trim()) {
       return {
@@ -1622,6 +1627,20 @@ function submitContactForm(formData) {
         success: false,
         error: 'La ville est requise'
       };
+    }
+
+    // Check for recurring customer unless forceNew is set
+    if (!options.forceNew) {
+      const existingCustomer = checkExistingCustomer(formData.email.trim());
+      if (existingCustomer.isRecurring) {
+        Logger.log('Recurring customer detected: ' + existingCustomer.customerName);
+        return {
+          success: false,
+          isRecurringCustomer: true,
+          existingCustomer: existingCustomer,
+          formData: formData // Return form data for use in createProjectForExistingCustomer
+        };
+      }
     }
 
     // Get the CRM sheet
@@ -1708,4 +1727,322 @@ function findLastRowWithData(sheet, column) {
   }
 
   return 1; // Return 1 if only header exists
+}
+
+// =============================================================================
+// AUTHORIZATION MANAGEMENT
+// =============================================================================
+
+/**
+ * Triggers all OAuth scopes required by the application
+ * Call this function to force re-authorization when permissions change
+ *
+ * @returns {Object} Result with success status and triggered services
+ */
+function triggerReauthorization() {
+  try {
+    const triggeredServices = [];
+
+    // Trigger Spreadsheet access
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id);
+    triggeredServices.push('Spreadsheets');
+
+    // Trigger Drive access
+    const folder = DriveApp.getFolderById(CONFIG.google_api.quote_destination_folder_id);
+    triggeredServices.push('Drive');
+
+    // Trigger Document access
+    const doc = DriveApp.getFileById(CONFIG.google_api.quote_template_id);
+    triggeredServices.push('Documents');
+
+    // Trigger Gmail access (compose scope)
+    const tempDraft = GmailApp.createDraft('', '', '');
+    tempDraft.deleteDraft();
+    triggeredServices.push('Gmail');
+
+    // Trigger external URL fetch (for QR codes)
+    UrlFetchApp.fetch('https://www.google.com', { muteHttpExceptions: true });
+    triggeredServices.push('URL Fetch');
+
+    Logger.log('Reauthorization triggered for: ' + triggeredServices.join(', '));
+
+    return {
+      success: true,
+      message: 'Autorisations vérifiées avec succès',
+      services: triggeredServices
+    };
+  } catch (error) {
+    Logger.log('Reauthorization error: ' + error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// =============================================================================
+// RECURRING CUSTOMER DETECTION
+// =============================================================================
+
+/**
+ * Checks if a customer with the given email already exists in the CRM
+ * Used for recurring customer detection on contact form submission
+ *
+ * @param {string} email - Email address to search for (case-insensitive)
+ * @returns {Object} Result object with customer information
+ * @returns {boolean} result.isRecurring - True if customer exists
+ * @returns {string} result.customerName - Name of the existing customer
+ * @returns {number} result.projectCount - Number of existing projects
+ * @returns {Object} result.lastProject - Details of most recent project
+ * @returns {Array<number>} result.rows - Array of row numbers for this customer
+ * @returns {number} result.mostRecentRow - Row number of most recent project
+ */
+function checkExistingCustomer(email) {
+  try {
+    if (!email || !email.trim()) {
+      return { isRecurring: false };
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
+      .getSheetByName(CONFIG.file_paths.crm_sheet_name);
+
+    if (!sheet) {
+      Logger.log('Sheet not found in checkExistingCustomer');
+      return { isRecurring: false };
+    }
+
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) {
+      return { isRecurring: false };
+    }
+
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const data = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
+
+    const C = CONFIG.column_mappings;
+    const emailIdx = headers.indexOf(C.client_email);
+    const nameIdx = headers.indexOf(C.client_name);
+    const statusIdx = headers.indexOf(C.status);
+    const quoteNumberIdx = headers.indexOf(C.quote_number);
+    const quoteDateIdx = headers.indexOf(C.quote_date);
+    const quoteJsonIdx = headers.indexOf(C.quote_data_json);
+
+    if (emailIdx === -1) {
+      Logger.log('Email column not found');
+      return { isRecurring: false };
+    }
+
+    const matchingRows = [];
+    let mostRecentRow = null;
+    let mostRecentDate = null;
+    let customerName = '';
+
+    data.forEach((row, index) => {
+      const rowEmail = row[emailIdx];
+      if (rowEmail && rowEmail.toString().trim().toLowerCase() === normalizedEmail) {
+        const rowNumber = index + 2; // Convert to 1-indexed sheet row
+        matchingRows.push(rowNumber);
+
+        // Track customer name from first match
+        if (!customerName && row[nameIdx]) {
+          customerName = row[nameIdx];
+        }
+
+        // Track most recent project by quote date or row number
+        const quoteDate = row[quoteDateIdx] ? new Date(row[quoteDateIdx]) : null;
+        if (!mostRecentRow || (quoteDate && (!mostRecentDate || quoteDate > mostRecentDate))) {
+          mostRecentRow = rowNumber;
+          mostRecentDate = quoteDate;
+        } else if (!quoteDate && !mostRecentDate && rowNumber > mostRecentRow) {
+          mostRecentRow = rowNumber;
+        }
+      }
+    });
+
+    if (matchingRows.length === 0) {
+      return { isRecurring: false };
+    }
+
+    // Get details of the most recent project
+    const recentRowData = data[mostRecentRow - 2]; // Convert back to 0-indexed
+    const lastProject = {
+      quoteNumber: recentRowData[quoteNumberIdx] || null,
+      status: recentRowData[statusIdx] || CONFIG.statuses.NEW,
+      quoteDate: recentRowData[quoteDateIdx] ? formatDate(new Date(recentRowData[quoteDateIdx])) : null,
+      value: parseQuoteValueOptimized(recentRowData[quoteJsonIdx])
+    };
+
+    Logger.log('Found recurring customer: ' + customerName + ' with ' + matchingRows.length + ' project(s)');
+
+    return {
+      isRecurring: true,
+      customerName: customerName,
+      projectCount: matchingRows.length,
+      lastProject: lastProject,
+      rows: matchingRows,
+      mostRecentRow: mostRecentRow
+    };
+
+  } catch (error) {
+    Logger.log('Error in checkExistingCustomer: ' + error.message);
+    return { isRecurring: false };
+  }
+}
+
+/**
+ * Retrieves all projects for a customer identified by email
+ * Used by the dashboard "Autres projets" tab
+ *
+ * @param {string} email - Email address to search for (case-insensitive)
+ * @returns {Array<Object>} Array of project objects
+ */
+function getRelatedProjects(email) {
+  try {
+    if (!email || !email.trim()) {
+      return [];
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
+      .getSheetByName(CONFIG.file_paths.crm_sheet_name);
+
+    if (!sheet) {
+      return [];
+    }
+
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) {
+      return [];
+    }
+
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const data = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
+
+    const C = CONFIG.column_mappings;
+    const emailIdx = headers.indexOf(C.client_email);
+    const nameIdx = headers.indexOf(C.client_name);
+    const statusIdx = headers.indexOf(C.status);
+    const quoteNumberIdx = headers.indexOf(C.quote_number);
+    const quoteDateIdx = headers.indexOf(C.quote_date);
+    const quoteJsonIdx = headers.indexOf(C.quote_data_json);
+    const workTypeIdx = headers.indexOf(C.work_type);
+    const timestampIdx = headers.indexOf(C.timestamp);
+
+    if (emailIdx === -1) {
+      return [];
+    }
+
+    const projects = [];
+
+    data.forEach((row, index) => {
+      const rowEmail = row[emailIdx];
+      if (rowEmail && rowEmail.toString().trim().toLowerCase() === normalizedEmail) {
+        const rowNumber = index + 2;
+        const quoteDate = row[quoteDateIdx] ? new Date(row[quoteDateIdx]) : null;
+        const timestamp = row[timestampIdx] ? new Date(row[timestampIdx]) : null;
+        const displayDate = quoteDate || timestamp;
+
+        projects.push({
+          row: rowNumber,
+          clientName: row[nameIdx] || '',
+          quoteNumber: row[quoteNumberIdx] || null,
+          status: row[statusIdx] || CONFIG.statuses.NEW,
+          quoteDate: displayDate ? formatDate(displayDate) : null,
+          sortDate: displayDate ? displayDate.getTime() : 0,
+          projectValue: parseQuoteValueOptimized(row[quoteJsonIdx]),
+          workType: row[workTypeIdx] || ''
+        });
+      }
+    });
+
+    // Sort by date (newest first)
+    projects.sort((a, b) => b.sortDate - a.sortDate);
+
+    return projects;
+
+  } catch (error) {
+    Logger.log('Error in getRelatedProjects: ' + error.message);
+    return [];
+  }
+}
+
+/**
+ * Creates a new project row for an existing customer
+ * Auto-fills contact information from the source row
+ *
+ * @param {Object} formData - New project form data
+ * @param {number} sourceRow - Row number to copy customer info from
+ * @returns {Object} Result object with success flag and new row number
+ */
+function createProjectForExistingCustomer(formData, sourceRow) {
+  try {
+    const sheet = SpreadsheetApp.openById(CONFIG.file_paths.crm_sheet_id)
+      .getSheetByName(CONFIG.file_paths.crm_sheet_name);
+
+    if (!sheet) {
+      throw new Error('Feuille CRM introuvable');
+    }
+
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const C = CONFIG.column_mappings;
+
+    // Get existing customer data from source row
+    const sourceData = sheet.getRange(sourceRow, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const sourceClient = createObjectFromRow(sourceData, headers);
+
+    // Find the last row with data
+    const timestampColIdx = headers.indexOf(C.timestamp);
+    const lastRow = findLastRowWithData(sheet, timestampColIdx + 1);
+    const insertRow = lastRow + 1;
+
+    // Build new row with auto-filled contact info
+    const newRow = new Array(headers.length).fill('');
+
+    const setColumnValue = (columnName, value) => {
+      const idx = headers.indexOf(columnName);
+      if (idx !== -1) {
+        newRow[idx] = value || '';
+      }
+    };
+
+    // Copy contact information from source row
+    setColumnValue(C.client_name, sourceClient[C.client_name]);
+    setColumnValue(C.contact_principal, sourceClient[C.contact_principal]);
+    setColumnValue(C.address, sourceClient[C.address]);
+    setColumnValue(C.postal_code, sourceClient[C.postal_code]);
+    setColumnValue(C.city, sourceClient[C.city]);
+    setColumnValue(C.client_email, sourceClient[C.client_email]);
+    setColumnValue(C.phone, sourceClient[C.phone]);
+    setColumnValue(C.client_type, sourceClient[C.client_type]);
+
+    // Set new project data from form
+    setColumnValue(C.timestamp, new Date());
+    setColumnValue(C.request_type, formData.requestType || '');
+    setColumnValue(C.project_details, formData.projectDetails || '');
+    setColumnValue(C.work_type, formData.workType || '');
+    setColumnValue(C.referral_source, formData.referralSource || 'Client existant');
+    setColumnValue(C.status, CONFIG.statuses.NEW);
+
+    // Insert the new row
+    sheet.getRange(insertRow, 1, 1, newRow.length).setValues([newRow]);
+
+    Logger.log('Created new project for existing customer at row ' + insertRow + ': ' + sourceClient[C.client_name]);
+
+    return {
+      success: true,
+      message: 'Nouveau projet créé pour ' + sourceClient[C.client_name],
+      newRow: insertRow,
+      customerName: sourceClient[C.client_name]
+    };
+
+  } catch (error) {
+    Logger.log('Error in createProjectForExistingCustomer: ' + error.message);
+    return {
+      success: false,
+      error: 'Erreur lors de la création du projet: ' + error.message
+    };
+  }
 }

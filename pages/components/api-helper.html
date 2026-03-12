@@ -285,6 +285,60 @@ const API = {
         .withFailureHandler(reject)
         .clearQuoteDraft(row);
     });
+  },
+
+  /**
+   * Recurring Customer APIs
+   */
+  checkExistingCustomer: function(email) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .checkExistingCustomer(email);
+    });
+  },
+
+  getRelatedProjects: function(email) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getRelatedProjects(email);
+    });
+  },
+
+  createProjectForExistingCustomer: function(formData, sourceRow) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .createProjectForExistingCustomer(formData, sourceRow);
+    });
+  },
+
+  /**
+   * Contact Form API (with recurring customer support)
+   */
+  submitContactForm: function(formData, options) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .submitContactForm(formData, options);
+    });
+  },
+
+  /**
+   * Authorization Management
+   */
+  triggerReauthorization: function() {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .triggerReauthorization();
+    });
   }
 };
 

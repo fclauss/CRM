@@ -1403,6 +1403,7 @@
     let clientData = null;
     let historyLoaded = false;
     let documentsLoaded = false;
+    let relatedProjectsLoaded = false;
     let editingField = null;
     let originalNotes = '';
     let notesModified = false;
@@ -1415,6 +1416,7 @@
       clientData = client;
       historyLoaded = false;
       documentsLoaded = false;
+      relatedProjectsLoaded = false;
       editingField = null;
       activeTab = 'project';
 
@@ -1445,6 +1447,9 @@
           <button class="tab-btn" onclick="switchTab('notes')" data-tab="notes">
             Notes
           </button>
+          <button class="tab-btn" onclick="switchTab('related')" data-tab="related">
+            Autres projets
+          </button>
         </div>
 
         <div class="tab-content">
@@ -1453,6 +1458,7 @@
           <div id="tab-documents" class="tab-panel"></div>
           <div id="tab-history" class="tab-panel"></div>
           <div id="tab-notes" class="tab-panel"></div>
+          <div id="tab-related" class="tab-panel"></div>
         </div>
       `;
 
@@ -1479,6 +1485,8 @@
         loadHistoryTab(clientData.row);
       } else if (tabName === 'documents' && !documentsLoaded) {
         loadDocumentsTab(clientData.row);
+      } else if (tabName === 'related' && !relatedProjectsLoaded) {
+        loadRelatedProjectsTab(clientData.email);
       }
     }
 
@@ -1988,6 +1996,124 @@
       html += '</div>';
 
       container.innerHTML = html;
+    }
+
+    /**
+     * Load Related Projects Tab
+     */
+    async function loadRelatedProjectsTab(email) {
+      if (relatedProjectsLoaded) return;
+
+      const container = document.getElementById('tab-related');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Chargement des projets...</p></div>';
+
+      if (!email) {
+        container.innerHTML = '<p class="empty-state-message">Aucun email associé à ce client</p>';
+        relatedProjectsLoaded = true;
+        return;
+      }
+
+      try {
+        const projects = await API.getRelatedProjects(email);
+        renderRelatedProjectsTab(projects);
+        relatedProjectsLoaded = true;
+      } catch (error) {
+        console.error('Error loading related projects:', error);
+        container.innerHTML = '<p class="empty-state-message" style="color: #f44336;">Erreur de chargement</p>';
+      }
+    }
+
+    function renderRelatedProjectsTab(projects) {
+      const container = document.getElementById('tab-related');
+
+      if (!projects || projects.length === 0) {
+        container.innerHTML = '<p class="empty-state-message">Aucun autre projet pour ce client</p>';
+        return;
+      }
+
+      // Calculate aggregated stats
+      const projectCount = projects.length;
+      const totalValue = projects.reduce((sum, p) => sum + (p.projectValue || 0), 0);
+      const firstProject = projects[projects.length - 1]; // Oldest (array is sorted newest first)
+
+      let html = `
+        <!-- Customer Summary Stats -->
+        <div style="background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <h4 style="margin: 0 0 15px 0; color: var(--primary-dark); display: flex; align-items: center; gap: 8px;">
+            👤 Résumé client
+          </h4>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;">
+            <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <div style="font-size: 24px; font-weight: 600; color: var(--primary);">${projectCount}</div>
+              <div style="font-size: 12px; color: #666; text-transform: uppercase;">Projet${projectCount > 1 ? 's' : ''}</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <div style="font-size: 24px; font-weight: 600; color: var(--success);">${formatCurrency(totalValue)}</div>
+              <div style="font-size: 12px; color: #666; text-transform: uppercase;">Valeur totale</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <div style="font-size: 16px; font-weight: 600; color: #666;">${firstProject.quoteDate || 'N/A'}</div>
+              <div style="font-size: 12px; color: #666; text-transform: uppercase;">Premier contact</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects List -->
+        <h4 style="margin: 0 0 15px 0; color: #333;">Tous les projets</h4>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+      `;
+
+      projects.forEach(project => {
+        const isCurrent = project.row === selectedClientRow;
+        const statusDot = getStatusDot(project.status);
+        const borderColor = isCurrent ? 'var(--primary)' : 'var(--gray-border)';
+        const bgColor = isCurrent ? '#e8f5e9' : 'white';
+
+        html += `
+          <div style="
+            background: ${bgColor};
+            border: 2px solid ${borderColor};
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: ${isCurrent ? 'default' : 'pointer'};
+            transition: all 0.2s;
+            ${isCurrent ? '' : 'hover: { box-shadow: 0 4px 8px rgba(0,0,0,0.1); }'}
+          " ${isCurrent ? '' : `onclick="navigateToProject(${project.row})"`}>
+            <div style="flex-shrink: 0; font-size: 20px;">${statusDot}</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: 500; color: #333; margin-bottom: 4px;">
+                ${project.quoteNumber ? escapeHtml(project.quoteNumber) : 'Sans devis'}
+                ${isCurrent ? '<span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 8px;">Actuel</span>' : ''}
+              </div>
+              <div style="font-size: 13px; color: #666;">
+                ${project.workType ? escapeHtml(project.workType.split('(')[0].trim()) : 'Type non défini'}
+                ${project.quoteDate ? ' • ' + project.quoteDate : ''}
+              </div>
+            </div>
+            <div style="text-align: right; flex-shrink: 0;">
+              <div style="font-weight: 500; color: ${project.projectValue ? 'var(--success)' : '#999'};">
+                ${project.projectValue ? formatCurrency(project.projectValue) : '—'}
+              </div>
+              <div style="font-size: 12px; color: #888;">${escapeHtml(project.status || 'Nouveau')}</div>
+            </div>
+            ${isCurrent ? '' : '<div style="color: #999; font-size: 18px;">→</div>'}
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    /**
+     * Navigate to a different project row
+     */
+    function navigateToProject(row) {
+      selectClient(row);
+      switchTab('project');
     }
 
     /**

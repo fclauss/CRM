@@ -669,6 +669,28 @@
     </div>
   </div>
 
+  <!-- Recurring Customer Dialog -->
+  <div class="modal-overlay" id="recurring-customer-modal">
+    <div class="modal-content">
+      <div class="modal-icon">👤</div>
+      <h3 class="modal-title">Client existant detecte</h3>
+      <div class="modal-text" id="recurring-customer-info">
+        <!-- Dynamically populated -->
+      </div>
+      <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="createNewProjectForExistingCustomer()">
+          📋 Nouveau projet pour ce client
+        </button>
+        <button class="btn btn-secondary" onclick="createAsNewCustomer()">
+          ➕ Creer comme nouveau client
+        </button>
+        <button class="btn btn-secondary" onclick="closeRecurringCustomerModal()">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="toast" id="toast"></div>
 
@@ -678,6 +700,7 @@
     // ==========================================================================
     const STORAGE_KEY = 'styleetmatiere_pending_forms';
     let pendingFormData = null;
+    let recurringCustomerData = null; // Stores detected recurring customer info
 
     // ==========================================================================
     // INITIALIZATION
@@ -833,8 +856,11 @@
 
     /**
      * Submit form to server
+     * @param {Object} formData - Form data to submit
+     * @param {Object} options - Optional settings (forceNew: true to skip recurring check)
      */
-    function submitForm(formData) {
+    function submitForm(formData, options) {
+      options = options || {};
       const submitBtn = document.getElementById('submit-btn');
       const submitText = document.getElementById('submit-text');
 
@@ -850,6 +876,13 @@
 
           if (result.success) {
             showSuccessMessage();
+          } else if (result.isRecurringCustomer) {
+            // Recurring customer detected - show modal
+            recurringCustomerData = {
+              existingCustomer: result.existingCustomer,
+              formData: result.formData
+            };
+            showRecurringCustomerModal(result.existingCustomer);
           } else {
             showToast(result.error || 'Une erreur est survenue', 'error');
           }
@@ -866,7 +899,7 @@
             showToast('Erreur: ' + error.message, 'error');
           }
         })
-        .submitContactForm(formData);
+        .submitContactForm(formData, options);
     }
 
     /**
@@ -950,6 +983,102 @@
         showToast('Toujours hors ligne', 'error');
         setTimeout(showOfflineModal, 500);
       }
+    }
+
+    // ==========================================================================
+    // RECURRING CUSTOMER MODAL
+    // ==========================================================================
+
+    /**
+     * Show recurring customer modal with customer info
+     */
+    function showRecurringCustomerModal(customer) {
+      const infoDiv = document.getElementById('recurring-customer-info');
+
+      // Build customer info display
+      let html = '<div style="text-align: left; padding: 10px; background: #f5f7fa; border-radius: 8px; margin-bottom: 15px;">';
+      html += '<strong>' + escapeHtml(customer.customerName) + '</strong><br>';
+      html += '<span style="color: #666;">a deja ' + customer.projectCount + ' projet(s)</span><br>';
+
+      if (customer.lastProject && customer.lastProject.quoteNumber) {
+        html += '<span style="font-size: 13px; color: #888;">';
+        html += 'Dernier devis: ' + escapeHtml(customer.lastProject.quoteNumber);
+        if (customer.lastProject.status) {
+          html += ' (' + escapeHtml(customer.lastProject.status) + ')';
+        }
+        html += '</span>';
+      }
+      html += '</div>';
+      html += '<p style="margin: 0; color: #666;">Que souhaitez-vous faire ?</p>';
+
+      infoDiv.innerHTML = html;
+      document.getElementById('recurring-customer-modal').classList.add('visible');
+    }
+
+    /**
+     * Close recurring customer modal
+     */
+    function closeRecurringCustomerModal() {
+      document.getElementById('recurring-customer-modal').classList.remove('visible');
+      recurringCustomerData = null;
+    }
+
+    /**
+     * Create new project for existing customer
+     * Uses contact info from the most recent row
+     */
+    function createNewProjectForExistingCustomer() {
+      if (!recurringCustomerData) {
+        showToast('Erreur: donnees client introuvables', 'error');
+        closeRecurringCustomerModal();
+        return;
+      }
+
+      const submitBtn = document.getElementById('submit-btn');
+      const submitText = document.getElementById('submit-text');
+
+      // Close modal and show loading
+      closeRecurringCustomerModal();
+      submitBtn.disabled = true;
+      submitText.innerHTML = '<span class="spinner"></span> Creation du projet...';
+
+      // Call server to create new project for existing customer
+      google.script.run
+        .withSuccessHandler(function(result) {
+          submitBtn.disabled = false;
+          submitText.textContent = 'Envoyer ma demande';
+
+          if (result.success) {
+            showSuccessMessage();
+          } else {
+            showToast(result.error || 'Erreur lors de la creation', 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          submitBtn.disabled = false;
+          submitText.textContent = 'Envoyer ma demande';
+          showToast('Erreur: ' + error.message, 'error');
+        })
+        .createProjectForExistingCustomer(
+          recurringCustomerData.formData,
+          recurringCustomerData.existingCustomer.mostRecentRow
+        );
+    }
+
+    /**
+     * Create as new customer (skip recurring check)
+     */
+    function createAsNewCustomer() {
+      if (!recurringCustomerData) {
+        showToast('Erreur: donnees formulaire introuvables', 'error');
+        closeRecurringCustomerModal();
+        return;
+      }
+
+      closeRecurringCustomerModal();
+
+      // Resubmit with forceNew option
+      submitForm(recurringCustomerData.formData, { forceNew: true });
     }
 
     // ==========================================================================
