@@ -43,3 +43,6 @@ Claude.local.md
 .env.local
 node_modules/
 package-lock.json
+
+# Claude Code worktrees (local only)
+.claude/worktrees/

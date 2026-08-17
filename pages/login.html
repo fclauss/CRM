@@ -302,13 +302,16 @@
       // Get the webapp URL and navigate in top window to trigger OAuth
       // Google Apps Script webapps run in an iframe, so we need top.location
       const currentUrl = window.location.href.split('?')[0]; // Base URL without params
+      const destination = currentUrl + '?page=dashboard';
+
+      // Route through Google AccountChooser so the user can pick which account to use
+      const accountChooserUrl = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent(destination);
 
       setTimeout(() => {
-        // Try to navigate the top window (breaks out of iframe)
         if (window.top !== window.self) {
-          window.top.location.href = currentUrl + '?page=dashboard';
+          window.top.location.href = accountChooserUrl;
         } else {
-          window.location.href = currentUrl + '?page=dashboard';
+          window.location.href = accountChooserUrl;
         }
       }, 500);
     }
